@@ -1237,7 +1237,6 @@ public class BaseVisitor extends SQLBaseVisitor {
 
 
 
-
         // return arg;
         return temp;
     }
@@ -1979,11 +1978,13 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         for(int i =0 ; i<ctx.children.size(); i++)
         {
-            if( ctx.instructions(i) != null){
-                function_body.addInstraction(visitInstructions(ctx.instructions(i)));
+            if( ctx.children.get(i) instanceof SQLParser.InstructionsContext ){
+
+                function_body.addNode(visitInstructions((SQLParser.InstructionsContext)ctx.children.get(i)));
+
             }
-            else if (ctx.sub_function_body(i) != null) {
-                Sub_function_body(ctx.sub_function_body(i),function_body);
+            else if (ctx.children.get(i) instanceof SQLParser.Sub_function_bodyContext) {
+                function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext)ctx.children.get(i)));
             }
         }
         Main.showSymboleTable();
@@ -2029,19 +2030,27 @@ public class BaseVisitor extends SQLBaseVisitor {
         return s;
 
      }*/
-    public void Sub_function_body (SQLParser.Sub_function_bodyContext ctx , function_body function_body){
+    @Override
+    public sub_function_body visitSub_function_body(SQLParser.Sub_function_bodyContext ctx){
         sub_function_body sub_function_body = new sub_function_body();
-        for (int i = 0; i < ctx.children.size() ; i++) {
-            if(ctx.instructions(i) != null)
-            {
-                function_body.addInstraction(visitInstructions(ctx.instructions(i)));
+        System.out.println("visit Sub function body");
+
+        Scope fucntionScope = new Scope();
+        Scope currentScope = Main.symbolTable.getScopes().get(Main.symbolTable.getScopes().size() - 1);
+        fucntionScope.setParent(currentScope);
+        Main.symbolTable.addScope(fucntionScope);
+
+        for ( int i = 0;i < ctx.children.size() ; i++)
+            if( ctx.children.get(i) instanceof SQLParser.InstructionsContext ){
+                sub_function_body.addNode(visitInstructions((SQLParser.InstructionsContext)ctx.children.get(i)));
             }
-            else if(ctx.sub_function_body(i) != null){
-                Sub_function_body(ctx.sub_function_body(i),function_body);
+            else if (ctx.children.get(i) instanceof SQLParser.Sub_function_bodyContext) {
+                sub_function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext)ctx.children.get(i)));
             }
 
-        }
+        return sub_function_body;
     }
+
     @Override
     public instructions visitFunctional_instruction(SQLParser.Functional_instructionContext ctx) {
         functional_instuctions instructions = new functional_instuctions();
@@ -2180,7 +2189,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     }
 
     @Override
-    public instructions visitIf_else_rule(SQLParser.If_else_ruleContext ctx) { //todo the visite return rule
+    public instructions visitIf_else_rule(SQLParser.If_else_ruleContext ctx) {
         System.out.println("visit if rule");
         if_else ins = new if_else();
         ins.setInstrucation_name(if_else.class.getName());
@@ -2230,6 +2239,12 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
                     ins.add_Else_if_rule_in_if(else_if_rule);
                     System.out.println("else if:" + ins.getElse_if());
 
+                    Scope elseifScop = new Scope();
+                    String elseifeName = ctx.else_if_rule().get(i).K_ELSE_IF().getText() + ctx.else_if_rule().get(i).hashCode();
+                    currentScope.setId(elseifeName);
+                    currentScope.setParent(parentScope);
+                    scopesStack.push(elseifScop);
+
                     for (int j = 0; j < ctx.else_if_rule().get(i).instructions().size(); j++) {
 
                         else_if_rule.addinstruction(visitInstructions(ctx.else_if_rule().get(i).instructions().get(j)));
@@ -2245,7 +2260,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
                         //System.out.println("****************the id for object exiting loop "+e.toString());
 
                     }
-
+                   Main.symbolTable.addScope(scopesStack.pop());
                 }
 
             }
@@ -2254,10 +2269,18 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
                 else_rule else_rule = new else_rule();
                 ins.setElse_rule(else_rule);
                 System.out.println("else :" + ins.getElse_rule());
+
+                Scope elseScope = new Scope();
+                String elseName = ctx.else_rulse().K_ELSE().getText() + ctx.else_rulse().hashCode();
+                currentScope.setId(elseName);
+                currentScope.setParent(parentScope);
+                scopesStack.push(elseScope);
+
                 for (int i = 0; i < ctx.else_rulse().instructions().size(); i++) {
                     else_rule.addinstruction(visitInstructions(ctx.else_rulse().instructions(i)));
 
                 }
+
             /*if(ctx.else_rulse().returning_in_if()!=null)
                 ins.setR(visitReturning_in_if(ctx.else_rulse().returning_in_if()));*/
                 if (ctx.else_rulse().return_rule() != null) {
@@ -2267,6 +2290,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
                     e.setR(r);
                     ins.setLoop(e);
                 }
+                Main.symbolTable.addScope(scopesStack.pop());
 
             }
         }
