@@ -1,1 +1,12 @@
-sssss
+func(){
+var x = y  ;
+if(z){
+var zozo ;
+if(n){
+var soso ;
+}
+}else if (hoho){var hohoson;}
+else if(hoho2){var hoho2son;}
+else{var elseson;
+}
+}
