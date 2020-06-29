@@ -15,7 +15,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import org.*;
+
 
 //import javax.json.*;
 import java.io.File;
@@ -36,7 +36,7 @@ public class Main {
 
 
 
-            File file = new File("../../samples/samples.txt");
+            File file = new File("C://Users//Dell//Desktop//Compiler_myBranch//Compiler_s2/samples//samples.txt");
             String fileName = file.getAbsolutePath();
 
             CharStream cs = fromFileName(fileName);

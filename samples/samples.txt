@@ -1,9 +1,1 @@
-func(){
-var x = y + u - i % 2 ;
-if(z){
-var zozo ;
-if(n){
-var soso ;
-}
-}
-}
+sssss
