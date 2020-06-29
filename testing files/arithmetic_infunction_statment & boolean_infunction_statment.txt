@@ -1,0 +1,60 @@
+arithmetic_infunction_statment
+    : IDENTIFIER (any_oprator)? ASSIGN
+                                    ((IDENTIFIER
+                                    | NUMERIC_LITERAL
+                                    | IDENTIFIER any_oprator NUMERIC_LITERAL
+                                    | NUMERIC_LITERAL any_oprator IDENTIFIER
+                                    | IDENTIFIER any_oprator IDENTIFIER
+                                    | NUMERIC_LITERAL any_oprator NUMERIC_LITERAL)
+                                    ( any_oprator IDENTIFIER
+                                    | any_oprator NUMERIC_LITERAL)*
+                                    )
+    | IDENTIFIER MINUS MINUS
+    | '-' '-' IDENTIFIER
+    | IDENTIFIER PLUS PLUS
+    | PLUS PLUS IDENTIFIER
+
+ ;
+ boolean_infunction_statment
+    : boolean_expr
+    | boolean_expr ((PIPE2 | AMP2 ) boolean_expr)*
+
+
+    //| IDENTIFIER any_boolean_oprator NUMERIC_LITERAL ((PIPE2 | AMP2 )(boolean_infunction_statment))*
+    //| NUMERIC_LITERAL any_boolean_oprator (IDENTIFIER
+    //                                      | NUMERIC_LITERAL
+    //                                      | OPEN_PAR boolean_infunction_statment CLOSE_PAR)
+    //                                      ((PIPE2 | AMP2 )(boolean_infunction_statment))*
+    //| NUMERIC_LITERAL any_boolean_oprator NUMERIC_LITERAL ((PIPE2 | AMP2 )(boolean_infunction_statment))*
+   // | '('boolean_infunction_statment')' (IDENTIFIER | boolean_infunction_statment )
+   // | (IDENTIFIER | boolean_infunction_statment ) '('boolean_infunction_statment')'
+ ;
+ minus_minus
+    : MINUS
+    ;
+boolean_expr
+    : K_TRUE
+    | K_FALSE
+    | (IDENTIFIER | NUMERIC_LITERAL ) any_boolean_oprator ( IDENTIFIER | NUMERIC_LITERAL )
+    | OPEN_PAR (boolean_expr | arithmetic_infunction_statment) CLOSE_PAR any_boolean_oprator (IDENTIFIER | NUMERIC_LITERAL  )
+    | (IDENTIFIER | NUMERIC_LITERAL ) any_boolean_oprator OPEN_PAR (boolean_expr | arithmetic_infunction_statment) CLOSE_PAR
+    | (OPEN_PAR (boolean_expr | arithmetic_infunction_statment) CLOSE_PAR ) any_boolean_oprator OPEN_PAR (boolean_expr | arithmetic_infunction_statment) CLOSE_PAR
+    ;
+any_boolean_oprator
+    : EQ
+    | GT
+    | GT_EQ
+    | LT
+    | LT_EQ
+    | NOT_EQ1
+
+;
+
+ any_oprator
+    : STAR
+    | DIV
+    | PWOER
+    | MOD
+    | PLUS
+    | MINUS
+    ;

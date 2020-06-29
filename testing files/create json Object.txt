@@ -1,0 +1,26 @@
+var json  bb = {
+name : "jhone",
+aas:num[]={1,2,3},
+sas :[{cat: "joli" , last : "AILSON" },{dog: "Restel" , last : "kaloni" }],
+age : 50,
+asd:str[]={"mohammad","JEHAD","NARGES"},
+nn : true , 
+vv : 'x'
+}
+
+
+var json vv ={
+name : "jhone",
+age : 50,
+nn : true , 
+vv : 'x',
+car : {
+xx : 'j',
+xx : 10,
+xx : "kjjj;lk",
+xx : {
+z: null
+},
+yy:{}
+}
+ }

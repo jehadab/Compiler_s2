@@ -1,0 +1,41 @@
+        int a[] = {1,1};
+        int t[] = a ;
+        int j[] = {2 ,2 };
+
+        int x =4 , y = 2 , z = -1;
+        int tt = x += y %= x<2 ? 2 : 3;
+        boolean b = true;
+        x = z + (y = 5);
+
+                if(x > (y = 10)){}
+        System.out.println();
+        x = x - - x ;
+
+
+        if(b = true )
+        x = x + (x +=   2 );
+
+        b &= true;
+
+        switch (x = 2){
+
+        }
+
+        b = 5 + y > 2;
+
+        x =(1<2) ? 3 :2 ;
+
+        if ( true);
+
+
+    for(  z =  x < 2 || true ? 1 : 3 ; 2<(x =  x > 4 ? 3 : 4) ; x = x < 2 ? 1 : 3 )
+        {
+
+        }
+        while (b = x > 2)
+        if(b = true){
+            if (false){
+                break;
+            }
+        }
+    }

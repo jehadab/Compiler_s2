@@ -1,0 +1,368 @@
+- print () ;
+
+-break;
+
+-continue;
+
+-foreach can take var without []
+
+-subquerry
+----------------------------------
+notes for antlr file
+ arithmetic_infunction_statment
+     : arithmetic_expr
+     | shortcut_statments
+    // |one_line_if_statment_rule
+the rule "one_line_if_statment_rule" in commeted still do not why ?
+
+-----------------------------------------------------------
+ /*
+
+    ArrayList<SQLParser.expressionContext> arithmetic_expr_tree = new ArrayList<>();
+    ArrayList<SQLParser.Arithmetic_exprContext> arithmetic_expr_tree_op = new ArrayList<>();
+    Stack<SQLParser.Boolean_exprContext> boolean_expr_tree = new Stack<>();
+    @Override
+    public Arithmatic_expr  visitArithmetic_expr(SQLParser.Arithmetic_exprContext ctx) {
+        System.out.println("visit artmatic EXPR");
+        Arithmatic_expr arithmatic_expr = new Arithmatic_expr();
+
+
+        DFS_arthmatic_expr(ctx);
+        arithmatic_expr =  Arithmatics( arithmatic_expr );
+
+        expression_algorthim(ctx);
+
+        for (int i = 0; i < arithmatic_expr.getArithmatic_exprs_list().size(); i++) {
+            if(arithmatic_expr.getArithmatic_exprs_list().get(i).getTermenal_node() != null)
+                System.out.print(arithmatic_expr.getArithmatic_exprs_list().get(i).getTermenal_node() + " ");
+            else if (arithmatic_expr.getArithmatic_exprs_list().get(i).getVariable_name() != null)
+                System.out.print(arithmatic_expr.getArithmatic_exprs_list().get(i).getVariable_name()+ " ");
+        }
+        for (int i = 0; i < arithmatic_expr.getArithmatic_exprs_list().size(); i++) {
+            if(arithmatic_expr.getArithmatic_exprs_list().get(i).getTermenal_node() != null)
+                System.out.print(arithmatic_expr.getArithmatic_exprs_list().get(i).getTermenal_node() + " " );
+            if(arithmatic_expr.getArithmatic_exprs_list().get(i).getVariable_name() != null)
+                System.out.print(arithmatic_expr.getArithmatic_exprs_list().get(i).getVariable_name()+ " ");
+        }
+
+        while (!arithmetic_expr_tree.isEmpty())
+        {
+
+            SQLParser.Arithmetic_exprContext temp = arithmetic_expr_tree.pop();
+            Arithmatic_expr termenal_expr = new Arithmatic_expr();
+
+            if(temp.arithmetic_expr(0) == null){
+                if(temp.NUMERIC_LITERAL() != null){
+                    termenal_expr.setTermenal_node(temp.NUMERIC_LITERAL().toString());
+                    System.out.println("number :" +termenal_expr.getTermenal_node());
+                }
+                else if(temp.varible_name().use_random_name().RANDOM_NAME() != null){
+                    termenal_expr.setTermenal_node(temp.varible_name().use_random_name().RANDOM_NAME().getText());
+                    System.out.println("var :" +termenal_expr.getTermenal_node());
+                }
+                arithmatic_expr.getArithmatic_exprs_list().add(termenal_expr);
+            }
+            System.out.println();
+        }
+                  return arithmatic_expr;
+
+    }
+    public boolean fill_arth_expr(SQLParser.Arithmetic_exprContext ctx , int level ,HashSet visited ){
+        if(ctx == null) {
+            return false;
+        }
+        if(level == 1 )
+        {
+            System.out.println(level+"------------- :" + ctx.getText());
+
+
+
+
+            arithmetic_expr_tree.add(ctx);
+
+                return true;
+
+        }
+        //if(ctx.children.get(0).getClass().getName() != "SQLParser.Arithmetic_exprContext")return false;
+
+        boolean left = fill_arth_expr(ctx.arithmetic_expr(1), level - 1 ,visited);
+        boolean right = fill_arth_expr(ctx.arithmetic_expr(0), level - 1 , visited);
+        return left || right;
+    }
+    public void DFS_arthmatic_expr (SQLParser.Arithmetic_exprContext ctx  )
+    {
+        int level = 1 ;
+
+        System.out.println("niggars :"+ctx.getChildCount());
+        System.out.println("niggarsD :"+ctx.depth());
+        System.out.println("niggarsc :" + ctx.children);
+        System.out.println("niggars0 :" + ctx.arithmetic_expr(0).getText());
+        System.out.println("niggars1 :" + ctx.arithmetic_expr(1).getText());
+        String x = ((SQLParser.Arithmetic_exprContext)ctx.children.toArray()[0]).getText();
+
+
+        HashSet<SQLParser.Arithmetic_exprContext> visited = new HashSet<SQLParser.Arithmetic_exprContext>();
+        while(fill_arth_expr(ctx , level , visited)){
+            //System.out.println("enter t");
+            level++;
+        }
+    }
+
+
+    private Arithmatic_expr Arithmatics( Arithmatic_expr arithmatic_expr){
+        for (int i = 0; i <arithmetic_expr_tree.size(); i++) {
+
+
+           SQLParser.Arithmetic_exprContext arithmetic_exprContext = arithmetic_expr_tree.get(i);
+           arithmetic_expr_tree.remove(i);
+
+            Arithmatic_expr termenal_expr = new Arithmatic_expr();
+                if(arithmetic_exprContext.NUMERIC_LITERAL() != null){
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.NUMERIC_LITERAL().toString());
+                    System.out.println("number :" +termenal_expr.getTermenal_node());
+                }
+                else if(arithmetic_exprContext.varible_name() != null){
+                    termenal_expr.setVariable_name(visitUse_random_name(arithmetic_exprContext.varible_name().use_random_name()));
+                    System.out.println("var :" +termenal_expr.getVariable_name());
+                }
+                else if(arithmetic_exprContext.IDENTIFIER() != null){
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.IDENTIFIER().getText());
+                    System.out.println("IDENTIFIER :" +termenal_expr.getTermenal_node());
+                }
+                else if(arithmetic_exprContext.call_function() != null){
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.call_function().getText());
+                    System.out.println("Call Function :" +termenal_expr.getTermenal_node());
+                }
+                else if(arithmetic_exprContext.ONE_CHAR_LETTER() != null){
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.ONE_CHAR_LETTER().getText());
+                    System.out.println("ONE_CHAR_LETTER" +termenal_expr.getTermenal_node());
+                }
+                else if(arithmetic_exprContext.varible_from_object() != null){
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.varible_from_object().getText());
+                    System.out.println("varible_from_object" +termenal_expr.getTermenal_node());
+                }
+                else if(arithmetic_exprContext.array_base_form_with_index() != null){
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.array_base_form_with_index().getText());
+                    System.out.println("array_base_form_with_index" +termenal_expr.getTermenal_node());
+                }
+
+
+
+                else if(arithmetic_exprContext.PLUS() != null ) {
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.PLUS().toString());
+                    System.out.println("opretor :"+termenal_expr.getTermenal_node());
+                }
+                else if (arithmetic_exprContext.MINUS() != null)
+                {
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.MINUS().toString());
+                    System.out.println("opretor :"+termenal_expr.getTermenal_node());
+                }
+                else if (arithmetic_exprContext.STAR() != null)
+                {
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.STAR().toString());
+                    System.out.println("opretor :"+termenal_expr.getTermenal_node());
+
+                }
+                else if (arithmetic_exprContext.DIV() != null)
+                {
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.DIV().toString());
+                    System.out.println("opretor :"+termenal_expr.getTermenal_node());
+
+                }
+                else if (arithmetic_exprContext.POWER() != null)
+                {
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.POWER().toString());
+                    System.out.println("opretor :"+termenal_expr.getTermenal_node());
+
+                }
+                else if (arithmetic_exprContext.MOD() != null)
+                {
+                    termenal_expr.setTermenal_node(arithmetic_exprContext.MOD().toString());
+                    System.out.println("opretor :"+termenal_expr.getTermenal_node());
+
+                }
+                arithmatic_expr.getArithmatic_exprs_list().add(termenal_expr);
+
+       }
+
+
+
+        return arithmatic_expr;
+    }
+
+    @Override
+    public full_arthmatic_statmint visitFull_arthmatic_statmint(SQLParser.Full_arthmatic_statmintContext ctx) {
+
+        System.out.println("visit Full arthmatic statmint ");
+        full_arthmatic_statmint full_arthmatic_statmint = new full_arthmatic_statmint();
+
+        for (int i = 0; i < ctx.use_random_name().size() ; i++) {
+        if(ctx.use_random_name() != null){
+             full_arthmatic_statmint.getUse_random_name().add(visitUse_random_name(ctx.use_random_name().get(i)));
+             System.out.println("var :" + full_arthmatic_statmint.getUse_random_name().get(i));
+            }
+        }
+        for (int i = 0; i < ctx.array_base_form_with_index().size() ; i++) {
+            if (ctx.array_base_form_with_index() != null) {
+                full_arthmatic_statmint.getArray_base_form_with_index().add(visitArray_base_form_with_index(ctx.array_base_form_with_index(i)));
+                System.out.println(full_arthmatic_statmint.getArray_base_form_with_index().get(i));
+            }
+        }
+        for (int i = 0; i < ctx.varible_from_object().size() ; i++) {
+            if (ctx.varible_from_object() != null) {
+                full_arthmatic_statmint.getVarible_from_object().add(visitVarible_from_object(ctx.varible_from_object(i)));
+                System.out.println(full_arthmatic_statmint.getVarible_from_object().get(i));
+            }
+        }
+        for (int i = 0; i < ctx.any_arithmetic_oprator().size() ; i++) {
+            if (ctx.varible_from_object() != null) {
+                full_arthmatic_statmint.getAny_arithmetic_oprator().add(ctx.any_arithmetic_oprator(i).getText());
+                System.out.println("oprator :"+full_arthmatic_statmint.getAny_arithmetic_oprator().get(i));
+            }
+        }
+        full_arthmatic_statmint.setArithmatic_expr(visitArithmetic_expr(ctx.arithmetic_expr()));
+
+        return full_arthmatic_statmint;
+    }
+
+    @Override
+    public arithmetic_infunction_statment visitArithmetic_infunction_statment(SQLParser.Arithmetic_infunction_statmentContext ctx) {
+        System.out.println("visit Arithmetic infunction statment");
+        arithmetic_infunction_statment arithmetic_infunction_statment = new arithmetic_infunction_statment();
+        if(ctx.full_arthmatic_statmint() != null) {
+            arithmetic_infunction_statment.setFull_arthmatic_statmint(visitFull_arthmatic_statmint(ctx.full_arthmatic_statmint()));
+        }
+        else if(ctx.shortcut_statments() != null) {
+            arithmetic_infunction_statment.setShortcut_instruction(ctx.shortcut_statments().getText());
+            System.out.println(arithmetic_infunction_statment.getShortcut_instruction());
+        }
+
+        return arithmetic_infunction_statment;
+    }
+
+    @Override
+    public Boolean_Expr  visitBoolean_expr(SQLParser.Boolean_exprContext ctx) {
+        System.out.println("visit Boolean EXPR");
+        Boolean_Expr boolean_expr = new Boolean_Expr();
+        DFS_boolean_expr(ctx  );
+        boolean_expr =  booleans( boolean_expr );
+
+        return boolean_expr;
+
+    }
+
+    private void DFS_boolean_expr (SQLParser.Boolean_exprContext ctx )
+    {
+        int level = 1 ;
+        HashSet<SQLParser.Arithmetic_exprContext> visited = new HashSet<SQLParser.Arithmetic_exprContext>();
+        while(fill_boolean_expr_tree(ctx , level , visited)){
+            //System.out.println("enter t");
+            level++;
+        }
+    }
+
+    private boolean fill_boolean_expr_tree(SQLParser.Boolean_exprContext ctx , int level ,HashSet visited ){
+        if(ctx == null) {
+            return false;
+        }
+        if(level == 1)
+        {
+            boolean_expr_tree.add(ctx);
+            return true;
+        }
+
+        boolean left = fill_boolean_expr_tree(ctx.boolean_expr(0), level - 1 ,visited);
+        boolean right = fill_boolean_expr_tree(ctx.boolean_expr(1), level - 1 , visited);
+        return left || right;
+    }
+
+    private Boolean_Expr booleans( Boolean_Expr boolean_expr){
+        while (!boolean_expr_tree.isEmpty())
+        {
+            SQLParser.Boolean_exprContext boolean_exprContext = boolean_expr_tree.pop();
+            Boolean_Expr termenal_expr = new Boolean_Expr();
+            if(boolean_exprContext.NUMERIC_LITERAL() != null){
+                termenal_expr.setTermenal_node(boolean_exprContext.NUMERIC_LITERAL().toString());
+                System.out.println("number :" +termenal_expr.getTermenal_node());
+            }
+            else if(boolean_exprContext.use_random_name() != null){
+                termenal_expr.setVariable_name(visitUse_random_name(boolean_exprContext.use_random_name()));
+                System.out.println("var :" +termenal_expr.getVariable_name());
+            }
+            else if(boolean_exprContext.IDENTIFIER() != null){
+                termenal_expr.setTermenal_node(boolean_exprContext.IDENTIFIER().getText());
+                System.out.println("IDENTIFIER :" +termenal_expr.getTermenal_node());
+            }
+            else if(boolean_exprContext.ONE_CHAR_LETTER() != null){
+                termenal_expr.setTermenal_node(boolean_exprContext.ONE_CHAR_LETTER().getText());
+                System.out.println("ONE_CHAR_LETTER" +termenal_expr.getTermenal_node());
+            }
+            else if(boolean_exprContext.varible_from_object() != null){
+                termenal_expr.getVariablefromobjects().add(visitVarible_from_object(boolean_exprContext.varible_from_object()));
+                System.out.println("varible_from_object" +termenal_expr.getVariablefromobjects());
+            }
+            else if(boolean_exprContext.array_base_form_with_index() != null){
+                termenal_expr.getArray_base_fom_with_indices().add(visitArray_base_form_with_index(boolean_exprContext.array_base_form_with_index()));
+                System.out.println("array_base_form_with_index" +termenal_expr.getArray_base_fom_with_indices());
+            }
+            else if (boolean_exprContext.arithmetic_expr() != null)
+            {
+                termenal_expr.setArithmatic_expr(visitArithmetic_expr(boolean_exprContext.arithmetic_expr()));
+            }
+
+
+            else if(boolean_exprContext.EQ() != null ) {
+                termenal_expr.setTermenal_node(boolean_exprContext.EQ().toString());
+                System.out.println("opretor :"+termenal_expr.getTermenal_node());
+            }
+            else if (boolean_exprContext.NOT_EQ1() != null)
+            {
+                termenal_expr.setTermenal_node(boolean_exprContext.NOT_EQ1().toString());
+                System.out.println("opretor :"+termenal_expr.getTermenal_node());
+
+            }
+            else if (boolean_exprContext.GT_EQ() != null)
+            {
+                termenal_expr.setTermenal_node(boolean_exprContext.GT_EQ().toString());
+                System.out.println("opretor :"+termenal_expr.getTermenal_node());
+            }
+            else if (boolean_exprContext.LT_EQ() != null)
+            {
+                termenal_expr.setTermenal_node(boolean_exprContext.LT_EQ().toString());
+                System.out.println("opretor :"+termenal_expr.getTermenal_node());
+
+            }
+            else if (boolean_exprContext.GT() != null)
+            {
+                termenal_expr.setTermenal_node(boolean_exprContext.GT().toString());
+                System.out.println("opretor :"+termenal_expr.getTermenal_node());
+
+            }
+            else if (boolean_exprContext.LT() != null)
+            {
+                termenal_expr.setTermenal_node(boolean_exprContext.LT().toString());
+                System.out.println("opretor :"+termenal_expr.getTermenal_node());
+
+            }
+            boolean_expr.getBoolean_exprs_list().add(termenal_expr);
+        }
+        return boolean_expr;
+    }
+
+    @Override
+    public Boolean_Infunction_Statment visitBoolean_infunction_statment(SQLParser.Boolean_infunction_statmentContext ctx) {
+        System.out.println("visit Boolean infunction statment");
+        Boolean_Infunction_Statment boolean_infunction_statment = new Boolean_Infunction_Statment();
+
+        if(ctx != null)
+        {
+            for (int i = 0; i <ctx.boolean_expr().size() ; i++) {
+                if(ctx.boolean_expr(i) != null)
+                    boolean_infunction_statment.getBoolean_exprs().add(visitBoolean_expr(ctx.boolean_expr(i)));
+            }
+        }
+
+        return boolean_infunction_statment;
+    }
+    */
+

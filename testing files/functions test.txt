@@ -1,0 +1,18 @@
+DEFULTE PARAMETER:        sum(var a , var b , var c=9 , var d=9 , var a=9 )
+  
+_______________________________________________________________________
+FUNCTION HEADER WITH CALL BACK:          
+sam(var ashdh,var dasda[] [] , cam(var dsa , var sp[]){
+};
+,var dada){
+};
+________________________________________________________
+
+sam(var ashdh ,var saa[], cam(var dsa , var sp[][]){
+};
+,var dada,var a=4){
+};
+
+_______________________________________________
+call function: 
+sum(2,'x',"moho",sap[][]={1,2,3},sa)
