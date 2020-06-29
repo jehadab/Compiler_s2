@@ -1940,6 +1940,15 @@ public class BaseVisitor extends SQLBaseVisitor {
         creatvaribelwihtout.setN(visitUse_random_name(ctx.varible_name().use_random_name()));
         creatvaribelwihtout.setInstrucation_name(creatingvariabelwithoutassing.class.getName());
 
+        Scope currentScope =  scopesStack.peek();
+        Symbol variableSymbol = new Symbol();
+        variableSymbol.setIsParam(false);
+        String name = ctx.varible_name().use_random_name().getText();
+        variableSymbol.setName(name);
+        variableSymbol.setScope(currentScope);
+//        variableSymbol.setType(); //todo add type
+        currentScope.addSymbol(name , variableSymbol);
+
         return  creatvaribelwihtout;
 
     }
@@ -2055,7 +2064,13 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         if(ctx.while_rule() != null)
         {
+            Scope whileScope = new Scope();
+            whileScope.setParent(scopesStack.peek());
+            whileScope.setId(ctx.while_rule().K_WHILE() +"_"+ ctx.while_rule().hashCode());
+
             instructions =  visitWhile_rule(ctx.while_rule());
+            scopesStack.push(whileScope);
+
             if(ctx.instructions().size()!=0) {
                 for (int i = 0; i < ctx.instructions().size(); i++) {
                     instructions.getInstructions().add(visitInstructions(ctx.instructions(i)));
@@ -2067,10 +2082,18 @@ public class BaseVisitor extends SQLBaseVisitor {
             {
                 visitExiting_loops(ctx.exiting_loops());
             }
+            Main.symbolTable.addScope(scopesStack.pop());
 
         }
         else if(ctx.foreach() != null) {
+
+            Scope foreachScope = new Scope();
+            foreachScope.setParent(scopesStack.peek());
+            foreachScope.setId(ctx.foreach().K_FOREACH().getText() + "_"+ ctx.foreach().hashCode());
+
             instructions = visitForeach(ctx.foreach());
+            scopesStack.push(foreachScope);
+
             for (int i = 0; i < ctx.instructions().size(); i++) {
                 instructions.getInstructions().add(visitInstructions(ctx.instructions(i)));
 
@@ -2080,8 +2103,17 @@ public class BaseVisitor extends SQLBaseVisitor {
                 visitExiting_loops(ctx.exiting_loops());
 
             }
-        } else if(ctx.for_loop_rule() != null) {
+            Main.symbolTable.addScope(scopesStack.pop());
+        }
+
+        else if(ctx.for_loop_rule() != null) {
+
+            Scope forScope = new Scope();
+            forScope.setId(ctx.for_loop_rule().K_FOR() +"_"+ctx.for_loop_rule().hashCode());
+            forScope.setParent(scopesStack.peek());
+
             instructions = visitFor_loop_rule(ctx.for_loop_rule());
+            scopesStack.push(forScope);
             for (int i = 0; i < ctx.instructions().size(); i++) {
                 instructions.getInstructions().add(visitInstructions(ctx.instructions(i)));
 
@@ -2090,6 +2122,8 @@ public class BaseVisitor extends SQLBaseVisitor {
             {
                visitExiting_loops(ctx.exiting_loops());
             }
+            Main.symbolTable.addScope(scopesStack.pop());
+
         }
 
 
@@ -2194,8 +2228,10 @@ public class BaseVisitor extends SQLBaseVisitor {
         ins.setExpression(visitExpression(ctx.if_rule().expression()));
 
         Scope parentScope = scopesStack.peek();
+        System.out.println(parentScope.getId());
 
         if(ctx.if_rule() != null) {
+
             Scope currentScope = new Scope();
             String scopeName = ctx.if_rule().K_IF().getText() + ctx.if_rule().hashCode();
             currentScope.setId(scopeName);
@@ -2231,16 +2267,16 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
             if (ctx.else_if_rule() != null) {
                 for (int i = 0; i < ctx.else_if_rule().size(); i++) {
-
                     System.out.println("visit else_if");
                     else_if_rule else_if_rule = new else_if_rule();
                     ins.add_Else_if_rule_in_if(else_if_rule);
                     System.out.println("else if:" + ins.getElse_if());
+                    else_if_rule.setExpression(visitExpression(ctx.else_if_rule().get(i).expression()));
 
                     Scope elseifScop = new Scope();
                     String elseifeName = ctx.else_if_rule().get(i).K_ELSE_IF().getText() + ctx.else_if_rule().get(i).hashCode();
-                    currentScope.setId(elseifeName);
-                    currentScope.setParent(parentScope);
+                    elseifScop.setId(elseifeName);
+                    elseifScop.setParent(parentScope);
                     scopesStack.push(elseifScop);
 
                     for (int j = 0; j < ctx.else_if_rule().get(i).instructions().size(); j++) {
@@ -2270,8 +2306,8 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
                 Scope elseScope = new Scope();
                 String elseName = ctx.else_rulse().K_ELSE().getText() + ctx.else_rulse().hashCode();
-                currentScope.setId(elseName);
-                currentScope.setParent(parentScope);
+                elseScope.setId(elseName);
+                elseScope.setParent(parentScope);
                 scopesStack.push(elseScope);
 
                 for (int i = 0; i < ctx.else_rulse().instructions().size(); i++) {
@@ -2362,6 +2398,12 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         do_while ins = new do_while();
         ins.setInstrucation_name(do_while.class.getName());
         ins.setExpression(visitExpression(ctx.while_rule().expression()));
+
+        Scope dowhileScope = new Scope();
+        dowhileScope.setId(ctx.K_DO().getText() +"_"+ctx.hashCode());
+        dowhileScope.setParent(scopesStack.peek());
+        scopesStack.push(dowhileScope);
+
         for (int i = 0; i <ctx.instructions().size() ; i++) {
             ins.addinstruction(visitInstructions(ctx.instructions(i)));
         }
@@ -2370,6 +2412,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             ins.setLoop(visitExiting_loops(ctx.exiting_loops()));
 
         }
+        Main.symbolTable.addScope(scopesStack.pop());
 
 
         return ins;
@@ -2380,28 +2423,36 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         System.out.println("visit for rule");
         For_Loop_Rule for_loop_rule = new For_Loop_Rule();
         for_loop_rule.setInstrucation_name(For_Loop_Rule.class.getName());
+
         if(ctx.expression() != null)
         {
             for_loop_rule.setExpression(visitExpression(ctx.expression()));
         }
-        if(ctx.inside_for_loop(0) != null)
+        else if(ctx.inside_for_loop(0) != null)
         {
             for_loop_rule.setLeft_inside_for_loop(visitInside_for_loop(ctx.inside_for_loop(0)));
-            System.out.println("visit left");
+        }
+        else if(ctx.create_varible_with_assign() != null){
+            for_loop_rule.setVar_with_asgn(visitCreate_varible_with_assign(ctx.create_varible_with_assign()));
+        }
+        else if(ctx.create_varible_without_assign() != null)
+        {
+            for_loop_rule.setVar_without_asgn(visitCreate_varible_without_assign(ctx.create_varible_without_assign()));
         }
         if(ctx.inside_for_loop(1) != null)
         {
             for_loop_rule.setRight_inside_for_loop(visitInside_for_loop(ctx.inside_for_loop(1)));
-            System.out.println("visit right");
         }
         return for_loop_rule;
     }
 
     @Override
     public Inside_for_loop visitInside_for_loop(SQLParser.Inside_for_loopContext ctx) {
-        System.out.println("visit inside for");
         Inside_for_loop inside_for_loop = new Inside_for_loop();
-        if(ctx.assign_array() != null){
+        if(ctx.expression() != null){
+            inside_for_loop.setExpression(visitExpression(ctx.expression()));
+        }
+        else if(ctx.assign_array() != null){
             inside_for_loop.setAssign_array(visitAssign_array(ctx.assign_array()));
         }
         else if (ctx.assign_varible() != null)
@@ -2411,7 +2462,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         }
         else if (ctx.shortcut_statments() != null)
         {
-         inside_for_loop.setShortcut_statments(ctx.shortcut_statments().getText());
+         inside_for_loop.setShortcut_statments(visitShortcut_statments(ctx.shortcut_statments()));
         }
         else if (ctx.create_Array_without_assign() != null)
         {
@@ -2436,6 +2487,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         ins.setInstrucation_name(Foreach.class.getName());
         ins.setLoop_variable(visitUse_random_name(ctx.use_random_name(0)));
         ins.setLoop_variable(visitUse_random_name(ctx.use_random_name(1)));
+        ArrayList<Object> d = new ArrayList<Object>();
 
         return ins;
     }
@@ -2512,6 +2564,12 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         System.out.println("visit variable assign");
         assign_variable var = new assign_variable();
 
+        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+        StackTraceElement stackTraceElement = stacktrace[2];
+        String methodName = stackTraceElement.getMethodName();
+        String createVariableMethode = "visitCreate_varible_with_assign";
+
+
         if (ctx.use_random_name() != null)
         {
             for (int i = 0; i <ctx.use_random_name().size() ; i++) {
@@ -2523,11 +2581,24 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
                 }
                 var.getVariable_with_opretor().add(variable_with_opretor);
             }
+            if(methodName == createVariableMethode)
+            {
+                Scope currentScope =  scopesStack.peek();
+                Symbol variableSymbol = new Symbol();
+                variableSymbol.setIsParam(false);
+                String name = ctx.use_random_name().get(0).getText();
+                variableSymbol.setName(name);
+                variableSymbol.setScope(currentScope);
+                //variableSymbol.setType(); //todo add type
+                currentScope.addSymbol(name , variableSymbol);
+            }
+
         }
         if(ctx.expression() != null)
         {
             var.setExpression(visitExpression(ctx.expression()));
         }
+
 
         return var;
     }
@@ -2804,3 +2875,5 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         return deafult;
     }
 }
+
+

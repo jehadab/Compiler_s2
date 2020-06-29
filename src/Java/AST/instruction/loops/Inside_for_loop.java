@@ -6,6 +6,9 @@ import Java.AST.creating.assign_variable;
 
 
 import Java.AST.assignmnet.*;
+import Java.AST.expr.Expression;
+import Java.AST.instruction.Shortcut_Statments;
+
 /**
  * Created by Jehad on 1/6/2020.
  */
@@ -34,18 +37,26 @@ public class Inside_for_loop extends Node {
         this.create_arry_without_assign = create_arry_without_assign;
     }
 
-    public String getShortcut_statments() {
+    public Shortcut_Statments getShortcut_statments() {
         return shortcut_statments;
     }
 
-    public void setShortcut_statments(String shortcut_statments) {
+    public void setShortcut_statments(Shortcut_Statments shortcut_statments) {
         this.shortcut_statments = shortcut_statments;
     }
+    public Expression getExpression() {
+        return expression;
+    }
+
+    public void setExpression(Expression expression) {
+        this.expression = expression;
+    }
+
 
     assign_Array assign_array ;
     assign_variable var ;
     createarrywithoutassign create_arry_without_assign;
-    String shortcut_statments;
-             /*arithmetic_infunction_statment*/
+    Shortcut_Statments shortcut_statments;
+    Expression expression;
 
 }
