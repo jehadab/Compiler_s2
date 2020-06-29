@@ -1978,11 +1978,13 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         for(int i =0 ; i<ctx.children.size(); i++)
         {
-            if( ctx.instructions(i) != null){
-                function_body.addInstraction(visitInstructions(ctx.instructions(i)));
+            if( ctx.children.get(i) instanceof SQLParser.InstructionsContext ){
+
+                function_body.addNode(visitInstructions((SQLParser.InstructionsContext)ctx.children.get(i)));
+
             }
-            else if (ctx.sub_function_body(i) != null) {
-                Sub_function_body(ctx.sub_function_body(i),function_body);
+            else if (ctx.children.get(i) instanceof SQLParser.Sub_function_bodyContext) {
+                function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext)ctx.children.get(i)));
             }
         }
         Main.showSymboleTable();
@@ -2028,18 +2030,25 @@ public class BaseVisitor extends SQLBaseVisitor {
         return s;
 
      }*/
-    public void Sub_function_body (SQLParser.Sub_function_bodyContext ctx , function_body function_body){
+    @Override
+    public sub_function_body visitSub_function_body(SQLParser.Sub_function_bodyContext ctx){
         sub_function_body sub_function_body = new sub_function_body();
-        for (int i = 0; i < ctx.children.size() ; i++) {
-            if(ctx.instructions(i) != null)
-            {
-                function_body.addInstraction(visitInstructions(ctx.instructions(i)));
+        System.out.println("visit Sub function body");
+
+        Scope fucntionScope = new Scope();
+        Scope currentScope = Main.symbolTable.getScopes().get(Main.symbolTable.getScopes().size() - 1);
+        fucntionScope.setParent(currentScope);
+        Main.symbolTable.addScope(fucntionScope);
+
+        for ( int i = 0;i < ctx.children.size() ; i++)
+            if( ctx.children.get(i) instanceof SQLParser.InstructionsContext ){
+                sub_function_body.addNode(visitInstructions((SQLParser.InstructionsContext)ctx.children.get(i)));
             }
-            else if(ctx.sub_function_body(i) != null){
-                Sub_function_body(ctx.sub_function_body(i),function_body);
+            else if (ctx.children.get(i) instanceof SQLParser.Sub_function_bodyContext) {
+                sub_function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext)ctx.children.get(i)));
             }
 
-        }
+        return sub_function_body;
     }
     @Override
     public instructions visitFunctional_instruction(SQLParser.Functional_instructionContext ctx) {
