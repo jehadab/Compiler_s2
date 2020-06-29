@@ -996,7 +996,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
     K_PRINT OPEN_PAR  (indisde_the_print)(PLUS indisde_the_print)*  CLOSE_PAR
      ;
      indisde_the_print:
-      ( IDENTIFIER |use_random_name | call_function |varible_from_object| array_base_form_with_index )
+      (expression| IDENTIFIER |use_random_name | call_function |varible_from_object| array_base_form_with_index )
      ;
    /* indisde_the_print_part1:
         ((use_random_name|call_function|varible_from_object| array_base_form_with_index) PLUS)
@@ -1054,7 +1054,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
        SCOL ( inside_for_loop)? CLOSE_PAR
     ;
     inside_for_loop:
-        (assign_varible | assign_array | create_Array_without_assign | shortcut_statments)   /*arithmetic_infunction_statment*/
+        (expression | assign_varible | assign_array | create_Array_without_assign | shortcut_statments)
     ;
 
     foreach:
