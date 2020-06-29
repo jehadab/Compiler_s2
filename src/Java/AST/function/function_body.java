@@ -9,8 +9,6 @@ public class function_body extends Node {
 
     List<Object> nodes = new ArrayList<Object>();
     returnes_rule r ;
-    sub_function_body sub_one ;
-
 
     public List<Object> getInstructions() {
         return nodes;
@@ -21,13 +19,6 @@ public class function_body extends Node {
     }
     public void addNode(Object Node){
         this.nodes.add(Node);
-    }
-    public sub_function_body getSub_one() {
-        return sub_one;
-    }
-
-    public void setSub_one(sub_function_body sub_one) {
-        this.sub_one = sub_one;
     }
 
     public returnes_rule getR() {
