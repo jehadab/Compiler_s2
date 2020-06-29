@@ -1237,7 +1237,6 @@ public class BaseVisitor extends SQLBaseVisitor {
 
 
 
-
         // return arg;
         return temp;
     }
