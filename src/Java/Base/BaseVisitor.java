@@ -1596,7 +1596,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         {
             Bracket_Expression bracket_expression = new Bracket_Expression();
             if(!ctx.expression().isEmpty()){
-
                 bracket_expression.setExpression_list(expression_algorthim(ctx.expression(0)));
             }
             else if (ctx.genral_assign() != null)
