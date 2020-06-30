@@ -66,6 +66,10 @@ public class BaseVisitor extends SQLBaseVisitor {
     public Parse visitParse(SQLParser.ParseContext ctx) {
         System.out.println("visitParse");
         Parse p = new Parse();
+        Scope globalScope = new Scope();
+        globalScope.setId("global_scope");
+        scopesStack.push(globalScope);
+
         if(ctx.create_aggregation_function().size()!=0)
         {
             for(int i=0;i<ctx.create_aggregation_function().size();i++)
@@ -84,16 +88,24 @@ public class BaseVisitor extends SQLBaseVisitor {
         }
          if (ctx.funtion().size() !=0)
         {
+
             System.out.println("visiting fucntion ");
             System.out.println(" size of the function "+ctx.funtion().size());
             for (int i = 0; i <ctx.funtion().size() ; i++) {
-                    p.getFunctions().add(visitFuntion(ctx.funtion(i)));
+                Scope functionScope = new Scope();
+                functionScope.setId(ctx.funtion().get(i).function_header().use_random_name().getText()+"_"+ctx.funtion().get(i).hashCode());
+                functionScope.setParent(scopesStack.peek());
+                scopesStack.push(functionScope);
+
+                p.getFunctions().add(visitFuntion(ctx.funtion(i)));
+
+                Main.symbolTable.addScope(scopesStack.pop());
             }
         }
         p.setLine(ctx.getStart().getLine()); //get line number
         p.setCol(ctx.getStart().getCharPositionInLine()); // get col number
-
-
+        Main.symbolTable.addScope(scopesStack.pop());
+        Main.showSymboleTable();
         return p;
     }
 
@@ -1174,11 +1186,11 @@ public class BaseVisitor extends SQLBaseVisitor {
     public function_header visitFunction_header(SQLParser.Function_headerContext ctx) {
         System.out.println("function_header ");
         function_header header = new function_header();
-
-        Scope functionScop = new Scope();
-        String functionName = ctx.use_random_name().getText();
-        functionScop.setId(functionName);
-        Main.symbolTable.addScope(functionScop);
+//
+//        Scope functionScop = new Scope();
+//        String functionName = ctx.use_random_name().getText();
+//        functionScop.setId(functionName);
+//        Main.symbolTable.addScope(functionScop);
 
         header.setName(ctx.use_random_name().getText());
         //System.out.println( " the value here "+ctx.args().size());
@@ -1797,13 +1809,13 @@ public class BaseVisitor extends SQLBaseVisitor {
         variable_name.setVariable_name(ctx.getText());
         System.out.println("variable stored : " + variable_name.getVariable_name());
 
-        Scope currentScope = scopesStack.peek();
+  /*      Scope currentScope = scopesStack.peek();
         Symbol variableSymbol = new Symbol();
         variableSymbol.setName(variable_name.getVariable_name());
         variableSymbol.setIsParam(false);
         variableSymbol.setScope(currentScope);
         //variableSymbol.setType(); //todo type
-        currentScope.addSymbol(variable_name.getVariable_name(),variableSymbol);
+        currentScope.addSymbol(variable_name.getVariable_name(),variableSymbol);*/
 
 
         return variable_name;
@@ -1964,13 +1976,26 @@ public class BaseVisitor extends SQLBaseVisitor {
             name = ctx.RANDOM_NAME().getSymbol().getText();
         }
 
-        Scope currentScope =  scopesStack.peek();
-        Symbol variableSymbol = new Symbol();
-        variableSymbol.setIsParam(false);
-        variableSymbol.setName(name);
-        variableSymbol.setScope(currentScope);
+
+        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+        StackTraceElement stackTraceElement = stacktrace[3];
+        String callingmethodName = stackTraceElement.getMethodName();
+        String createVariableMethode = "visitCreate_varible_with_assign";
+
+        if(callingmethodName.equals(createVariableMethode))
+        {
+            Scope currentScope =  scopesStack.peek();
+            Symbol variableSymbol = new Symbol();
+            variableSymbol.setIsParam(false);
+            variableSymbol.setName(name);
+            variableSymbol.setScope(currentScope);
 //        variableSymbol.setType(); //todo add type
-        currentScope.addSymbol(name , variableSymbol);
+            currentScope.addSymbol(name , variableSymbol);
+
+        }
+
+
+
 
         System.out.println("visitUse_random_name: " + name);
         return name ;
@@ -1981,12 +2006,13 @@ public class BaseVisitor extends SQLBaseVisitor {
         function_body function_body = new function_body();
         instructions ins ;
 
-        Scope functionScope = Main.symbolTable.getScopes().get(Main.symbolTable.getScopes().size() - 1);
-        scopesStack.push(functionScope);
+//        Scope functionScope = Main.symbolTable.getScopes().get(Main.symbolTable.getScopes().size() - 1);
+//        scopesStack.push(functionScope);
 
 
         for(int i =0 ; i<ctx.children.size(); i++)
         {
+            System.out.println("---------------");
             if( ctx.children.get(i) instanceof SQLParser.InstructionsContext ){
 
                 function_body.addNode(visitInstructions((SQLParser.InstructionsContext)ctx.children.get(i)));
@@ -1996,7 +2022,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                 function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext)ctx.children.get(i)));
             }
         }
-        Main.showSymboleTable();
+
 
         // System.out.println(((While_Rule)function_body.getInstructions().get(2)).getBoolean_infunction_statment().getBoolean_exprs().get(0).getBoolean_exprs_list().get(0).getTermenal_node());
 
@@ -2567,11 +2593,6 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         System.out.println("visit variable assign");
         assign_variable var = new assign_variable();
 
-        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-        StackTraceElement stackTraceElement = stacktrace[2];
-        String methodName = stackTraceElement.getMethodName();
-        String createVariableMethode = "visitCreate_varible_with_assign";
-
 
         if (ctx.use_random_name() != null)
         {
@@ -2583,17 +2604,6 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
                     variable_with_opretor.setOperator(ctx.any_arithmetic_oprator().get(i).getText());
                 }
                 var.getVariable_with_opretor().add(variable_with_opretor);
-            }
-            if(methodName == createVariableMethode)
-            {
-                Scope currentScope =  scopesStack.peek();
-                Symbol variableSymbol = new Symbol();
-                variableSymbol.setIsParam(false);
-                String name = ctx.use_random_name().get(0).getText();
-                variableSymbol.setName(name);
-                variableSymbol.setScope(currentScope);
-                //variableSymbol.setType(); //todo add type
-                currentScope.addSymbol(name , variableSymbol);
             }
 
         }

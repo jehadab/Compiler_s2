@@ -1,5 +1,13 @@
+create aggregation function sum (d:/o/p,classname,methodname, typename , [  string,number , boolean ,kk ])
 func(){
-var x1;
-{var x2 ;
-{var x3 }{var xx2}var xx1;}
+if(ii){
+ var x = 5 ;
+ var y = yy ;
+ var u = uu;
+
+
 }
+ var y = yy ;
+ z = zz ;
+ z = zz ;
+ }
