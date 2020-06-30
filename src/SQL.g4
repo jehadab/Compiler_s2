@@ -880,7 +880,8 @@ any_name
  //| '(' any_name ')'
  ;
 create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name OPEN_PAR
-  jar_pathe
+  //jar_pathe
+  IDENTIFIER
   COMMA
    use_random_name
    COMMA
@@ -890,7 +891,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
    COMMA
    OPEN_SQER_BAR (parames? (COMMA parames)*)  CLOSE_SQER_PAR CLOSE_PAR;
 
-   jar_pathe: (use_random_name ':' '/' use_random_name) ('/' use_random_name)*| use_random_name;
+  // jar_pathe: (use_random_name ':' '/' use_random_name) ('/' use_random_name)*| use_random_name;
       parames: K_STRING |K_NUMBER| K_BOOLEAN  |table_name |column_name;
 // start section instraction and functions defination --------------------------------------------------------------
 

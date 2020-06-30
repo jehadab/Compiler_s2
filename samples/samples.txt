@@ -1,14 +1,6 @@
 func(){
-var x = y  ;
-if(z){
-var zozo ;
-if(n){
-var soso ;
+
+create aggregation function b ("hh",class name , method name , type , [number ])
 }
-}else if (hoho){var hohoson;}
-else if(hoho2){var hoho2son;}
-else{var elseson;
-}
-}         lllllookijuhtfrdesopopoopopopo
 
 
