@@ -9,4 +9,6 @@ var soso ;
 else if(hoho2){var hoho2son;}
 else{var elseson;
 }
-}
+}         lllllookijuhtfrdesopopoopopopo
+
+
