@@ -3,11 +3,5 @@ func(){
 if(ii){
  var x = 5 ;
  var y = yy ;
- var u = uu;
-
-
-}
- var y = yy ;
- z = zz ;
- z = zz ;
- }
+ var u ;
+}}

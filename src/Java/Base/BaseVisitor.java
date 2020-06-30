@@ -1309,8 +1309,20 @@ public class BaseVisitor extends SQLBaseVisitor {
     }
 
     @Override public create_variable_withassign visitCreate_varible_with_assign(SQLParser.Create_varible_with_assignContext ctx) {
+
         create_variable_withassign variable_with_assign = new  create_variable_withassign();
         variable_with_assign.setVar(visitAssign_varible(ctx.assign_varible()));
+
+        Scope currentScope = new Scope();
+        currentScope = scopesStack.peek();
+        Symbol createdSymbol = new Symbol();
+        String name = ctx.assign_varible().use_random_name().get(0).getText();
+        createdSymbol.setName(name);
+        createdSymbol.setIsParam(false);
+        createdSymbol.setScope(currentScope);
+//        createdSymbol.setType();
+        currentScope.addSymbol(name , createdSymbol);
+
         return variable_with_assign;
     }
 
@@ -1977,7 +1989,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         }
 
 
-        StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
+       /* StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
         StackTraceElement stackTraceElement = stacktrace[3];
         String callingmethodName = stackTraceElement.getMethodName();
         String createVariableMethode = "visitCreate_varible_with_assign";
@@ -1993,7 +2005,7 @@ public class BaseVisitor extends SQLBaseVisitor {
             currentScope.addSymbol(name , variableSymbol);
 
         }
-
+*/
 
 
 
