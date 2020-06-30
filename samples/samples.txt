@@ -1,6 +1,13 @@
+create aggregation function sum (d:/o/p,classname,methodname, typename , [  string,number , boolean ,kk ])
 func(){
-var x = y + u - i % 2 ;
-if(z){
-var zozo ;
+if(ii){
+ var x = 5 ;
+ var y = yy ;
+ var u = uu;
+
+
 }
-}
+ var y = yy ;
+ z = zz ;
+ z = zz ;
+ }

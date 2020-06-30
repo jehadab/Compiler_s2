@@ -1,6 +1,7 @@
 package Java.AST.instruction.Print_rule;
 
 import Java.AST.Node;
+import Java.AST.expr.Expression;
 import Java.AST.instruction.CallFunction;
 import Java.AST.arrayandjson.variablefromobject;
 import Java.AST.arrayandjson.array_base_fom_with_index;
@@ -52,6 +53,15 @@ public class Inside_the_print extends Node {
         this.identifire = identifire;
     }
 
+    public Expression getExpression() {
+        return expression;
+    }
+
+    public void setExpression(Expression expression) {
+        this.expression = expression;
+    }
+
+    Expression expression;
     String identifire ;
     CallFunction callFunction;
     variablefromobject variable_from_object;
