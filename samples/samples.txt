@@ -1,6 +1,5 @@
-func(){
+
 
 create aggregation function b ("hh",class name , method name , type , [number ])
-}
 
 
