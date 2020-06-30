@@ -54,6 +54,7 @@ public class Main {
 
     }
     public static void showSymboleTable(){
+        System.out.println("_______________");
         for (int i = 0; i <Main.symbolTable.getScopes().size() ; i++) {
             System.out.println("scope: "+symbolTable.getScopes().get(i).getId());
             if(symbolTable.getScopes().get(i).getParent() != null){
@@ -66,6 +67,7 @@ public class Main {
             for ( Object symbol :symbolTable.getScopes().get(i).getSymbolMap().values().toArray()) {
                 System.out.println("Symbol: "+ ((Symbol) symbol).getName());
             }
+            System.out.println("_______________");
 
         }
     }

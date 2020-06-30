@@ -2044,18 +2044,19 @@ public class BaseVisitor extends SQLBaseVisitor {
         sub_function_body sub_function_body = new sub_function_body();
         System.out.println("visit Sub function body");
 
-        Scope fucntionScope = new Scope();
-        Scope currentScope = Main.symbolTable.getScopes().get(Main.symbolTable.getScopes().size() - 1);
-        fucntionScope.setParent(currentScope);
-        Main.symbolTable.addScope(fucntionScope);
+        Scope subFucntionScope = new Scope();
+        subFucntionScope.setId("sub_function_body_"+ctx.hashCode());
+        subFucntionScope.setParent(scopesStack.peek());
+        scopesStack.push(subFucntionScope);
 
-        for ( int i = 0;i < ctx.children.size() ; i++)
-            if( ctx.children.get(i) instanceof SQLParser.InstructionsContext ){
-                sub_function_body.addNode(visitInstructions((SQLParser.InstructionsContext)ctx.children.get(i)));
+        for ( int i = 0;i < ctx.children.size() ; i++) {
+            if (ctx.children.get(i) instanceof SQLParser.InstructionsContext) {
+                sub_function_body.addNode(visitInstructions((SQLParser.InstructionsContext) ctx.children.get(i)));
+            } else if (ctx.children.get(i) instanceof SQLParser.Sub_function_bodyContext) {
+                sub_function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext) ctx.children.get(i)));
             }
-            else if (ctx.children.get(i) instanceof SQLParser.Sub_function_bodyContext) {
-                sub_function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext)ctx.children.get(i)));
-            }
+        }
+        Main.symbolTable.addScope(scopesStack.pop());
 
         return sub_function_body;
     }
@@ -2774,10 +2775,15 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
     }
     @Override
     public instructions visitSwitch_rule(SQLParser.Switch_ruleContext ctx) {
-        System.out.println("visit Switch");
 
+        System.out.println("visit Switch");
         Switch ins = new Switch();
         ins.setInstrucation_name(Switch.class.getName());
+
+        Scope switchScope = new Scope();
+        switchScope.setId(ctx.K_SWITCH().getText() +"_"+ctx.hashCode());
+        switchScope.setParent(scopesStack.peek());
+
         if(ctx.use_random_name() != null)
         {
             ins.setVariable_name(visitUse_random_name(ctx.use_random_name()));
@@ -2802,9 +2808,8 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         {
             ins.setExpression(visitExpression(ctx.expression()));
         }
-
+        scopesStack.push(switchScope) ;
         if(ctx.case_rule() != null) {
-
             for (int i = 0; i < ctx.case_rule().size(); i++) {
                 ins.getCases().add(visitCase_rule(ctx.case_rule(i)));
             }
@@ -2815,6 +2820,9 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         {
             ins.setDeafult(visitDefult(ctx.defult()));
         }
+
+        Main.symbolTable.addScope(scopesStack.pop());
+
         return ins;
     }
 
@@ -2826,7 +2834,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
          if (ctx.expression() != null){
             case_ins.setExpression(visitExpression(ctx.expression()));
         }
-        if(ctx.any_name() != null){
+        else if(ctx.any_name() != null){
             case_ins.setVariable_name(ctx.any_name().getText());
         }
         else if(ctx.NUMERIC_LITERAL() != null)
