@@ -2392,7 +2392,12 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         System.out.println("visit inside print");
         Inside_the_print inside_the_print = new Inside_the_print();
 
-           if(ctx.varible_from_object() != null)
+            if(ctx.expression() != null)
+            {
+                inside_the_print.setExpression(visitExpression(ctx.expression()));
+
+            }
+           else if(ctx.varible_from_object() != null)
            {
                inside_the_print.setVariable_from_object(visitVarible_from_object(ctx.varible_from_object()));
                System.out.println(inside_the_print.getVariable_from_object());
