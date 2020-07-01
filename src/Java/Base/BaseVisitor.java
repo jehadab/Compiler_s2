@@ -95,6 +95,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                 Scope functionScope = new Scope();
                 functionScope.setId(ctx.funtion().get(i).function_header().use_random_name().getText()+"_"+ctx.funtion().get(i).hashCode());
                 functionScope.setParent(scopesStack.peek());
+
                 scopesStack.push(functionScope);
 
                 p.getFunctions().add(visitFuntion(ctx.funtion(i)));
@@ -1286,7 +1287,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("visite create with assign ");
         createvariablewithassign variable_with_assign  = new createvariablewithassign();
         if(ctx.create_varible_with_assign()!=null) {
-            create_variable_withassign create = new create_variable_withassign();
+            variable_with_assign.setVar_wiht_assign(visitCreate_varible_with_assign(ctx.create_varible_with_assign()));
+            /*create_variable_withassign create = new create_variable_withassign();
             Symbol symbol = new Symbol();
             Type types = new Type();
             variable_with_assign.setVar_wiht_assign(visitCreate_varible_with_assign(ctx.create_varible_with_assign()));
@@ -1303,9 +1305,9 @@ public class BaseVisitor extends SQLBaseVisitor {
                 symbol.setType(types);
             }
             if (create.getVar().getExpression().getExpression_list().getIntral_expression_value().getTure_or_False() != null)
-            {
+            {symbol.setType(types);
                 types.setName(Type.BOOLEAN_CONST);
-                symbol.setType(types);
+
             }
             if(create.getVar().getExpression().getExpression_list().getIntral_expression_value().getVariable_name()!=null)
             {
@@ -1313,8 +1315,8 @@ public class BaseVisitor extends SQLBaseVisitor {
             }
 
             System.out.println(" getting variable name "+symbol.getName());
-            System.out.println(" getting variable type "+symbol.getType().getName());
-
+            System.out.println(" getting variable tycrpe "+symbol.getType().getName());
+*/
         }
 
 
@@ -1349,7 +1351,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         createdSymbol.setScope(currentScope);
 //        createdSymbol.setType();
         currentScope.addSymbol(name , createdSymbol);
-
+       Error_ofusing_undeclared_variabler(createdSymbol.getScope(),createdSymbol.getName() );
+       // rec_Error_fousing_undeclared_variabler(createdSymbol.getScope(),createdSymbol.getName() );
         return variable_with_assign;
     }
 
@@ -1673,9 +1676,11 @@ public class BaseVisitor extends SQLBaseVisitor {
         return expression_list;
     }
     public Shortcut_Statments shortcut_Statments_Expression(SQLParser.ExpressionContext ctx){
+        System.out.println("just to make me understand ");
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
         if(ctx.intral_expression_value().varible_name() != null){
             Variable_Name variable_name =  visitVarible_name(ctx.intral_expression_value().varible_name());
+          // Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.);
             shortcut_statments.setShortcut_variable_name(variable_name.getVariable_name());
         }
         if(ctx.PLUS_PLUS() != null){
@@ -2634,7 +2639,6 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         }
         return ins;
     }
-
     @Override
     public assign_variable visitAssign_varible(SQLParser.Assign_varibleContext ctx) {
         System.out.println("visit variable assign");
@@ -2659,7 +2663,14 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             var.setExpression(visitExpression(ctx.expression()));
         }
 
-
+        if(ctx.select_stmt()!=null)
+        {
+           var.setSelect(visitSelect_stmt(ctx.select_stmt()));
+        }
+        if(ctx.factored_select_stmt()!=null)
+        {
+            var.setFactored(visitFactored_select_stmt(ctx.factored_select_stmt()));
+        }
 
         return var;
     }
@@ -2766,7 +2777,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
     @Override
     public Shortcut_Statments visitShortcut_statments(SQLParser.Shortcut_statmentsContext ctx){
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
-
+        Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.use_random_name().getText());
         if(ctx.use_random_name() != null){
             shortcut_statments.setShortcut_variable_name(visitUse_random_name(ctx.use_random_name()));
 
@@ -2824,6 +2835,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         ins.setInstrucation_name(Switch.class.getName());
 
         Scope switchScope = new Scope();
+
         switchScope.setId(ctx.K_SWITCH().getText() +"_"+ctx.hashCode());
         switchScope.setParent(scopesStack.peek());
 
@@ -2943,6 +2955,47 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             System.out.println("operator < or > or <= or >= can not be applied to "+symbol_1.getType().getName() +"and"+symbol_2.getType().getName());
         }
         // we could use it in loops
+    }
+    public void Error_ofusing_undeclared_variabler (Scope scope , String symbole_name ){
+        boolean declared = false ;
+       while(scope.getId()!= "global_scope"){
+           if(scope.getSymbolMap().get(symbole_name)!=null)
+           {
+               declared=true;
+               break;
+           }
+           else {
+               scope=scope.getParent();
+               declared=false ;
+
+           }
+
+       }
+       /*if(declared==true )
+       {
+           System.out.println("variable"+symbole_name +"is declared befor ");
+       }*/
+        if (declared==false )
+       {
+           System.out.println(" Error variable   "+symbole_name+"  is not declared befor ");
+       }
+
+    }
+    public void rec_Error_fousing_undeclared_variabler (Scope scope , String symbole_name ){
+   if(scope.getId()=="global_scope")
+       return ;
+   else {
+       if(scope.getSymbolMap().get(symbole_name)!=null)
+       {
+           System.out.println("varaible is declared ");
+        return ;
+       }
+       else {
+           scope=scope.getParent();
+           rec_Error_fousing_undeclared_variabler( scope,  symbole_name);
+
+       }
+   }
     }
 }
 

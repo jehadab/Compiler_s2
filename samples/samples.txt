@@ -1,12 +1,20 @@
-create aggregation function sum (d:/o/p,classname,methodname, typename , [  string,number , boolean ,kk ])
-func(){
-if(ii){
- var x = 5 ;
- var y = yy ;
- var u = uu;
+
+function sum (){
+x++;
+if(x<9){
+var x =0;
+while(x<9){
+x--;
 }
-if(nn){}
- var y = yy ;
- z = zz ;
- z = zz ;
- }
+x++;
+}
+x++;
+}
+
+
+
+
+
+
+
+

@@ -36,7 +36,7 @@ public class Main {
 
 
 
-            File file = new File("../../samples/samples.txt");
+            File file = new File("C://Users//Dell//Desktop//Sql_compiler//samples//samples.txt");
             String fileName = file.getAbsolutePath();
 
             CharStream cs = fromFileName(fileName);
@@ -51,6 +51,7 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
 
     }
     public static void showSymboleTable(){
@@ -74,4 +75,6 @@ public class Main {
 
         }
     }
-}
+
+    }
+
