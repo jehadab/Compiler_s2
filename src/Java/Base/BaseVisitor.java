@@ -1339,7 +1339,6 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         create_variable_withassign variable_with_assign = new  create_variable_withassign();
         variable_with_assign.setVar(visitAssign_varible(ctx.assign_varible()));
-
         Scope currentScope = new Scope();
         currentScope = scopesStack.peek();
         Symbol createdSymbol = new Symbol();
@@ -2709,7 +2708,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             A.setAggregationFunctionName(visitUse_random_name(ctx.use_random_name(0)));
         }
 
-         A.setJat_path(ctx.IDENTIFIER().toString());
+        //A.setJat_path(ctx.IDENTIFIER().toString());
         A.setClassName(ctx.use_random_name(1).getText());
         A.setMethodName(ctx.use_random_name(2).getText());
         A.setReturnType(ctx.use_random_name(3).getText());// here sgould we viste retur  type
