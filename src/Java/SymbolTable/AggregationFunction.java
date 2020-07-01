@@ -9,11 +9,19 @@ import java.util.ArrayList;
 
 public class AggregationFunction extends Type {
     protected String AggregationFunctionName;
-    jar_path JarPath;
+    protected  String jar_path;
     protected String ClassName;
     protected String MethodName;
     protected String returnType;
     private ArrayList<parametes> params = new ArrayList();
+
+    public String getJat_path() {
+        return jar_path;
+    }
+
+    public void setJat_path(String jat_path) {
+        this.jar_path = jat_path;
+    }
 
     public AggregationFunction() {
     }
@@ -46,13 +54,7 @@ public class AggregationFunction extends Type {
         return this.returnType;
     }
 
-    public jar_path getJarPath() {
-        return this.JarPath;
-    }
 
-    public void setJarPath(jar_path jarPath) {
-        this.JarPath = jarPath;
-    }
 
     public void setReturnType(String returnType) {
         this.returnType = returnType;

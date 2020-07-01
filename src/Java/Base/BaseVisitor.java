@@ -837,7 +837,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         return reslult_cloumn ;
     }
 
-    @Override public Ordering_term visitOrdering_term(SQLParser.Ordering_termContext ctx) {
+    @Override
+    public Ordering_term visitOrdering_term(SQLParser.Ordering_termContext ctx) {
         System.out.println("visitOrdering_term");
         Ordering_term ordering_term = new Ordering_term();
         if (ctx.expr()!=null){
@@ -1284,12 +1285,38 @@ public class BaseVisitor extends SQLBaseVisitor {
     @Override public createvariablewithassign visitCreating_with_assign(SQLParser.Creating_with_assignContext ctx) {
         System.out.println("visite create with assign ");
         createvariablewithassign variable_with_assign  = new createvariablewithassign();
-
-        if(ctx.create_varible_with_assign()!=null)
-        {
+        if(ctx.create_varible_with_assign()!=null) {
+            create_variable_withassign create = new create_variable_withassign();
+            Symbol symbol = new Symbol();
+            Type types = new Type();
             variable_with_assign.setVar_wiht_assign(visitCreate_varible_with_assign(ctx.create_varible_with_assign()));
-            variable_with_assign.setInstrucation_name(variable_with_assign.getVar_wiht_assign().getInstrucation_name());
+            create = (create_variable_withassign) variable_with_assign.getVar_wiht_assign();
+            for (int i = 0; i < create.getVar().getVariable_with_opretor().size(); i++) {
+                symbol.setName(create.getVar().getVariable_with_opretor().get(i).getVariable_name());
+            }
+            if (create.getVar().getExpression().getExpression_list().getIntral_expression_value().getNUMERIC_LITERAL() != null) {
+                types.setName(Type.NUMBER_CONST);
+                symbol.setType(types);
+            }
+            if (create.getVar().getExpression().getExpression_list().getIntral_expression_value().getIdentyfire() != null) {
+                types.setName(Type.STRING_CONST);
+                symbol.setType(types);
+            }
+            if (create.getVar().getExpression().getExpression_list().getIntral_expression_value().getTure_or_False() != null)
+            {
+                types.setName(Type.BOOLEAN_CONST);
+                symbol.setType(types);
+            }
+            if(create.getVar().getExpression().getExpression_list().getIntral_expression_value().getVariable_name()!=null)
+            {
+                // we should get the varaible type search symbole initilaize same scope or scope father
+            }
+
+            System.out.println(" getting variable name "+symbol.getName());
+            System.out.println(" getting variable type "+symbol.getType().getName());
+
         }
+
 
         else if(ctx.create_json_with_assign()!=null)
         {
@@ -2249,6 +2276,10 @@ public class BaseVisitor extends SQLBaseVisitor {
             {
                 instructions = visitShortcut_statments(ctx.nonfunctional_instruction().shortcut_statments());
             }
+            else if(ctx.nonfunctional_instruction().create_aggregation_function()!=null)
+            {
+                instructions.setAggregation_function(visitCreate_aggregation_function(ctx.nonfunctional_instruction().create_aggregation_function()));
+            }
 
      //todo complete it else if (ctx.nonfunctional_instruction().one_line_if_instruction()!=null)
 
@@ -2629,6 +2660,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         }
 
 
+
         return var;
     }
 
@@ -2677,7 +2709,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             A.setAggregationFunctionName(visitUse_random_name(ctx.use_random_name(0)));
         }
 
-        A.setJarPath(visitJar_pathe(ctx.jar_pathe()));
+         A.setJat_path(ctx.IDENTIFIER().toString());
         A.setClassName(ctx.use_random_name(1).getText());
         A.setMethodName(ctx.use_random_name(2).getText());
         A.setReturnType(ctx.use_random_name(3).getText());// here sgould we viste retur  type
@@ -2694,23 +2726,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         return A ;
 
     }
-    public jar_path visitJar_pathe(SQLParser.Jar_patheContext ctx){
-        jar_path path = new jar_path();
-        System.out.println("visite jar");
 
-        if(ctx.use_random_name(0)!=null)
-        {
-            //path.setName(visitUse_random_name(ctx.use_random_name(0)));
-            if(ctx.use_random_name().size()!=0)
-            {
-                for(int u=0;u<ctx.use_random_name().size();u++)
-                {
-                    path.add_new_path_name(visitUse_random_name(ctx.use_random_name(u)));
-                }
-            }
-        }
-        return path;
-    }
     public parametes visitParames(SQLParser.ParamesContext ctx){
         System.out.println("visite params ");
         parametes p = new parametes();
@@ -2911,8 +2927,22 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         }
         return deafult;
     }
-    public boolean checkIfVariableSymboleExisist(Symbol symbol){
-        return true;
+    /*---------------------------- function for symantic check */
+    public void  if_the_operator_equal_notequal_assignment_is_ture_or_not( Symbol symbol_1  , Symbol symbol_2  ) {
+        if (symbol_1.getType().getName() != symbol_2.getType().getName()) {
+            System.out.println("error can not assignment two variable with diffrenete types");
+
+        }
+    }
+    public void if_GreaterThan_SmallerThan( Symbol symbol_1  , Symbol symbol_2 ){
+        if(symbol_1.getType().getName()!=symbol_2.getType().getName()){
+            System.out.println("error can not equal or not to diffrente type");
+        }
+        if((symbol_1.getType().getName()==Type.BOOLEAN_CONST&&symbol_2.getType().getName()==Type.BOOLEAN_CONST)|| (symbol_1.getType().getName()==Type.STRING_CONST&&symbol_2.getType().getName()==Type.STRING_CONST))
+        {
+            System.out.println("operator < or > or <= or >= can not be applied to "+symbol_1.getType().getName() +"and"+symbol_2.getType().getName());
+        }
+        // we could use it in loops
     }
 }
 
