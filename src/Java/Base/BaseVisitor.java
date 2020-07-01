@@ -86,7 +86,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                 }
             }
         }
-         if (ctx.funtion().size() !=0)
+         if (ctx.funtion() != null)
         {
 
             System.out.println("visiting fucntion ");
@@ -2683,12 +2683,13 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         A.setReturnType(ctx.use_random_name(3).getText());// here sgould we viste retur  type
         if(ctx.parames().size()!=0)
         {
-            System.out.println("the size of parames "+ctx.use_random_name().size());
+            System.out.println("the size of parametars "+ctx.use_random_name().size());
             for(int i=0;i<ctx.parames().size();i++)
             {
                 A.add_parama(visitParames(ctx.parames(i)));
             }
         }
+
 
         return A ;
 
@@ -2909,6 +2910,9 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             System.out.println("visite the break relue "+ctx.K_BREAK().getSymbol().getText().toString());
         }
         return deafult;
+    }
+    public boolean checkIfVariableSymboleExisist(Symbol symbol){
+        return true;
     }
 }
 

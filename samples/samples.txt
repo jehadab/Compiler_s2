@@ -3,5 +3,10 @@ func(){
 if(ii){
  var x = 5 ;
  var y = yy ;
- var u ;
-}}
+ var u = uu;
+}
+if(nn){}
+ var y = yy ;
+ z = zz ;
+ z = zz ;
+ }
