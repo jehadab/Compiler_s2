@@ -1287,33 +1287,34 @@ public class BaseVisitor extends SQLBaseVisitor {
         createvariablewithassign variable_with_assign  = new createvariablewithassign();
         if(ctx.create_varible_with_assign()!=null) {
             create_variable_withassign create = new create_variable_withassign();
+
             Symbol symbol = new Symbol();
             Type types = new Type();
             variable_with_assign.setVar_wiht_assign(visitCreate_varible_with_assign(ctx.create_varible_with_assign()));
             create = (create_variable_withassign) variable_with_assign.getVar_wiht_assign();
-            for (int i = 0; i < create.getVar().getVariable_with_opretor().size(); i++) {
-                symbol.setName(create.getVar().getVariable_with_opretor().get(i).getVariable_name());
-            }
-            if (create.getVar().getExpression().getExpression_list().getIntral_expression_value().getNUMERIC_LITERAL() != null) {
-                types.setName(Type.NUMBER_CONST);
-                symbol.setType(types);
-            }
-            if (create.getVar().getExpression().getExpression_list().getIntral_expression_value().getIdentyfire() != null) {
-                types.setName(Type.STRING_CONST);
-                symbol.setType(types);
-            }
-            if (create.getVar().getExpression().getExpression_list().getIntral_expression_value().getTure_or_False() != null)
-            {
-                types.setName(Type.BOOLEAN_CONST);
-                symbol.setType(types);
-            }
-            if(create.getVar().getExpression().getExpression_list().getIntral_expression_value().getVariable_name()!=null)
-            {
-                // we should get the varaible type search symbole initilaize same scope or scope father
-            }
-
-            System.out.println(" getting variable name "+symbol.getName());
-            System.out.println(" getting variable type "+symbol.getType().getName());
+//            for (int i = 0; i < create.getVar().getVariable_with_opretor().size(); i++) {
+//                symbol.setName(create.getVar().getVariable_with_opretor().get(i).getVariable_name());
+//            }
+//            if (create.getVar().getExpression().getExpression_list().getIntral_expression_value().getNUMERIC_LITERAL() != null) {
+//                types.setName(Type.NUMBER_CONST);
+//                symbol.setType(types);
+//            }
+//            if (create.getVar().getExpression().getExpression_list().getIntral_expression_value().getIdentyfire() != null) {
+//                types.setName(Type.STRING_CONST);
+//                symbol.setType(types);
+//            }
+//            if (create.getVar().getExpression().getExpression_list().getIntral_expression_value().getTure_or_False() != null)
+//            {
+//                types.setName(Type.BOOLEAN_CONST);
+//                symbol.setType(types);
+//            }
+//            if(create.getVar().getExpression().getExpression_list().getIntral_expression_value().getVariable_name()!=null)
+//            {
+//                // we should get the varaible type search symbole initilaize same scope or scope father
+//            }
+//
+//            System.out.println(" getting variable name "+symbol.getName());
+//            System.out.println(" getting variable type "+symbol.getType().getName());
 
         }
 
@@ -1339,6 +1340,7 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         create_variable_withassign variable_with_assign = new  create_variable_withassign();
         variable_with_assign.setVar(visitAssign_varible(ctx.assign_varible()));
+
         Scope currentScope = new Scope();
         currentScope = scopesStack.peek();
         Symbol createdSymbol = new Symbol();
@@ -1348,6 +1350,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         createdSymbol.setScope(currentScope);
 //        createdSymbol.setType();
         currentScope.addSymbol(name , createdSymbol);
+
 
         return variable_with_assign;
     }
@@ -2655,7 +2658,8 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         }
         if(ctx.expression() != null)
         {
-            var.setExpression(visitExpression(ctx.expression()));
+            Expression expression= visitExpression(ctx.expression());
+            var.setExpression(expression);
         }
 
 
@@ -2943,6 +2947,67 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         }
         // we could use it in loops
     }
+    public Type checkExprissionSymbolType(String name , Expression expression){
+
+        if(expression.getExpression_list().getIntral_expression_value() != null){
+            if(expression.getExpression_list().getIntral_expression_value().getNUMERIC_LITERAL() != null){
+                Type t =  new Type();
+                t.setName(Type.NUMBER_CONST);
+                return t;
+            }
+        }
+        return new Type();
+
+    }
+    public boolean checkExpressionTypeValid(Expression expression){
+        ArrayList<Intral_Expression_Value> expression_lists = convertExpretionListToArray(expression);
+        ArrayList<Type> types = new ArrayList<>();
+        int typesIndex = 0 ;
+        for (Intral_Expression_Value intral_expression_value:expression_lists
+             ) {
+
+            Type type = new Type();
+            if(intral_expression_value.getNUMERIC_LITERAL() != null)
+            {
+
+                type.setName(Type.NUMBER_CONST);
+                types.add(type);
+            }
+            else if (intral_expression_value.getTure_or_False() != null)
+            {
+                type.setName(Type.BOOLEAN_CONST);
+                types.add(type);
+            }
+            else if (intral_expression_value.getIdentyfire() != null)
+            {
+                type.setName(Type.STRING_CONST);
+                types.add(type);
+            }
+
+        }
+        return true;
+
+    }
+    public ArrayList convertExpretionListToArray(Expression expression)
+    {
+        ArrayList<Intral_Expression_Value> expression_list = new ArrayList<>();
+
+        extractDataFromExpretion(expression.getExpression_list() , expression_list);
+        System.out.println(expression_list.size());
+        return expression_list;
+    }
+    public void extractDataFromExpretion(Expression_List expression_list , ArrayList<Intral_Expression_Value> expression_lists){
+        if(expression_list.getIntral_expression_value() != null){
+                expression_lists.add(expression_list.getIntral_expression_value());
+        }
+        if (expression_list.getRight_expr() != null){
+            extractDataFromExpretion(expression_list.getRight_expr() , expression_lists);
+        }
+        if(expression_list.getLeft_expr() != null){
+            extractDataFromExpretion(expression_list.getLeft_expr() , expression_lists);
+        }
+    }
+
 }
 
 
