@@ -29,6 +29,7 @@ import Java.AST.instruction.Returning.returnes_rule;
 import Java.AST.instruction.all_the_non_functional_instructions.One_line_if;
 import Java.Main;
 import Java.SymbolTable.*;
+import com.sun.org.apache.xml.internal.utils.StringComparable;
 import generated.SQLBaseVisitor;
 import generated.SQLParser;
 
@@ -1172,6 +1173,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     public FunctionDeclaration visitFuntion(SQLParser.FuntionContext ctx) {
         System.out.println("function declaration ");
         FunctionDeclaration funcdec = new FunctionDeclaration();
+
         funcdec.setHeader(visitFunction_header(ctx.function_header()));
         funcdec.setBody(visitFunction_body(ctx.function_body()));
 
@@ -1192,10 +1194,11 @@ public class BaseVisitor extends SQLBaseVisitor {
 //        Scope functionScop = new Scope();
 //        String functionName = ctx.use_random_name().getText();
 //        functionScop.setId(functionName);
-//        Main.symbolTable.addScope(functionScop);
-
+//        Main.symbolTable.addScope(functionScop)
         header.setName(ctx.use_random_name().getText());
         //System.out.println( " the value here "+ctx.args().size());
+        Main.symbolTable.add_functions(header);
+        //System.out.println("changing size"+Main.symbolTable.getFunctions().size());
         for (int i = 0; i < ctx.args().size(); i++) {
             //header.additemtoarglist();
             //header.setArg((List<args>) visitArgs(ctx.args().get(i)));
@@ -1213,8 +1216,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         // header.pri();
         // we should use for loop
         // set list of parameteres
-
-
 
         return header;
     }
@@ -2271,6 +2272,7 @@ public class BaseVisitor extends SQLBaseVisitor {
             }
             else if (ctx.nonfunctional_instruction().call_function() != null)
             {
+
                 instructions = visitCall_function(ctx.nonfunctional_instruction().call_function());
             }
             else if ( ctx.nonfunctional_instruction().print_statment() !=  null)
@@ -2578,6 +2580,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         System.out.println("visit call function");
         CallFunction ins = new CallFunction();
         ins.setInstrucation_name(CallFunction.class.getName());
+        Error_UNdeclared_Function(ctx.use_random_name().getText());
         ins.setFunction_name(ctx.use_random_name().getText());
         for (int i = 0; i <ctx.prameters().size() ; i++) {
             ins.getParameters().add(visitPrameters(ctx.prameters(i)));
@@ -2981,6 +2984,42 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
        }
 
     }
+    public void Error_UNdeclared_Function(String function_name){
+     boolean    isdeclared=false ;
+     for(int i=0;i<Main.symbolTable.getFunctions().size();i++)
+     {
+         //System.out.println(" in the i"+i+Main.symbolTable.getFunctions().get(i).getName());
+         //System.out.println("from the passing "+function_name);
+         if(function_name.equals(Main.symbolTable.getFunctions().get(i).getName())==true)
+             {
+                 isdeclared=true;
+                 break;
+             }
+             else isdeclared=false;
+     }
+if(isdeclared==false )
+{
+    System.out.println(" Error  the function   "+function_name+"   is not  declared befor ");
+
+}
+
+    }
+
+        /*if(scopesStack.peek().getId()==function_name)
+        {
+            isdeclared=true;
+        }*/
+
+           // for (int i = 0; i < Main.symbolTable.getScopes().size(); i++) {
+               // if (Main.symbolTable.getScopes().get(i).getId() == function_name) {
+                 //   isdeclared = true;
+                   // break;
+             //   System.out.println("print what we have in the array_list "+Main.symbolTable.getScopes().get(i).getId());
+               // System.out.println("print what we get from the "+function_name'');
+               // }
+
+
+
     public void rec_Error_fousing_undeclared_variabler (Scope scope , String symbole_name ){
    if(scope.getId()=="global_scope")
        return ;

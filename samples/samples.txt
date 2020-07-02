@@ -1,20 +1,15 @@
-
 function sum (){
-x++;
-if(x<9){
-var x =0;
-while(x<9){
-x--;
+sum();
 }
-x++;
+function div(){
+sum();
 }
-x++;
+function Find(){
+help();
 }
-
-
-
-
-
-
-
-
+function help (){
+sum();
+}
+function testing (){
+help();
+}

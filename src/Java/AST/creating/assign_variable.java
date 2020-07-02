@@ -15,7 +15,8 @@ import java.util.List;
 
 public class assign_variable extends Node {   // to do the arithmatic structure one ....
 
-
+    select_stmt select ;//todo select from SQL
+    SelectFactoredStmt factored;
     public assign_variable(){
         this.variable_with_opretor = new ArrayList<>();
     }
@@ -56,6 +57,5 @@ public class assign_variable extends Node {   // to do the arithmatic structure 
         this.factored = factored;
     }
 
-    select_stmt select ;//todo select from SQL
-    SelectFactoredStmt factored;
+
 }
