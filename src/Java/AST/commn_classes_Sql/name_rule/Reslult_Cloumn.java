@@ -13,6 +13,10 @@ public class Reslult_Cloumn extends Node {
     private Column_alias column_alias;
     private boolean star;
 
+
+
+
+
     @Override
     public void accept(AstVistor astVisitor) {
         astVisitor.visit(this);

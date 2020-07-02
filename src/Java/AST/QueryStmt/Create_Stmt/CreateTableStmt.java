@@ -4,6 +4,7 @@ import Java.AST.QueryStmt.SelectStmt.select_stmt;
 import Java.AST.QueryStmt.Statement;
 import Java.AST.commn_classes_Sql.name_rule.DataBaseName;
 import Java.AST.commn_classes_Sql.name_rule.TableName;
+import Java.AST.instruction.non_functional_instructions;
 import Java.Visitor.AstVistor;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ import java.util.List;
 /**
  * Created by moham on 12/31/2019.
  */
-public class CreateTableStmt extends Statement {
+public class CreateTableStmt extends Statement  {
  private DataBaseName dataBaseName ;
  private TableName tableName;
  private List<TableConstraint> tableConstraints = new ArrayList<>();
