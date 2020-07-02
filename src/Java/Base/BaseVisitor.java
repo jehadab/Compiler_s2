@@ -243,6 +243,8 @@ public class BaseVisitor extends SQLBaseVisitor {
                 for (int i = 0; i < ctx.column_def().size(); i++) {
                     columnDefs.add(visitColumn_def(ctx.column_def(i)));
                 }
+
+
                 createTableStmt.setColumnDefs(columnDefs);
 
                 if(ctx.table_constraint()!=null){
@@ -426,7 +428,7 @@ public class BaseVisitor extends SQLBaseVisitor {
             create_type.setName("Create_Type");
         }
         currentScope.addType(type.getName(),type);
-        type.setScope(currentScope);
+//        type.setScope(currentScope);
         Main.symbolTable.addType(type);
         return create_type;
     }
@@ -1672,7 +1674,8 @@ public class BaseVisitor extends SQLBaseVisitor {
             expression_list.setShortcut_statments(shortcut_Statments_Expression(ctx));
         } else if (!ctx.OPEN_PAR().isEmpty()) {
             Bracket_Expression bracket_expression = new Bracket_Expression();
-            if(!ctx.expression().isEmpty()){
+            if (!ctx.expression().isEmpty()) {
+
                 bracket_expression.setExpression_list(expression_algorthim(ctx.expression(0)));
             } else if (ctx.genral_assign() != null) {
                 bracket_expression.setAssign(visitGenral_assign(ctx.genral_assign()));
@@ -2255,7 +2258,6 @@ public class BaseVisitor extends SQLBaseVisitor {
             }
 
             //todo complete it else if (ctx.nonfunctional_instruction().one_line_if_instruction()!=null)
-
 
         }
         // for(int i=0;i<ctx.functional_instruction().instructions().size();i++)
