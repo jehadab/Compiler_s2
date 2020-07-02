@@ -24,7 +24,7 @@ var x1;
 }
 
 -----------------------------------------------------------------
-using variable undeclared (error)
+using variable undeclared (errr)
 function g (){
 var x=0;
 if(c<9)
@@ -32,15 +32,6 @@ if(c<9)
 x++;
 }
 x++;
-
-----------------------------------
-function g (){
-var x;
-var y;
-{
-x++;
-}
-y++;
 }
 --------------------------------
 func(){
@@ -65,3 +56,18 @@ x++;
 }
 ---------------------------------------------------
 calling function (error)
+function sum (){
+sum();
+}
+function div(){
+sum();
+}
+function Find(){
+help();
+}
+function help (){
+sum();
+}
+function testing (){
+help();
+}
