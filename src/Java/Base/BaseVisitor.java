@@ -2013,9 +2013,6 @@ public class BaseVisitor extends SQLBaseVisitor {
             else if (ctx.children.get(i) instanceof SQLParser.Sub_function_bodyContext) {
                 function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext)ctx.children.get(i)));
             }
-            else if (ctx.children.get(i) instanceof SQLParser.Sql_stmt_listContext) {
-                function_body.addNode(visitSql_stmt_list((SQLParser.Sql_stmt_listContext)ctx.children.get(i)));
-            }
         }
         Main.showSymboleTable();
 
@@ -2234,6 +2231,12 @@ public class BaseVisitor extends SQLBaseVisitor {
             else if (ctx.nonfunctional_instruction().shortcut_statments() != null)
             {
                 instructions = visitShortcut_statments(ctx.nonfunctional_instruction().shortcut_statments());
+            }
+            else if(ctx.nonfunctional_instruction().create_table_stmt() != null){
+                instructions  = visitCreate_table_stmt(ctx.nonfunctional_instruction().create_table_stmt());
+            }
+            else if(ctx.nonfunctional_instruction().create_type() != null){
+                instructions = visitCreate_type(ctx.nonfunctional_instruction().create_type());
             }
 
      //todo complete it else if (ctx.nonfunctional_instruction().one_line_if_instruction()!=null)
@@ -2625,7 +2628,12 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         {
             var.setExpression(visitExpression(ctx.expression()));
         }
-
+        if(ctx.factored_select_stmt()!= null){
+            var.setFactored(visitFactored_select_stmt(ctx.factored_select_stmt()));
+        }
+        if(ctx.select_stmt() != null){
+            var.setSelect(visitSelect_stmt(ctx.select_stmt()));
+        }
 
         return var;
     }

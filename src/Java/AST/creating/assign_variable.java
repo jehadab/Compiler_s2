@@ -1,6 +1,8 @@
 package Java.AST.creating;
 
 import Java.AST.Node;
+import Java.AST.QueryStmt.SelectStmt.SelectFactoredStmt;
+import Java.AST.QueryStmt.SelectStmt.select_stmt;
 import Java.AST.assignmnet.Variable_with_opretor;
 import Java.AST.expr.Arithmatic_expr;
 import Java.AST.expr.Boolean_Infunction_Statment;
@@ -11,21 +13,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class assign_variable extends Node {   // to do the arithmatic structure one ....
-
-
+    select_stmt select ;
+    SelectFactoredStmt factored;
     public assign_variable(){
         this.variable_with_opretor = new ArrayList<>();
     }
 
+    public SelectFactoredStmt getFactored() {
+        return factored;
+    }
 
+    public void setFactored(SelectFactoredStmt factored) {
+        this.factored = factored;
+    }
 
-//    public Select getSelect() {
-//        return select;
-//    }
-//
-//    public void setSelect(Select select) {
-//        this.select = select;
-//    }
+    public select_stmt getSelect() {
+        return select;
+    }
+
+    public void setSelect(select_stmt select) {
+        this.select = select;
+    }
 
     public List<Variable_with_opretor> getVariable_with_opretor() {
         return variable_with_opretor;
@@ -46,6 +54,5 @@ public class assign_variable extends Node {   // to do the arithmatic structure 
 
     List<Variable_with_opretor> variable_with_opretor ;
 
-//    Select select ;//todo select from SQL
-//    //factored_select_stmt
+
 }

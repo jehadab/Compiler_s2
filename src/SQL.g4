@@ -913,18 +913,18 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
          ;
    function_body:
        OPEN_BRACKET
-       (sub_function_body | instructions | sql_stmt_list)* (return_rule SCOL)?
+       (sub_function_body | instructions )* (return_rule SCOL)?
        CLOSE_BRACKET
    ;
 
     sub_function_body:
-       OPEN_BRACKET (sub_function_body | instructions | sql_stmt_list)* CLOSE_BRACKET
-
+       OPEN_BRACKET (sub_function_body | instructions )* CLOSE_BRACKET
       ;
+
    instructions // todo switch in instraction
      :(functional_instruction | nonfunctional_instruction )
-
    ;
+
    functional_instruction :
  (do_while | if_else_rule|switch_rule|(while_rule|foreach|for_loop_rule)
  ((exiting_loops)?SCOL | OPEN_BRACKET instructions*  (exiting_loops SCOL)?CLOSE_BRACKET| instructions));
@@ -937,6 +937,8 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
        | grnral_creating
        | genral_assign
        |create_aggregation_function
+       |create_type
+       |create_table_stmt
         // i just do that to make sure for the one line if | one_line_if_instruction
        ) SCOL
 
