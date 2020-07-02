@@ -11,12 +11,18 @@ import java.util.Map;
 public class Type {
     private String name;
     private Map<String, Type> columns = new HashMap();
+    private Scope scope;
     public static final String NUMBER_CONST = "number";
     public static final String STRING_CONST = "string";
     public static final String BOOLEAN_CONST = "boolean";
     public static final String UNDEFINDED = "undefined";
 
-    public Type() {
+    public Scope getScope() {
+        return scope;
+    }
+
+    public void setScope(Scope scope) {
+        this.scope = scope;
     }
 
     public String getName() {
@@ -31,6 +37,7 @@ public class Type {
 
         //columns.put(namecol ,typecol);todo mohammad
     }
+
 
 //    public boolean checkValidTypewithScoop(Scope scope){
 //
