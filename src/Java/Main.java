@@ -7,6 +7,8 @@ import Java.AST.create.generalcreating;
 import Java.Base.BaseVisitor;
 import Java.SymbolTable.Symbol;
 import Java.SymbolTable.SymbolTable;
+import Java.SymbolTable.Table;
+import Java.SymbolTable.Type;
 import generated.SQLBaseListener;
 import generated.SQLLexer;
 import generated.SQLParser;
@@ -14,18 +16,9 @@ import generated.SQLParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-
-
-
-//import javax.json.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
 
@@ -65,6 +58,26 @@ public class Main {
             }
             for ( Object symbol :symbolTable.getScopes().get(i).getSymbolMap().values().toArray()) {
                 System.out.println("Symbol: "+ ((Symbol) symbol).getName());
+            }
+
+            for ( Object table :symbolTable.getScopes().get(i).getTableMap().values().toArray())
+            {
+                System.out.println("table: "+ ((Table) table).getTable_name());
+                System.out.println("the columns in this table : ");
+                System.out.println(" [  ");
+                for(int j = 0 ; j < ((Table) table).getColumnDefListList().size();j++){
+                    System.out.println(((Table) table).getColumnDefListList().get(j).getName()
+                            +"  the column type : "+ ((Table) table).getColumnDefListList().get(j).getTypeName().getName());
+                    System.out.println("  ");
+                }
+                System.out.println("  ] ");
+            }
+            for (Object type :symbolTable.getScopes().get(i).getTypeMap().values().toArray()){
+                System.out.println("Types: "+((Type) type).getName());
+                System.out.println("the columns in this types : ");
+                System.out.println(" [  ");
+                System.out.println(((Type) type).getColumns());
+                System.out.println("  ] ");
             }
 
         }

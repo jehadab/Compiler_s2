@@ -12,8 +12,23 @@ public class Scope {
     private String id;
     private Scope parent;
     private Map<String, Symbol> symbolMap = new LinkedHashMap();
+    private Map<String,Table> tableMap = new LinkedHashMap<>();
+    private Map<String ,Type> typeMap = new LinkedHashMap<>();
+
+
+    public void setTableMap(Map<String, Table> tableMap) {
+        this.tableMap = tableMap;
+    }
 
     public Scope() {
+    }
+
+    public Map<String, Type> getTypeMap() {
+        return typeMap;
+    }
+
+    public void setTypeMap(Map<String, Type> typeMap) {
+        this.typeMap = typeMap;
     }
 
     public String getId() {
@@ -42,5 +57,15 @@ public class Scope {
 
     public void addSymbol(String name, Symbol symbol) {
         this.symbolMap.put(name, symbol);
+    }
+
+    public void addTable(String table_name, Table table) {
+    this.tableMap.put(table_name , table);
+    }
+    public void addType(String type_name, Type type) {
+        this.typeMap.put(type_name , type);
+    }
+    public Map<String, Table> getTableMap() {
+        return tableMap;
     }
 }

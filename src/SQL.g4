@@ -334,8 +334,11 @@ column_name '=' expr
 // ;
 
 column_def
- : column_name ( column_constraint | type_name )*
+ :
+//  column_name ( column_constraint | type_name )*
+  column_name ( column_constraint* | type_name )
  ;
+
 
  type_name
   : oneOftype_name ( '(' signed_number1 ')'
@@ -910,12 +913,12 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
          ;
    function_body:
        OPEN_BRACKET
-       (sub_function_body | instructions)* (return_rule SCOL)?
+       (sub_function_body | instructions | sql_stmt_list)* (return_rule SCOL)?
        CLOSE_BRACKET
    ;
 
     sub_function_body:
-       OPEN_BRACKET (sub_function_body | instructions)* CLOSE_BRACKET
+       OPEN_BRACKET (sub_function_body | instructions | sql_stmt_list)* CLOSE_BRACKET
 
       ;
    instructions // todo switch in instraction
@@ -1017,8 +1020,8 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
     // |K_IF '('boolean_infunction_statment')' '{'(sub_function_body)'}' K_ELSE '{'(sub_function_body)'}'
     // | K_IF '('boolean_infunction_statment')''{'(sub_function_body)'}' K_ELSE K_IF'('boolean_infunction_statment ')''{'(sub_function_body)'}'
      if_rule
-     :   K_IF OPEN_PAR ( expression  | genral_assign ) CLOSE_PAR
-       ( OPEN_BRACKET instructions* (return_rule SCOL) ?  CLOSE_BRACKET
+     :   K_IF OPEN_PAR ( expression  | genral_assign  ) CLOSE_PAR
+       ( OPEN_BRACKET (instructions)* (return_rule SCOL) ?  CLOSE_BRACKET
        | (return_rule | instructions)? SCOL)
      ;
      else_if_rule:

@@ -1,12 +1,14 @@
-func(){
-var x = y  ;
-if(z){
-var zozo ;
-if(n){
-var soso ;
+main()
+{
+Create Table Student (Id number, Name string,
+DateOfBirthEpoch bignumber, HomeAddress Address,
+WorkAddress Address)type = "json" , path = "D://Desctop//table.path" ;
+var x = 5;
 }
-}else if (hoho){var hohoson;}
-else if(hoho2){var hoho2son;}
-else{var elseson;
-}
+main2()
+{
+create type address( id number , name string ,dsd boolean ,num number , contenct_info phoneInfo)
+
+Create Table Student2 (Id2 number, Name2 string,
+ WorkAddress2 Address)type = "json" , path = "D://Desctop//table2.path" ;
 }
