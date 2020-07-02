@@ -27,8 +27,19 @@ public class Type {
         this.name = name;
     }
 
-    public Map<String, Type> getColumns() {
-        return this.columns;
+    public void addColumnForType(String namecol,String typecol){
+
+        //columns.put(namecol ,typecol);todo mohammad
+    }
+
+//    public boolean checkValidTypewithScoop(Scope scope){
+//
+//    }
+
+
+    public Map<String, String> getColumns() {
+        //return this.columns; todo mohammad
+        return getColumns();
     }
 
     public void setColumns(Map<String, Type> columns) {

@@ -122,7 +122,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         List<Statement> sqlStmt = new ArrayList<Statement>();
         for (int i = 0; i < ctx.sql_stmt().size(); i++) {
             sqlStmt.add(visitSql_stmt(ctx.sql_stmt(i)));
-
         }
 
         return sqlStmt;
@@ -136,19 +135,21 @@ public class BaseVisitor extends SQLBaseVisitor {
         Statement s = new Statement();
         if (ctx.factored_select_stmt() != null) {
             s = visitFactored_select_stmt(ctx.factored_select_stmt());
-        } else if (ctx.delete_stmt() != null) {
-            s = visitDelete_stmt(ctx.delete_stmt());
+        }
+        else if (ctx.delete_stmt() != null) {
+            s = visitDelete_stmt(ctx.delete_stmt());// ... ignor this
         } else if (ctx.drop_table_stmt() != null) {
-            s = visitDrop_table_stmt(ctx.drop_table_stmt());//todo check for more detail
+            s = visitDrop_table_stmt(ctx.drop_table_stmt());//... ignor this
         } else if (ctx.create_table_stmt() != null) {
             s = visitCreate_table_stmt(ctx.create_table_stmt());
         } else if (ctx.alter_table_stmt() != null) {
-            s = visitAlter_table_stmt(ctx.alter_table_stmt());
+            s = visitAlter_table_stmt(ctx.alter_table_stmt());// ... ignor this
         } else if (ctx.insert_stmt() != null) {
-            s = visitInsert_stmt(ctx.insert_stmt());
+            s = visitInsert_stmt(ctx.insert_stmt());// ... ignor this
         } else if (ctx.update_stmt() != null) {
-            s = visitUpdate_stmt(ctx.update_stmt());
-        } else if (ctx.create_type() != null) {
+            s = visitUpdate_stmt(ctx.update_stmt());// ... ignor this
+        }
+        else if(ctx.create_type()!=null){
             s = visitCreate_type(ctx.create_type());
         }
 
@@ -224,21 +225,31 @@ public class BaseVisitor extends SQLBaseVisitor {
     @Override
     public CreateTableStmt visitCreate_table_stmt(SQLParser.Create_table_stmtContext ctx) {
         System.out.println("visitCreate_table_stmt");
-        CreateTableStmt createTableStmt = new CreateTableStmt();
+        Scope currentScope =  scopesStack.peek();
+        Table table = new Table();
+         CreateTableStmt createTableStmt = new CreateTableStmt();
 //        if(ctx.database_name()!=null) {
 //            createTableStmt.setDataBaseName(visitDatabase_name(ctx.database_name()));
 //        }
-        if (ctx.table_name() != null) {
+        if(ctx.table_name()!=null){
             createTableStmt.setTableName(visitTable_name(ctx.table_name()));
-            if (ctx.column_def() != null) {
+//            for store the name of the table in table in the SymbolTable
+            String name = ctx.table_name().use_random_name().getText();
+            table.setTable_name(name);
+
+            if(ctx.column_def()!=null)
+            {
                 List<ColumnDef> columnDefs = new ArrayList<>();
-                for (int i = 0; i < ctx.column_def().size(); i++) {
+                for (int i = 0; i <ctx.column_def().size() ; i++) {
                     columnDefs.add(visitColumn_def(ctx.column_def(i)));
                 }
+
+
                 createTableStmt.setColumnDefs(columnDefs);
-                if (ctx.table_constraint() != null) {
-                    List<TableConstraint> tableConstraints = new ArrayList<>();
-                    for (int i = 0; i < ctx.table_constraint().size(); i++) {
+
+                if(ctx.table_constraint()!=null){
+                    List<TableConstraint> tableConstraints= new ArrayList<>();
+                    for (int i = 0; i <ctx.table_constraint().size() ; i++) {
                         tableConstraints.add(visitTable_constraint(ctx.table_constraint(i)));
                     }
                     createTableStmt.setTableConstraints(tableConstraints);
@@ -255,6 +266,12 @@ public class BaseVisitor extends SQLBaseVisitor {
             }
 
         }
+        currentScope.addTable(table.getTable_name(),table);
+        table.setColumnDefListList(createTableStmt.getColumnDefs());
+        table.setPath_of_table(createTableStmt.getDeclarePathTable().getPath());
+//        System.out.println("the path of the table is : "+table.getPath_of_table());
+        table.setExtension_of_table(createTableStmt.getDeclareTypeTable().getType());
+//        System.out.println("the extension of the table is : "+table.getExtension_of_table());
         createTableStmt.setName("Create Table");
 
 
@@ -296,9 +313,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                 }
             }
             if (ctx.type_name() != null) {
-                for (int i = 0; i < ctx.type_name().size(); i++) {
-                    colmndef.addItemToListOfTypeName(visitType_name(ctx.type_name(i)));
-                }
+              colmndef.setTypeName(visitType_name(ctx.type_name()));
             }
         }
         return colmndef;
@@ -385,7 +400,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                 typeName.setLim2(ctx.signed_number2().getText());
                 System.out.println("singed_number is : " + "(" + typeName.getLim2() + ")");
             }
-
+            typeName.setName(ctx.oneOftype_name().getText());
         }
         return typeName;
     }
@@ -394,18 +409,27 @@ public class BaseVisitor extends SQLBaseVisitor {
     @Override
     public Create_Type visitCreate_type(SQLParser.Create_typeContext ctx) {
         System.out.println("visit_creat_type");
+        Scope currentScope =  scopesStack.peek();
+        Type type = new Type();
         Create_Type create_type = new Create_Type();
         if (ctx.use_random_name() != null) {
             create_type.setNameOfType(ctx.use_random_name().getText());
-            if (ctx.inside_create_type() != null) {
-                List<InsideCreateType> insideCreateTypes = new ArrayList<>();
-                for (int i = 0; i < ctx.inside_create_type().size(); i++) {
+//            todo check for the type name
+            type.setName(create_type.getNameOfType());
+            if(ctx.inside_create_type()!=null){
+                List<InsideCreateType> insideCreateTypes =  new ArrayList<>();
+                for(int i=0; i<ctx.inside_create_type().size();i++){
                     insideCreateTypes.add(visitInside_create_type(ctx.inside_create_type(i)));
+                    type.addColumnForType(insideCreateTypes.get(i).getNameOfColumnOfType(),insideCreateTypes.get(i).getType());
                 }
+
                 create_type.setInsideCreateTypeList(insideCreateTypes);
             }
             create_type.setName("Create_Type");
         }
+        currentScope.addType(type.getName(),type);
+        type.setScope(currentScope);
+        Main.symbolTable.addType(type);
         return create_type;
     }
 
@@ -2067,9 +2091,12 @@ public class BaseVisitor extends SQLBaseVisitor {
                 sub_function_body.addNode(visitInstructions((SQLParser.InstructionsContext) ctx.children.get(i)));
             } else if (ctx.children.get(i) instanceof SQLParser.Sub_function_bodyContext) {
                 sub_function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext) ctx.children.get(i)));
+            } else if (ctx.children.get(i) instanceof SQLParser.Sql_stmt_listContext) {
+                sub_function_body.addNode(visitSql_stmt_list((SQLParser.Sql_stmt_listContext) ctx.children.get(i)));
             }
         }
-        Main.symbolTable.addScope(scopesStack.pop());
+            Main.symbolTable.addScope(scopesStack.pop());
+
 
         return sub_function_body;
     }
@@ -2201,6 +2228,12 @@ public class BaseVisitor extends SQLBaseVisitor {
             } else if (ctx.nonfunctional_instruction().create_aggregation_function() != null) {
                 instructions.setAggregation_function(visitCreate_aggregation_function(ctx.nonfunctional_instruction().create_aggregation_function()));
             }
+            else if(ctx.nonfunctional_instruction().create_table_stmt() != null){
+                instructions  = visitCreate_table_stmt(ctx.nonfunctional_instruction().create_table_stmt());
+            }
+            else if(ctx.nonfunctional_instruction().create_type() != null){
+                instructions = visitCreate_type(ctx.nonfunctional_instruction().create_type());
+            }
 
             //todo complete it else if (ctx.nonfunctional_instruction().one_line_if_instruction()!=null)
 
@@ -2233,6 +2266,7 @@ public class BaseVisitor extends SQLBaseVisitor {
             for (int i = 0; i < ctx.if_rule().instructions().size(); i++) {
                 ins.addinstruction(visitInstructions(ctx.if_rule().instructions(i)));
             }
+
             // System.out.println("check the value in the returnign in if "+ctx.if_rule().returning_in_if().getText().toString().toString());
             //   if(ctx.if_rule().returning_in_if()!=null) {
             //System.out.println("here we are ");
@@ -2543,12 +2577,11 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             Expression expression = visitExpression(ctx.expression());
             var.setExpression(expression);
         }
-
-if (ctx.select_stmt() != null) {
-            var.setSelect(visitSelect_stmt(ctx.select_stmt()));
-        }
-        if (ctx.factored_select_stmt() != null) {
+        if(ctx.factored_select_stmt()!= null){
             var.setFactored(visitFactored_select_stmt(ctx.factored_select_stmt()));
+        }
+        if(ctx.select_stmt() != null){
+            var.setSelect(visitSelect_stmt(ctx.select_stmt()));
         }
 
         return var;
