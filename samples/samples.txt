@@ -1,6 +1,7 @@
 create aggregation function sum (d:/o/p,classname,methodname, typename , [  string,number , boolean ,kk ])
 func(){
-var x = y + z ;
+var x = 1 *4 % 2;
+ x = x + 1;
 
 if(y)
 {

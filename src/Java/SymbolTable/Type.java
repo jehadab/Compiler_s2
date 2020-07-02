@@ -14,6 +14,7 @@ public class Type {
     public static final String NUMBER_CONST = "number";
     public static final String STRING_CONST = "string";
     public static final String BOOLEAN_CONST = "boolean";
+    public static final String UNDEFINDED = "undefined";
 
     public Type() {
     }

@@ -68,6 +68,8 @@ public class Main {
             for ( Object symbol :symbolTable.getScopes().get(i).getSymbolMap().values().toArray()) {
                 System.out.println("-Symbol: "+ ((Symbol) symbol).getName());
                 System.out.println("-Symbol Scope: "+ ((Symbol) symbol).getScope().getId());
+                System.out.println("-Symbol type: "+ ((Symbol) symbol).getType().getName());
+
 
             }
             System.out.println("_______________");

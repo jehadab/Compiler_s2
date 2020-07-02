@@ -792,7 +792,6 @@ keyword
  | K_NEXTVAL
  ;
 
-// TODO check all names below
 
 //[a-zA-Z_0-9\t \-\[\]\=]+
 unknown
@@ -902,7 +901,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
        function_body)
    ;
 
-    function_header: // todo rebuild antler
+    function_header:
 
          use_random_name
          OPEN_PAR
@@ -1145,7 +1144,6 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
                   | factored_select_stmt
                   | select_stmt
 
-                  //| arithmetic_infunction_statment // todo here merge with infunction
 
              )
      ;
@@ -1361,7 +1359,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
      | ONE_CHAR_LETTER
      | varible_from_object
      | array_base_form_with_index
-     | call_function) //todo call function
+     | call_function)
   ;*/
    shortcut_statments
       : MINUS_MINUS use_random_name
@@ -1618,7 +1616,7 @@ IDENTIFIER
  : '"' (~'"' | '""')* '"'
  //| '`' (~'`' | '``')* '`'
  //| '[' ~']'* ']'
- //| RANDOM_NAME // TODO check: needs more chars in set
+ //| RANDOM_NAME
  ;
 RANDOM_NAME :
 [a-zA-Z_] [a-zA-Z_0-9]*
