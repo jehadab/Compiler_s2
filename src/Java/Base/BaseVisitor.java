@@ -2488,10 +2488,9 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         if (ctx.assign_varible() != null) {
             ins.setVar(visitAssign_varible(ctx.assign_varible()));
             boolean isTypeValid = checkExpressionTypeValid(ins.getVar().getExpression());
-            if(isTypeValid)
-            {
-                if(compareTwoTypes(getVariableType(ins.getVar().getVariable_with_opretor().get(0).getVariable_name())
-                        ,getFirstExpritionType(ins.getVar().getExpression()))){
+            if (isTypeValid) {
+                if (compareTwoTypes(getVariableType(ins.getVar().getVariable_with_opretor().get(0).getVariable_name())
+                        , getFirstExpritionType(ins.getVar().getExpression()))) {
 
                     getVariableType(ins.getVar().getVariable_with_opretor().get(0).getVariable_name()).
                             setName(getFirstExpritionType(ins.getVar().getExpression()).getName());
@@ -2774,45 +2773,43 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
     }
 
 
-    public boolean compareTwoTypes(Type firstType , Type secondType){
-        if(secondType.getName().equals(Type.UNDEFINDED)){
+    public boolean compareTwoTypes(Type firstType, Type secondType) {
+        if (secondType.getName().equals(Type.UNDEFINDED)) {
             System.err.println("trying to assign undefined variable");
             return false;
-        }
-        else if(firstType.getName().equals(secondType.getName())){
+        } else if (firstType.getName().equals(secondType.getName())) {
             return true;
-        }
-        else if(firstType.getName().equals(Type.UNDEFINDED))
+        } else if (firstType.getName().equals(Type.UNDEFINDED))
             return true;
         else {
             return false;
         }
     }
+
     public Type addTypeForVariable(Expression expression) {
         Type type = new Type();
         boolean checktypeValidation = checkExpressionTypeValid(expression);
         if (checktypeValidation) {
             type.setName(getFirstExpritionType(expression).getName());
-        }
-        else {
+        } else {
 
         }
         return type;
     }
 
-        public Type getFirstExpritionType(Expression expression) {
-         Type type = new Type();
-         type.setName("undefined first function");
+    public Type getFirstExpritionType(Expression expression) {
+        Type type = new Type();
+        type.setName("undefined first function");
         ArrayList<Intral_Expression_Value> expression_lists = convertExpretionListToArray(expression);
 
         if (expression_lists.get(0).getNUMERIC_LITERAL() != null) {
-            type.setName( Type.NUMBER_CONST);
+            type.setName(Type.NUMBER_CONST);
         } else if (expression_lists.get(0).getTure_or_False() != null) {
-            type.setName( Type.BOOLEAN_CONST);
+            type.setName(Type.BOOLEAN_CONST);
         } else if (expression_lists.get(0).getIdentyfire() != null) {
             type.setName(Type.STRING_CONST);
         } else if (expression_lists.get(0).getVariable_name() != null) {
-            type = getVariableType(expression_lists.get(0).getVariable_name().getVariable_name()) ;
+            type = getVariableType(expression_lists.get(0).getVariable_name().getVariable_name());
         }
         return type;
     }
@@ -2868,7 +2865,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
                 } else {
                     // error in expression types
-                    System.err.println("Can't applied operation between " +types.get(i).getName() +" And " + types.get(i + 1).getName());
+                    System.err.println("Can't applied operation between " + types.get(i).getName() + " And " + types.get(i + 1).getName());
                     return false;
                 }
 
@@ -2903,9 +2900,10 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             extractDataFromExpretion(expression_list.getLeft_expr(), expression_lists);
         }
     }
-    public void displayExprissionList(ArrayList<Intral_Expression_Value> intral_expression_values){
-        for (Intral_Expression_Value node:intral_expression_values
-             ) {
+
+    public void displayExprissionList(ArrayList<Intral_Expression_Value> intral_expression_values) {
+        for (Intral_Expression_Value node : intral_expression_values
+                ) {
             if (node.getNUMERIC_LITERAL() != null) {
                 System.out.println(node.getNUMERIC_LITERAL());
             } else if (node.getTure_or_False() != null) {
@@ -2919,11 +2917,12 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
         }
     }
-    public void dispalaySymbolsInScope(Scope scope){
-        for ( Object symbol :scope.getSymbolMap().values().toArray()) {
-            System.out.println("-Symbol: "+ ((Symbol) symbol).getName());
-            System.out.println("-Symbol Scope: "+ ((Symbol) symbol).getScope().getId());
-            System.out.println("-Symbol type: "+ ((Symbol) symbol).getType().getName());
+
+    public void dispalaySymbolsInScope(Scope scope) {
+        for (Object symbol : scope.getSymbolMap().values().toArray()) {
+            System.out.println("-Symbol: " + ((Symbol) symbol).getName());
+            System.out.println("-Symbol Scope: " + ((Symbol) symbol).getScope().getId());
+            System.out.println("-Symbol type: " + ((Symbol) symbol).getType().getName());
 
 
         }
