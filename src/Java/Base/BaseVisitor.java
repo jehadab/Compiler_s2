@@ -1352,7 +1352,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         createdSymbol.setScope(currentScope);
 //        createdSymbol.setType();
         currentScope.addSymbol(name , createdSymbol);
-       Error_ofusing_undeclared_variabler(createdSymbol.getScope(),createdSymbol.getName() );
+     //  Error_ofusing_undeclared_variabler(createdSymbol.getScope(),createdSymbol.getName() );
        // rec_Error_fousing_undeclared_variabler(createdSymbol.getScope(),createdSymbol.getName() );
         return variable_with_assign;
     }
@@ -1995,6 +1995,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     @Override public creatingvariabelwithoutassing visitCreate_varible_without_assign(SQLParser.Create_varible_without_assignContext ctx) {
         System.out.println("creatingvariabelwithoutassing");
         creatingvariabelwithoutassing creatvaribelwihtout = new creatingvariabelwithoutassing();
+      //  Error_ofusing_undeclared_variabler( ,ctx.varible_name().use_random_name().getText());
         creatvaribelwihtout.setN(visitUse_random_name(ctx.varible_name().use_random_name()));
         creatvaribelwihtout.setInstrucation_name(creatingvariabelwithoutassing.class.getName());
 
@@ -3020,7 +3021,7 @@ if(isdeclared==false )
 
 
 
-    public void rec_Error_fousing_undeclared_variabler (Scope scope , String symbole_name ){
+   /* public void rec_Error_fousing_undeclared_variabler (Scope scope , String symbole_name ){
    if(scope.getId()=="global_scope")
        return ;
    else {
@@ -3035,7 +3036,7 @@ if(isdeclared==false )
 
        }
    }
-    }
+    }*/
 }
 
 

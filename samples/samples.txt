@@ -1,15 +1,8 @@
-function sum (){
-sum();
+function g (){
+var x;
+var y;
+{
+x++;
 }
-function div(){
-sum();
-}
-function Find(){
-help();
-}
-function help (){
-sum();
-}
-function testing (){
-help();
+y++;
 }
