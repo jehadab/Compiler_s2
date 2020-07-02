@@ -29,7 +29,7 @@ import Java.AST.instruction.Returning.returnes_rule;
 import Java.AST.instruction.all_the_non_functional_instructions.One_line_if;
 import Java.Main;
 import Java.SymbolTable.*;
-import com.sun.org.apache.xml.internal.utils.StringComparable;
+//import com.sun.org.apache.xml.internal.utils.StringComparable;
 import generated.SQLBaseVisitor;
 import generated.SQLParser;
 
