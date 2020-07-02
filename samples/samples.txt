@@ -1,11 +1,9 @@
 create aggregation function sum (d:/o/p,classname,methodname, typename , [  string,number , boolean ,kk ])
 func(){
-var x = 1 *4 % 2;
- x = x + 1;
+var x =2;
+var y ;
 
-if(y)
-{
-}
+x = y ;
 
 
 }

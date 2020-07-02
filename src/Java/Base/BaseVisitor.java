@@ -2490,8 +2490,13 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             boolean isTypeValid = checkExpressionTypeValid(ins.getVar().getExpression());
             if(isTypeValid)
             {
-                compareTwoTypes(getVariableType(ins.getVar().getVariable_with_opretor().get(0).getVariable_name())
-                        ,getVariableType(getFirstExpritionType(ins.getVar().getExpression())));
+                if(compareTwoTypes(getVariableType(ins.getVar().getVariable_with_opretor().get(0).getVariable_name())
+                        ,getFirstExpritionType(ins.getVar().getExpression()))){
+
+                    getVariableType(ins.getVar().getVariable_with_opretor().get(0).getVariable_name()).
+                            setName(getFirstExpritionType(ins.getVar().getExpression()).getName());
+                }
+
             }
         } else if (ctx.assign_array() != null) {
             ins.setArray(visitAssign_array(ctx.assign_array()));
@@ -2770,12 +2775,15 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
 
     public boolean compareTwoTypes(Type firstType , Type secondType){
-        if(!firstType.getName().equals(Type.UNDEFINDED) ||!secondType.getName().equals(Type.UNDEFINDED)){
+        if(secondType.getName().equals(Type.UNDEFINDED)){
+            System.err.println("trying to assign undefined variable");
             return false;
         }
         else if(firstType.getName().equals(secondType.getName())){
             return true;
         }
+        else if(firstType.getName().equals(Type.UNDEFINDED))
+            return true;
         else {
             return false;
         }
@@ -2784,23 +2792,27 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         Type type = new Type();
         boolean checktypeValidation = checkExpressionTypeValid(expression);
         if (checktypeValidation) {
-            type.setName(getFirstExpritionType(expression));
+            type.setName(getFirstExpritionType(expression).getName());
+        }
+        else {
+
         }
         return type;
     }
 
-        public String getFirstExpritionType(Expression expression) {
-         String type = "undefinedfirs";
+        public Type getFirstExpritionType(Expression expression) {
+         Type type = new Type();
+         type.setName("undefined first function");
         ArrayList<Intral_Expression_Value> expression_lists = convertExpretionListToArray(expression);
 
         if (expression_lists.get(0).getNUMERIC_LITERAL() != null) {
-            type = Type.NUMBER_CONST;
+            type.setName( Type.NUMBER_CONST);
         } else if (expression_lists.get(0).getTure_or_False() != null) {
-            type = Type.BOOLEAN_CONST;
+            type.setName( Type.BOOLEAN_CONST);
         } else if (expression_lists.get(0).getIdentyfire() != null) {
-            type = Type.STRING_CONST;
+            type.setName(Type.STRING_CONST);
         } else if (expression_lists.get(0).getVariable_name() != null) {
-            type = getVariableType(expression_lists.get(0).getVariable_name().getVariable_name()).getName() ;
+            type = getVariableType(expression_lists.get(0).getVariable_name().getVariable_name()) ;
         }
         return type;
     }
@@ -2808,15 +2820,16 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
     public Type getVariableType(String variableName) {
         Scope currentScope = scopesStack.peek();
         Type variableType = new Type();
+        variableType.setName("did not find variable");
         while (currentScope.getParent() != null) {
             if (currentScope.getSymbolMap().containsKey(variableName)) {
+//                System.err.println("ggggggggggg"+currentScope.getSymbolMap().containsKey(variableName));
                 return currentScope.getSymbolMap().get(variableName).getType();
             } else {
-
                 currentScope = currentScope.getParent();
             }
         }
-        variableType.setName("undefined variable Type");
+
         return variableType;
 
     }
@@ -2855,22 +2868,23 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
                 } else {
                     // error in expression types
+                    System.err.println("Can't applied operation between " +types.get(i).getName() +" And " + types.get(i + 1).getName());
                     return false;
                 }
 
 
             }
         }
-        for (int i = 0; i < types.size(); i++) {
-
-//            System.out.println("types: " + types.get(i).getName());
-        }
+//        for (int i = 0; i < types.size(); i++) {
+//
+//           System.out.println("types: " + types.get(i).getName());
+//        }
 
         return true;
 
     }
 
-    public ArrayList<Intral_Expression_Value> convertExpretionListToArray(Expression expression) {
+    private ArrayList<Intral_Expression_Value> convertExpretionListToArray(Expression expression) {
         ArrayList<Intral_Expression_Value> expression_list = new ArrayList<>();
 
         extractDataFromExpretion(expression.getExpression_list(), expression_list);
@@ -2878,7 +2892,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         return expression_list;
     }
 
-    public void extractDataFromExpretion(Expression_List expression_list, ArrayList<Intral_Expression_Value> expression_lists) {
+    private void extractDataFromExpretion(Expression_List expression_list, ArrayList<Intral_Expression_Value> expression_lists) {
         if (expression_list.getIntral_expression_value() != null) {
             expression_lists.add(expression_list.getIntral_expression_value());
         }
@@ -2904,8 +2918,15 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
 
         }
+    }
+    public void dispalaySymbolsInScope(Scope scope){
+        for ( Object symbol :scope.getSymbolMap().values().toArray()) {
+            System.out.println("-Symbol: "+ ((Symbol) symbol).getName());
+            System.out.println("-Symbol Scope: "+ ((Symbol) symbol).getScope().getId());
+            System.out.println("-Symbol type: "+ ((Symbol) symbol).getType().getName());
 
 
+        }
     }
 
 }
