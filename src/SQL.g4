@@ -792,7 +792,6 @@ keyword
  | K_NEXTVAL
  ;
 
-// TODO check all names below
 
 //[a-zA-Z_0-9\t \-\[\]\=]+
 unknown
@@ -880,7 +879,8 @@ any_name
  //| '(' any_name ')'
  ;
 create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name OPEN_PAR
-  jar_pathe
+  //jar_pathe
+  IDENTIFIER
   COMMA
    use_random_name
    COMMA
@@ -890,7 +890,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
    COMMA
    OPEN_SQER_BAR (parames? (COMMA parames)*)  CLOSE_SQER_PAR CLOSE_PAR;
 
-   jar_pathe: (use_random_name ':' '/' use_random_name) ('/' use_random_name)*| use_random_name;
+  // jar_pathe: (use_random_name ':' '/' use_random_name) ('/' use_random_name)*| use_random_name;
       parames: K_STRING |K_NUMBER| K_BOOLEAN  |table_name |column_name;
 // start section instraction and functions defination --------------------------------------------------------------
 
@@ -901,7 +901,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
        function_body)
    ;
 
-    function_header: // todo rebuild antler
+    function_header:
 
          use_random_name
          OPEN_PAR
@@ -1144,7 +1144,6 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
                   | factored_select_stmt
                   | select_stmt
 
-                  //| arithmetic_infunction_statment // todo here merge with infunction
 
              )
      ;
@@ -1360,7 +1359,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
      | ONE_CHAR_LETTER
      | varible_from_object
      | array_base_form_with_index
-     | call_function) //todo call function
+     | call_function)
   ;*/
    shortcut_statments
       : MINUS_MINUS use_random_name
@@ -1617,7 +1616,7 @@ IDENTIFIER
  : '"' (~'"' | '""')* '"'
  //| '`' (~'`' | '``')* '`'
  //| '[' ~']'* ']'
- //| RANDOM_NAME // TODO check: needs more chars in set
+ //| RANDOM_NAME
  ;
 RANDOM_NAME :
 [a-zA-Z_] [a-zA-Z_0-9]*

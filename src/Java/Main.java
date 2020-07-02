@@ -36,7 +36,7 @@ public class Main {
 
 
 
-            File file = new File("../../samples/samples.txt");
+            File file = new File("C://Users//Dell//Desktop//Sql_compiler//samples//samples.txt");
             String fileName = file.getAbsolutePath();
 
             CharStream cs = fromFileName(fileName);
@@ -52,9 +52,12 @@ public class Main {
             e.printStackTrace();
         }
 
+
     }
     public static void showSymboleTable(){
-        for (int i = 0; i <Main.symbolTable.getScopes().size() ; i++) {
+        System.out.println("scopes stored :"+symbolTable.getScopes().size() );
+        System.out.println("_______________");
+        for (int i = 0; i <symbolTable.getScopes().size() ; i++) {
             System.out.println("scope: "+symbolTable.getScopes().get(i).getId());
             if(symbolTable.getScopes().get(i).getParent() != null){
                 System.out.println("father: "+symbolTable.getScopes().get(i).getParent().getId());
@@ -64,9 +67,17 @@ public class Main {
                 System.out.println("father: "+symbolTable.getScopes().get(i).getParent());
             }
             for ( Object symbol :symbolTable.getScopes().get(i).getSymbolMap().values().toArray()) {
-                System.out.println("Symbol: "+ ((Symbol) symbol).getName());
+                System.out.println("-Symbol: "+ ((Symbol) symbol).getName());
+                System.out.println("-Symbol Scope: "+ ((Symbol) symbol).getScope().getId());
+                System.out.println("-Symbol type: "+ ((Symbol) symbol).getType().getName());
+
+
             }
+            System.out.println("_______________");
 
         }
     }
-}
+int x ;
+
+    }
+
