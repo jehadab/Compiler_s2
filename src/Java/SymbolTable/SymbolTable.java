@@ -5,15 +5,27 @@
 
 package Java.SymbolTable;
 
+import Java.AST.function.function_header;
+import Java.AST.instruction.arithmetic_infunction_statment;
+
 import java.util.ArrayList;
 
 public class SymbolTable {
     private ArrayList<Scope> scopes = new ArrayList();
     private ArrayList<Type> declaredTypes = new ArrayList();
+    private ArrayList<function_header> functions= new ArrayList<function_header>();
 
     public SymbolTable() {
     }
 
+    public ArrayList<function_header> getFunctions() {
+        return functions;
+    }
+
+    public void setFunctions(ArrayList<function_header> functions) {
+        this.functions = functions;
+    }
+public void add_functions(function_header new_function ){this.functions.add(new_function);}
     public ArrayList<Scope> getScopes() {
         return this.scopes;
     }

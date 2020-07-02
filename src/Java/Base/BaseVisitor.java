@@ -29,6 +29,7 @@ import Java.AST.instruction.Returning.returnes_rule;
 import Java.AST.instruction.all_the_non_functional_instructions.One_line_if;
 import Java.Main;
 import Java.SymbolTable.*;
+import com.sun.org.apache.xml.internal.utils.StringComparable;
 import generated.SQLBaseVisitor;
 import generated.SQLParser;
 
@@ -92,6 +93,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                 Scope functionScope = new Scope();
                 functionScope.setId(ctx.funtion().get(i).function_header().use_random_name().getText() + "_" + ctx.funtion().get(i).hashCode());
                 functionScope.setParent(scopesStack.peek());
+
                 scopesStack.push(functionScope);
 
                 p.getFunctions().add(visitFuntion(ctx.funtion(i)));
@@ -1151,6 +1153,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     public FunctionDeclaration visitFuntion(SQLParser.FuntionContext ctx) {
         System.out.println("function declaration ");
         FunctionDeclaration funcdec = new FunctionDeclaration();
+
         funcdec.setHeader(visitFunction_header(ctx.function_header()));
         funcdec.setBody(visitFunction_body(ctx.function_body()));
 
@@ -1171,10 +1174,11 @@ public class BaseVisitor extends SQLBaseVisitor {
 //        Scope functionScop = new Scope();
 //        String functionName = ctx.use_random_name().getText();
 //        functionScop.setId(functionName);
-//        Main.symbolTable.addScope(functionScop);
-
+//        Main.symbolTable.addScope(functionScop)
         header.setName(ctx.use_random_name().getText());
         //System.out.println( " the value here "+ctx.args().size());
+        Main.symbolTable.add_functions(header);
+        //System.out.println("changing size"+Main.symbolTable.getFunctions().size());
         for (int i = 0; i < ctx.args().size(); i++) {
             //header.additemtoarglist();
             //header.setArg((List<args>) visitArgs(ctx.args().get(i)));
@@ -1191,7 +1195,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         // header.pri();
         // we should use for loop
         // set list of parameteres
-
 
         return header;
     }
@@ -1608,6 +1611,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         Expression expression = new Expression();
         //cleanExpressionTree(ctx);
         expression.setExpression_list(expression_algorthim(ctx));
+
+        int x = 1, y = 2, z = 3;
         System.out.println("visit expression");
 
         return expression;
@@ -1651,9 +1656,11 @@ public class BaseVisitor extends SQLBaseVisitor {
     }
 
     public Shortcut_Statments shortcut_Statments_Expression(SQLParser.ExpressionContext ctx) {
+        System.out.println("just to make me understand ");
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
         if (ctx.intral_expression_value().varible_name() != null) {
             Variable_Name variable_name = visitVarible_name(ctx.intral_expression_value().varible_name());
+            // Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.);
             shortcut_statments.setShortcut_variable_name(variable_name.getVariable_name());
         }
         if (ctx.PLUS_PLUS() != null) {
@@ -1684,8 +1691,11 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         } else if (ctx.DIV() != null) {
             expression_list.setOp(ctx.DIV().toString());
-            System.out.println("opretor :" + expression_list.getOp());
-        } else if (ctx.MOD() != null) {
+            System.out.println("opretor :"+expression_list.getOp());
+
+        }
+        else if (ctx.MOD() != null)
+        {
             expression_list.setOp(ctx.MOD().toString());
             System.out.println("opretor :" + expression_list.getOp());
         } else if (ctx.LT2() != null) {
@@ -1926,6 +1936,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     public creatingvariabelwithoutassing visitCreate_varible_without_assign(SQLParser.Create_varible_without_assignContext ctx) {
         System.out.println("creatingvariabelwithoutassing");
         creatingvariabelwithoutassing creatvaribelwihtout = new creatingvariabelwithoutassing();
+        //  Error_ofusing_undeclared_variabler( ,ctx.varible_name().use_random_name().getText());
         creatvaribelwihtout.setN(visitUse_random_name(ctx.varible_name().use_random_name()));
         creatvaribelwihtout.setInstrucation_name(creatingvariabelwithoutassing.class.getName());
 
@@ -2179,7 +2190,9 @@ public class BaseVisitor extends SQLBaseVisitor {
                 // System.out.println("check what we have in gneral creating "+instructions.getInstrucation_name());
             } else if (ctx.nonfunctional_instruction().genral_assign() != null) {
                 instructions = visitGenral_assign(ctx.nonfunctional_instruction().genral_assign());
-            } else if (ctx.nonfunctional_instruction().call_function() != null) {
+            }
+            else if (ctx.nonfunctional_instruction().call_function() != null)
+            {
                 instructions = visitCall_function(ctx.nonfunctional_instruction().call_function());
             } else if (ctx.nonfunctional_instruction().print_statment() != null) {
                 instructions = visitPrint_statment(ctx.nonfunctional_instruction().print_statment());
@@ -2188,6 +2201,10 @@ public class BaseVisitor extends SQLBaseVisitor {
             } else if (ctx.nonfunctional_instruction().create_aggregation_function() != null) {
                 instructions.setAggregation_function(visitCreate_aggregation_function(ctx.nonfunctional_instruction().create_aggregation_function()));
             }
+
+            //todo complete it else if (ctx.nonfunctional_instruction().one_line_if_instruction()!=null)
+
+
         }
         // for(int i=0;i<ctx.functional_instruction().instructions().size();i++)
         //   System.out.println("^^^^^^^^"+ctx.functional_instruction().instructions(i).toString());
@@ -2447,6 +2464,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         System.out.println("visit call function");
         CallFunction ins = new CallFunction();
         ins.setInstrucation_name(CallFunction.class.getName());
+        Error_UNdeclared_Function(ctx.use_random_name().getText());
         ins.setFunction_name(ctx.use_random_name().getText());
         for (int i = 0; i < ctx.prameters().size(); i++) {
             ins.getParameters().add(visitPrameters(ctx.prameters(i)));
@@ -2487,17 +2505,16 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
         if (ctx.assign_varible() != null) {
             ins.setVar(visitAssign_varible(ctx.assign_varible()));
-            boolean isTypeValid = checkExpressionTypeValid(ins.getVar().getExpression());
+        boolean isTypeValid = checkExpressionTypeValid(ins.getVar().getExpression());
             if (isTypeValid) {
                 if (compareTwoTypes(getVariableType(ins.getVar().getVariable_with_opretor().get(0).getVariable_name())
                         , getFirstExpritionType(ins.getVar().getExpression()))) {
 
                     getVariableType(ins.getVar().getVariable_with_opretor().get(0).getVariable_name()).
                             setName(getFirstExpritionType(ins.getVar().getExpression()).getName());
-                }
-
-            }
-        } else if (ctx.assign_array() != null) {
+                }}
+       } else if (ctx.assign_array() != null)
+        {
             ins.setArray(visitAssign_array(ctx.assign_array()));
         } else if (ctx.assign_json() != null) {
             ins.setJson(visitAssign_json(ctx.assign_json()));
@@ -2527,6 +2544,12 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             var.setExpression(expression);
         }
 
+if (ctx.select_stmt() != null) {
+            var.setSelect(visitSelect_stmt(ctx.select_stmt()));
+        }
+        if (ctx.factored_select_stmt() != null) {
+            var.setFactored(visitFactored_select_stmt(ctx.factored_select_stmt()));
+        }
 
         return var;
     }
@@ -2571,7 +2594,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             A.setAggregationFunctionName(visitUse_random_name(ctx.use_random_name(0)));
         }
 
-        //A.setJat_path(ctx.IDENTIFIER().toString());
+         //A.setJat_path(ctx.IDENTIFIER().toString());
         A.setClassName(ctx.use_random_name(1).getText());
         A.setMethodName(ctx.use_random_name(2).getText());
         A.setReturnType(ctx.use_random_name(3).getText());// here sgould we viste retur  type
@@ -2621,7 +2644,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
     @Override
     public Shortcut_Statments visitShortcut_statments(SQLParser.Shortcut_statmentsContext ctx) {
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
-
+        Error_ofusing_undeclared_variabler(scopesStack.peek(), ctx.use_random_name().getText());
         if (ctx.use_random_name() != null) {
             shortcut_statments.setShortcut_variable_name(visitUse_random_name(ctx.use_random_name()));
 
@@ -2674,6 +2697,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         ins.setInstrucation_name(Switch.class.getName());
 
         Scope switchScope = new Scope();
+
         switchScope.setId(ctx.K_SWITCH().getText() + "_" + ctx.hashCode());
         switchScope.setParent(scopesStack.peek());
 
@@ -2770,21 +2794,59 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             System.out.println("operator < or > or <= or >= can not be applied to " + symbol_1.getType().getName() + "and" + symbol_2.getType().getName());
         }
         // we could use it in loops
-    }
+    } public void Error_ofusing_undeclared_variabler(Scope scope, String symbole_name) {
+        boolean declared = false;
+        while (scope.getId() != "global_scope") {
+            if (scope.getSymbolMap().get(symbole_name) != null) {
+                declared = true;
+                break;
+            } else {
+                scope = scope.getParent();
+                declared = false;
 
+            }
 
-    public boolean compareTwoTypes(Type firstType, Type secondType) {
-        if (secondType.getName().equals(Type.UNDEFINDED)) {
-            System.err.println("trying to assign undefined variable");
-            return false;
-        } else if (firstType.getName().equals(secondType.getName())) {
-            return true;
-        } else if (firstType.getName().equals(Type.UNDEFINDED))
-            return true;
-        else {
-            return false;
         }
+       /*if(declared==true )
+       {
+           System.out.println("variable"+symbole_name +"is declared befor ");
+       }*/
+        if (declared == false) {
+            System.out.println(" Error variable   " + symbole_name + "  is not declared befor ");
+        }
+
     }
+
+    public void Error_UNdeclared_Function(String function_name) {
+        boolean isdeclared = false;
+        for (int i = 0; i < Main.symbolTable.getFunctions().size(); i++) {
+            //System.out.println(" in the i"+i+Main.symbolTable.getFunctions().get(i).getName());
+            //System.out.println("from the passing "+function_name);
+            if (function_name.equals(Main.symbolTable.getFunctions().get(i).getName()) == true) {
+                isdeclared = true;
+                break;
+            } else isdeclared = false;
+        }
+        if (isdeclared == false) {
+            System.out.println(" Error  the function   " + function_name + "   is not  declared befor ");
+
+        }
+
+    }
+
+
+   public boolean compareTwoTypes(Type firstType, Type secondType) {
+       if (secondType.getName().equals(Type.UNDEFINDED)) {
+           System.err.println("trying to assign undefined variable");
+           return false;
+       } else if (firstType.getName().equals(secondType.getName())) {
+           return true;
+       } else if (firstType.getName().equals(Type.UNDEFINDED))
+           return true;
+       else {
+           return false;
+       }
+   }
 
     public Type addTypeForVariable(Expression expression) {
         Type type = new Type();
@@ -2929,5 +2991,10 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
     }
 
 }
+
+
+
+
+
 
 

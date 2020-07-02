@@ -22,3 +22,52 @@ var x1;
 {var x2 ;
 {var x3 }{var xx2}var xx1;}
 }
+
+-----------------------------------------------------------------
+using variable undeclared (errr)
+function g (){
+var x=0;
+if(c<9)
+{
+x++;
+}
+x++;
+}
+--------------------------------
+func(){
+x++;
+if(x<9)
+{
+var x=0;
+}
+x--;
+}
+--------------------------------------
+function sum (){
+x++;
+if(x<9){
+var x =0;
+while(x<9){
+x--;
+}
+x++;
+}
+x++;
+}
+---------------------------------------------------
+calling function (error)
+function sum (){
+sum();
+}
+function div(){
+sum();
+}
+function Find(){
+help();
+}
+function help (){
+sum();
+}
+function testing (){
+help();
+}
