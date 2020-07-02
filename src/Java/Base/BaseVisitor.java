@@ -160,7 +160,8 @@ public class BaseVisitor extends SQLBaseVisitor {
                 }
                 select.setOrdering_terms(ordering_terms);
             }
-            if(ctx.limit_expr()!=null){
+            if(ctx.limit_expr()!=null)
+            {
                 select.setLimitExpr(visitExpr(ctx.limit_expr().expr()));
                 if(ctx.K_OFFSET()!=null){
                     select.setOffset(true);
@@ -225,7 +226,6 @@ public class BaseVisitor extends SQLBaseVisitor {
 //        }
         if(ctx.table_name()!=null){
             createTableStmt.setTableName(visitTable_name(ctx.table_name()));
-//            for store the name of the table in table in the SymbolTable
             String name = ctx.table_name().use_random_name().getText();
             table.setTable_name(name);
 
@@ -235,8 +235,6 @@ public class BaseVisitor extends SQLBaseVisitor {
                 for (int i = 0; i <ctx.column_def().size() ; i++) {
                     columnDefs.add(visitColumn_def(ctx.column_def(i)));
                 }
-
-
                 createTableStmt.setColumnDefs(columnDefs);
 
                 if(ctx.table_constraint()!=null){
@@ -598,8 +596,10 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("visitSelect_stmt");
         select_stmt select_stmt = new select_stmt();
         if (ctx.select_or_values() != null) {
+
             select_stmt.setSelectOrValue(visitSelect_or_values(ctx.select_or_values()));
             if (ctx.ordering_term() != null) {
+
                 for (int i = 0; i < ctx.ordering_term().size(); i++) {
                     select_stmt.addItemToListof_ordering_term(visitOrdering_term(ctx.ordering_term(i)));
                 }
@@ -623,10 +623,19 @@ public class BaseVisitor extends SQLBaseVisitor {
     public Select_Core visitSelect_core(SQLParser.Select_coreContext ctx) {
         System.out.println("visitSelect_core");
         Select_Core select_core = new Select_Core();
+//        Scope currentScope = scopesStack.peek();
         if (ctx.result_column() != null) {
             List<Reslult_Cloumn> reslult_cloumnList = new ArrayList<>();
             for (int i = 0; i < ctx.result_column().size(); i++) {
                 reslult_cloumnList.add(visitResult_column(ctx.result_column(i)));
+//                //                                               tablename.columnname
+////                if(select_core.getReslult_cloumnList().get(i).getHelper_value()==select_core.getReslult_cloumnList().get(i).getTable_with_dot_column()){
+//                    String table_name =  select_core.getReslult_cloumnList().get(i).getExpr().getTableName().getName();
+//                    System.out.println("the table name is for test 44444 :"+ table_name);
+//                    String column_name = select_core.getReslult_cloumnList().get(i).getExpr().getColumnName().getName();
+//                    System.out.println("the column name is for test 33333 :"+ column_name);
+////                }
+
             }
             select_core.setReslult_cloumnList(reslult_cloumnList);
 
@@ -696,7 +705,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         return list_of_expr; }
 
     @Override public SelectOrValue visitSelect_or_values(SQLParser.Select_or_valuesContext ctx)
-    {int c=1;
+    {
+        int c=1;
         System.out.println("visitSelect_or_values");
         SelectOrValue selectOrValue= new SelectOrValue();
         if(ctx.result_column()!=null){
@@ -829,17 +839,17 @@ public class BaseVisitor extends SQLBaseVisitor {
         Reslult_Cloumn reslult_cloumn = new Reslult_Cloumn();
         if (ctx.STAR()!=null){
             reslult_cloumn.setStar(true);
-        }
+           }
         else if(ctx.table_name()!=null && ctx.DOT()!=null && ctx.STAR()!=null){
             reslult_cloumn.setTableName(visitTable_name(ctx.table_name()));
             reslult_cloumn.setStar(true);
-        }
+               }
         else if(ctx.expr()!=null){
             reslult_cloumn.setExpr(visitExpr(ctx.expr()));
             if(ctx.K_AS()!=null &&ctx.column_alias()!=null){
                 reslult_cloumn.setColumn_alias(visitColumn_alias(ctx.column_alias()));
             }
-        }
+                }
         return reslult_cloumn ;
     }
 
@@ -1090,9 +1100,15 @@ public class BaseVisitor extends SQLBaseVisitor {
 
     @Override public TableName visitTable_name(SQLParser.Table_nameContext ctx)
     {
+        Scope currentScope = scopesStack.peek();
         System.out.println("visitTable_name");
         TableName tableName = new TableName();
         tableName.setName(ctx.use_random_name().RANDOM_NAME().getText());
+        if(tableName.checkValidTable(currentScope  , tableName.getName())){
+            System.out.println("__________________________________________________________________________________");
+            System.out.println("your table name is not declare before you can not use the table before declare it");
+            System.out.println("__________________________________________________________________________________");
+        }
         System.out.println("the table name is : "+tableName.getName());
         return tableName;
     }
@@ -2237,6 +2253,9 @@ public class BaseVisitor extends SQLBaseVisitor {
             }
             else if(ctx.nonfunctional_instruction().create_type() != null){
                 instructions = visitCreate_type(ctx.nonfunctional_instruction().create_type());
+            }
+            else if(ctx.nonfunctional_instruction().factored_select_stmt()!= null){
+                instructions = visitFactored_select_stmt(ctx.nonfunctional_instruction().factored_select_stmt());
             }
 
      //todo complete it else if (ctx.nonfunctional_instruction().one_line_if_instruction()!=null)

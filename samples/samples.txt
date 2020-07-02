@@ -1,19 +1,6 @@
-main()
-{
-Create Table Student (Id number, Name string,
+main(){
+Create Table StudentTable (Id number, Name string,
 DateOfBirthEpoch bignumber, HomeAddress Address,
 WorkAddress Address)type = "json" , path = "D://Desctop//table.path" ;
-var x = 5;
-}
-main2()
-{
-create type address( id number , name string ,dsd boolean ,num number , contenct_info phoneInfo)
-
-if(5<10){
-Create Table Student2 (Id2 number, Name2 string,
- WorkAddress2 Address)type = "json" , path = "D://Desctop//table2.path"
- if(x == 5){
- var p = 4
- }
-}
+select Student_name from StudentTable
 }

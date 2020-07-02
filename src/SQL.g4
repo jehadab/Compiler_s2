@@ -939,6 +939,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
        |create_aggregation_function
        |create_type
        |create_table_stmt
+       |factored_select_stmt // todo this will remove (just for testing)
         // i just do that to make sure for the one line if | one_line_if_instruction
        ) SCOL
 
