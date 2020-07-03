@@ -1974,6 +1974,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("creatingvariabelwithoutassing");
         creatingvariabelwithoutassing creatvaribelwihtout = new creatingvariabelwithoutassing();
         //  Error_ofusing_undeclared_variabler( ,ctx.varible_name().use_random_name().getText());
+        Error_in_Multiple_Declarations(ctx.varible_name().use_random_name().getText());
         creatvaribelwihtout.setN(visitUse_random_name(ctx.varible_name().use_random_name()));
         creatvaribelwihtout.setInstrucation_name(creatingvariabelwithoutassing.class.getName());
 
@@ -2566,6 +2567,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         if (ctx.use_random_name() != null) {
             for (int i = 0; i < ctx.use_random_name().size(); i++) {
                 Variable_with_opretor variable_with_opretor = new Variable_with_opretor();
+                Error_in_Multiple_Declarations(ctx.use_random_name().get(i).getText());
                 variable_with_opretor.setVariable_name(visitUse_random_name(ctx.use_random_name().get(i)));
                 if (ctx.any_arithmetic_oprator() != null && ctx.any_arithmetic_oprator().size() != 0) {
                     variable_with_opretor.setOperator(ctx.any_arithmetic_oprator().get(i).getText());
@@ -3102,6 +3104,29 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             System.out.println("-Symbol type: " + ((Symbol) symbol).getType().getName());
 
 
+        }
+    }
+    public void Error_in_Multiple_Declarations (String name   ){
+        boolean is_already_declared = false ;
+        //symbole.getName().equals()
+        if(scopesStack.peek().getSymbolMap().get(name)!=null)
+        {
+            System.err.println("variable"+ name +"can be declared at most once ");
+
+        }
+        else {
+            Scope scop = scopesStack.peek().getParent();
+            while(scop!=null)
+            {
+                if(scop.getSymbolMap().get(name )!=null){
+                    System.err.println("variable   "+    name     +  "  can be declared at most once");
+                    break;
+                }
+                else {
+                    scop = scop.getParent();
+
+                }
+            }
         }
     }
 
