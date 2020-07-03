@@ -45,7 +45,6 @@ public class Main {
             e.printStackTrace();
         }
 
-
     }
     public static void showSymboleTable(){
         System.out.println("scopes stored :"+symbolTable.getScopes().size() );
