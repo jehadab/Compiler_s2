@@ -1,6 +1,4 @@
 func(){
-var x ;
-var x;
-for(x;x>2 ; x++){}
+for(var x =1;x>2 ; ++x + 5){}
 
 }

@@ -2449,16 +2449,19 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         For_Loop_Rule for_loop_rule = new For_Loop_Rule();
         for_loop_rule.setInstrucation_name(For_Loop_Rule.class.getName());
 
-        if (ctx.expression() != null) {
-            for_loop_rule.setExpression(visitExpression(ctx.expression()));
-        } else if (ctx.inside_for_loop(0) != null) {
-            for_loop_rule.setLeft_inside_for_loop(visitInside_for_loop(ctx.inside_for_loop(0)));
-        } else if (ctx.create_varible_with_assign() != null) {
+
+         if (ctx.create_varible_with_assign() != null) {
             for_loop_rule.setVar_with_asgn(visitCreate_varible_with_assign(ctx.create_varible_with_assign()));
         } else if (ctx.create_varible_without_assign() != null) {
             for_loop_rule.setVar_without_asgn(visitCreate_varible_without_assign(ctx.create_varible_without_assign()));
+        }else if (ctx.inside_for_loop(0) != null) { //left hand
+            for_loop_rule.setLeft_inside_for_loop(visitInside_for_loop(ctx.inside_for_loop(0)));
         }
-        if (ctx.inside_for_loop(1) != null) {
+        if (ctx.expression() != null) {
+            for_loop_rule.setExpression(visitExpression(ctx.expression()));
+            symanticCheck(for_loop_rule.getExpression());
+        }if(ctx.inside_for_loop(1) != null)
+        { // right hand
             for_loop_rule.setRight_inside_for_loop(visitInside_for_loop(ctx.inside_for_loop(1)));
         }
         return for_loop_rule;
@@ -2469,7 +2472,9 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         Inside_for_loop inside_for_loop = new Inside_for_loop();
         if (ctx.expression() != null) {
             inside_for_loop.setExpression(visitExpression(ctx.expression()));
-        } else if (ctx.assign_array() != null) {
+        symanticCheck(inside_for_loop.getExpression());
+        }
+        else if(ctx.assign_array() != null){
             inside_for_loop.setAssign_array(visitAssign_array(ctx.assign_array()));
         } else if (ctx.assign_varible() != null) {
             inside_for_loop.setVar(visitAssign_varible(ctx.assign_varible()));
@@ -3024,33 +3029,33 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         return resault;
     }
 
-/*    private boolean symanticCheck(assignment ins) {
-        boolean resault = true;
-        String leftSideVariableName = ins.getVar().getVariable_with_opretor().get(0).getVariable_name();
-        resault = symanticCheck(ins.getVar().getExpression());
+    /*    private boolean symanticCheck(assignment ins) {
+            boolean resault = true;
+            String leftSideVariableName = ins.getVar().getVariable_with_opretor().get(0).getVariable_name();
+            resault = symanticCheck(ins.getVar().getExpression());
 
-        if (resault) {
-            resault = Error_ofusing_undeclared_variabler(scopesStack.peek() ,leftSideVariableName );
-            if(resault){
-                Type leftsideVariableType = getVariableType(leftSideVariableName);
-                resault = compareTwoTypes(leftsideVariableType, getFirstExpritionType(ins.getVar().getExpression()));
-                if (resault) {
-                    leftsideVariableType.setName(getFirstExpritionType(ins.getVar().getExpression()).getName());
+            if (resault) {
+                resault = Error_ofusing_undeclared_variabler(scopesStack.peek() ,leftSideVariableName );
+                if(resault){
+                    Type leftsideVariableType = getVariableType(leftSideVariableName);
+                    resault = compareTwoTypes(leftsideVariableType, getFirstExpritionType(ins.getVar().getExpression()));
+                    if (resault) {
+                        leftsideVariableType.setName(getFirstExpritionType(ins.getVar().getExpression()).getName());
+                    }
                 }
             }
-        }
 
 
 
-        return resault;
-    }*/
+            return resault;
+        }*/
     private boolean symanticCheck(assignment ins) {
         boolean resault = true;
         String leftSideVariableName = ins.getVar().getVariable_with_opretor().get(0).getVariable_name();
         resault = symanticCheck(ins.getVar().getExpression());
 
 
-        resault = Error_ofusing_undeclared_variabler(scopesStack.peek() ,leftSideVariableName );
+        resault = Error_ofusing_undeclared_variabler(scopesStack.peek(), leftSideVariableName);
 
         Type leftsideVariableType = getVariableType(leftSideVariableName);
         resault = compareTwoTypes(leftsideVariableType, getFirstExpritionType(ins.getVar().getExpression()));
@@ -3131,6 +3136,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
     }
 
 }
+
 
 
 
