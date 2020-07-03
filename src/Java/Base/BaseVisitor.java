@@ -313,9 +313,9 @@ public class BaseVisitor extends SQLBaseVisitor {
                     colmndef.addItemToListOfColumnConstraint(visitColumn_constraint(ctx.column_constraint(i)));
                 }
             }
-            if (ctx.type_name() != null) {
+           /* if (ctx.type_name() != null) {
               colmndef.setTypeName(visitType_name(ctx.type_name()));
-            }
+            }*/ // TODO: 7/3/2020   mouhammad  
         }
         return colmndef;
     }

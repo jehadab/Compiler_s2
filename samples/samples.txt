@@ -1,13 +1,11 @@
-create aggregation function sum (d:/o/p,classname,methodname, typename , [  string,number , boolean ,kk ])
-func(){
-var x = y  ;
-if(z){
-var zozo ;
-if(n){
-var soso ;
+function sum (){
+x++;
+if(x<9){
+var x =0;
+while(x<9){
+x--;
 }
-}else if (hoho){var hohoson;}
-else if(hoho2){var hoho2son;}
-else{var elseson;
+x++;
 }
+x++;
 }
