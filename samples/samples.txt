@@ -1,4 +1,9 @@
-func(){
-for(var x =1;x>2 ; ++x + 5){}
-if(true){}
+function  s (){
+var x= true;
+if(true)
+{
+x++;
+}
+x++;
+
 }

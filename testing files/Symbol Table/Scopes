@@ -198,3 +198,29 @@ while(true )
 var x;
 }
 }
+--------------------------------
+(adding function in short_cut)
+function  s (){
+var x= true;
+if(true)
+{
+x++;
+}
+x++;
+
+}
+---------------------------------
+function  s (){
+var x= true;
+
+x++;
+
+}
+-----------------------------
+function  s (){
+
+
+x++;
+
+}
+

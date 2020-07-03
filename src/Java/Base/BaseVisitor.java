@@ -1974,7 +1974,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("creatingvariabelwithoutassing");
         creatingvariabelwithoutassing creatvaribelwihtout = new creatingvariabelwithoutassing();
         //  Error_ofusing_undeclared_variabler( ,ctx.varible_name().use_random_name().getText());
-        Error_in_Multiple_Declarations(ctx.varible_name().use_random_name().getText());
+       // Error_in_Multiple_Declarations(ctx.varible_name().use_random_name().getText());
         creatvaribelwihtout.setN(visitUse_random_name(ctx.varible_name().use_random_name()));
         creatvaribelwihtout.setInstrucation_name(creatingvariabelwithoutassing.class.getName());
 
@@ -1987,7 +1987,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         variableSymbol.setName(name);
         variableSymbol.setScope(currentScope);
         variableSymbol.setType(type);
-        currentScope.addSymbol(name, variableSymbol);
+        if(Error_in_Multiple_Declarations(ctx.varible_name().use_random_name().getText())==false)
+        {currentScope.addSymbol(name, variableSymbol);}
 
         return creatvaribelwihtout;
 
@@ -2572,7 +2573,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         if (ctx.use_random_name() != null) {
             for (int i = 0; i < ctx.use_random_name().size(); i++) {
                 Variable_with_opretor variable_with_opretor = new Variable_with_opretor();
-                Error_in_Multiple_Declarations(ctx.use_random_name().get(i).getText());
+                    // Error_in_Multiple_Declarations(ctx.use_random_name().get(i).getText()); // TODO: 7/4/2020  narjess
                 variable_with_opretor.setVariable_name(visitUse_random_name(ctx.use_random_name().get(i)));
                 if (ctx.any_arithmetic_oprator() != null && ctx.any_arithmetic_oprator().size() != 0) {
                     variable_with_opretor.setOperator(ctx.any_arithmetic_oprator().get(i).getText());
@@ -2685,7 +2686,13 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
     @Override
     public Shortcut_Statments visitShortcut_statments(SQLParser.Shortcut_statmentsContext ctx) {
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
-        Error_ofusing_undeclared_variabler(scopesStack.peek(), ctx.use_random_name().getText());
+        boolean  go_to=false ;
+       if( Error_ofusing_undeclared_variabler(scopesStack.peek(), ctx.use_random_name().getText())== false)
+       {
+           System.err.println("variable    "+ctx.use_random_name().getText() +"   is not  declared befor ");
+       }
+       else go_to=true;
+
         if (ctx.use_random_name() != null) {
             shortcut_statments.setShortcut_variable_name(visitUse_random_name(ctx.use_random_name()));
 
@@ -2699,6 +2706,9 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
         System.out.println("shortcut stored : " + shortcut_statments.getInstrucation_name());
         System.out.println(shortcut_statments.getOprator());
+        if(go_to==true)
+        if(Check_From_ShortCut_Type(shortcut_statments)==true)
+            System.err.println("Error  type  "+ shortcut_statments.getShortcut_variable_name()+" is not number ");
 
 
         return shortcut_statments;
@@ -2854,9 +2864,9 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
        {
            System.out.println("variable"+symbole_name +"is declared befor ");
        }*/
-        if (declared == false) {
-            System.err.println(" Error variable   " + symbole_name + "  is not declared before ");
-        }
+      //  if (declared == false) {
+        //    System.err.println(" Error variable   " + symbole_name + "  is not declared before ");
+        //}
         return declared;
 
     }
@@ -2919,6 +2929,36 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         }
         return type;
     }
+public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
+  boolean isnot_shortcut=false ;
+
+      Symbol sym = scopesStack.peek().getSymbolMap().get(short_cut.getShortcut_variable_name());
+      if (sym != null) {
+          if (sym.getType().getName().equals(Type.NUMBER_CONST)==false ) {
+              isnot_shortcut = true;
+
+          }
+      }
+      else {
+          Scope scop = scopesStack.peek().getParent();
+          while(scop!=null)
+          {
+              if(scop.getSymbolMap().get(short_cut.getShortcut_variable_name())!=null)
+              {
+                  Symbol s = scop.getSymbolMap().get(short_cut.getShortcut_variable_name());
+                  if (s.getType().getName().equals(Type.NUMBER_CONST)==false ) {
+                      isnot_shortcut = true;
+                      break;
+                  }
+              }
+              else if (scop.getSymbolMap().get(short_cut.getShortcut_variable_name())==null) { scop=scop.getParent();}
+          }
+
+      }
+
+
+      return isnot_shortcut;
+}
 
     public Type getVariableType(String variableName) {
         Scope currentScope = scopesStack.peek();
@@ -3111,12 +3151,13 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
         }
     }
-    public void Error_in_Multiple_Declarations (String name   ){
+    public boolean  Error_in_Multiple_Declarations (String name   ){
         boolean is_already_declared = false ;
         //symbole.getName().equals()
         if(scopesStack.peek().getSymbolMap().get(name)!=null)
         {
-            System.err.println("variable"+ name +"can be declared at most once ");
+            is_already_declared=true;
+            System.err.println("variable    "+ name +"    can be declared at most once ");
 
         }
         else {
@@ -3125,6 +3166,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             {
                 if(scop.getSymbolMap().get(name )!=null){
                     System.err.println("variable   "+    name     +  "  can be declared at most once");
+                    is_already_declared=true;
                     break;
                 }
                 else {
@@ -3133,6 +3175,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
                 }
             }
         }
+        return is_already_declared;
     }
 
 }
