@@ -54,6 +54,27 @@ x++;
 }
 x++;
 }
+------------------------------------
+function sum (){ // we can not do declared in if
+x++;
+if(x<9)
+var x=0;
+while(true )
+x++;
+x--;
+
+}
+
+----------------------------------
+function sum (){
+x++;
+if(x<9)
+{var x=0;
+while(true )
+x++;
+x--;
+}
+}
 ---------------------------------------------------
 calling function (error)
 function sum (){
@@ -70,4 +91,110 @@ sum();
 }
 function testing (){
 help();
+}
+-------------------------------------------------
+(Multi declared variable in the same scope  )
+function sum (){
+var x   ;
+{var x;
+var x;
+}
+if(true ){
+var x;
+
+ var x;
+}
+}
+--------------------------------
+function sum (){
+var x   ;
+{var x;
+var x;
+}
+
+}
+-------------------------------------
+function sum (){
+var x;
+var x;
+var x;
+}
+----------------------------------------
+function sum (){ // give me error in the table name
+var x =0;
+var x = select * from s;
+
+}
+--------------------------------------
+function sum (){
+var x =0;
+var x = 9;
+
+}
+------------------------------------------------
+function sum (){
+var x =0;
+var x = p;
+}
+------------------------------------
+function sum (){
+var x =0;
+{
+{
+{
+{
+var x;
+}
+}
+}
+}
+}
+----------------------------
+function sum (){
+if(true )
+{
+var x;
+while(true )
+{
+var x;
+}
+}
+}
+--------------------------------------------
+
+function sum (){
+if(true )
+{
+var x;
+}
+while(true )
+{
+var x ;
+}
+}
+--------------------
+
+function sum (){
+var x;
+if(true )
+{
+var x;
+}
+while(true )
+{
+var x;
+}
+}
+-----------------------------------
+
+function sum (){
+var x=0;
+if(true )
+{
+var x;
+}
+while(true )
+{
+var x;
+}
 }
