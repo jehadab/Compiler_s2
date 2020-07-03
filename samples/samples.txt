@@ -1,12 +1,4 @@
+func(){
+for(x;x>2 ; x++){}
 
-function sum (){
-var x=0;
-if(true )
-{
-var x;
-}
-while(true )
-{
-var x;
-}
 }
