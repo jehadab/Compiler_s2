@@ -242,11 +242,10 @@ public class BaseVisitor extends SQLBaseVisitor {
                 List<ColumnDef> columnDefs = new ArrayList<>();
                 for (int i = 0; i < ctx.column_def().size(); i++) {
                     columnDefs.add(visitColumn_def(ctx.column_def(i)));
+                    Column col  =  new Column();
+                    col.setColumn_name(columnDefs.get(i).getName());
+                    col.setColumn_type(columnDefs.get(i).getTypeName().getName());
                 }
-
-
-                createTableStmt.setColumnDefs(columnDefs);
-
                 if(ctx.table_constraint()!=null){
                     List<TableConstraint> tableConstraints= new ArrayList<>();
                     for (int i = 0; i <ctx.table_constraint().size() ; i++) {
@@ -267,7 +266,6 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         }
         currentScope.addTable(table.getTable_name(),table);
-        table.setColumnDefListList(createTableStmt.getColumnDefs());
         table.setPath_of_table(createTableStmt.getDeclarePathTable().getPath());
 //        System.out.println("the path of the table is : "+table.getPath_of_table());
         table.setExtension_of_table(createTableStmt.getDeclareTypeTable().getType());
@@ -849,8 +847,10 @@ public class BaseVisitor extends SQLBaseVisitor {
             reslult_cloumn.setTableName(visitTable_name(ctx.table_name()));
             reslult_cloumn.setStar(true);
                }
+
         else if(ctx.expr()!=null){
             reslult_cloumn.setExpr(visitExpr(ctx.expr()));
+
             if (ctx.K_AS() != null && ctx.column_alias() != null) {
                 reslult_cloumn.setColumn_alias(visitColumn_alias(ctx.column_alias()));
             }
@@ -976,6 +976,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     //    -----------------------------------------------------expr----------------------------------------------------
     @Override
     public Expr visitExpr(SQLParser.ExprContext ctx) {
+        Scope currentScope = scopesStack.peek();
         System.out.println("visitExpr");
         Expr expr = new Expr();
         if (ctx.literal_value() != null) {
@@ -984,11 +985,20 @@ public class BaseVisitor extends SQLBaseVisitor {
         if (ctx.database_name() != null) {
             expr.setDataBaseName(visitDatabase_name(ctx.database_name()));
         }
-        if (ctx.table_name() != null) {
+        boolean validTable = false ;
+        if (ctx.table_name() != null)
+        {
             expr.setTableName(visitTable_name(ctx.table_name()));
         }
-        if (ctx.column_name() != null) {
+        if (ctx.column_name() != null)
+        {
             expr.setColumnName(visitColumn_name(ctx.column_name()));
+            if(validTable == true){
+                boolean test  = currentScope.getTableMap().get(expr.getTableName().getName()).getColumnMap().containsKey(expr.getColumnName().getName());
+            if(test == true){
+                System.err.println("your column name is used before in the"+expr.getTableName().getName()+"the error in Line "+expr.getLine()+"  column "+expr.getCol());
+            }
+            }
         }
         if (ctx.unary_operator() != null && ctx.expr() != null) {
             System.out.println("hy");
@@ -1093,16 +1103,31 @@ public class BaseVisitor extends SQLBaseVisitor {
 
     @Override public TableName visitTable_name(SQLParser.Table_nameContext ctx)
     {
-        Scope currentScope = scopesStack.peek();
         System.out.println("visitTable_name");
         TableName tableName = new TableName();
         tableName.setName(ctx.use_random_name().RANDOM_NAME().getText());
-        if(tableName.checkValidTable(currentScope  , tableName.getName())){
-            System.out.println("__________________________________________________________________________________");
-            System.out.println("your table name is not declare before you can not use the table before declare it");
-            System.out.println("__________________________________________________________________________________");
-        }
         System.out.println("the table name is : "+tableName.getName());
+        Scope currentScope = scopesStack.peek();
+        boolean validTable = false ;
+        //        for creating table
+        if(ctx.getParent() instanceof SQLParser.Create_table_stmtContext == true){
+            System.out.println("come from creating table ****************");
+        }
+//        for useing the table name in any statment
+        else{
+            boolean test ;
+            System.out.println("***************************************test test test test test test*************************************");
+            while (!validTable)
+            {
+                test = currentScope.getTableMap().containsKey(tableName.getName());
+                if(test == false && currentScope.getParent() == null)
+                {
+                    System.err.println("your table name is not declare before you can not use the table before declare it"+"the error in Line "+tableName.getLine()+"  column "+tableName.getCol());
+                    validTable = true ;
+                }
+                currentScope = currentScope.getParent();
+            }
+        }
         return tableName;
     }
 
@@ -2044,14 +2069,11 @@ public class BaseVisitor extends SQLBaseVisitor {
         for (int i = 0; i < ctx.children.size(); i++) {
             System.out.println("---------------");
             if (ctx.children.get(i) instanceof SQLParser.InstructionsContext) {
-
                 function_body.addNode(visitInstructions((SQLParser.InstructionsContext) ctx.children.get(i)));
-
             } else if (ctx.children.get(i) instanceof SQLParser.Sub_function_bodyContext) {
                 function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext) ctx.children.get(i)));
             }
         }
-
 
         // System.out.println(((While_Rule)function_body.getInstructions().get(2)).getBoolean_infunction_statment().getBoolean_exprs().get(0).getBoolean_exprs_list().get(0).getTermenal_node());
 

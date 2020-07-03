@@ -1,12 +1,9 @@
-func(){
-var x = y  ;
-if(z){
-var zozo ;
-if(n){
-var soso ;
-}
-}else if (hoho){var hohoson;}
-else if(hoho2){var hoho2son;}
-else{var elseson;
-}
+main()
+{
+Create Table Student (Id number, Name string,
+ DateOfBirthEpoch bignumber, HomeAddress Address,
+ WorkAddress Address)type = "json" , path = "D://Desctop//table.path";
+
+select Student.tab from Student;
+
 }
