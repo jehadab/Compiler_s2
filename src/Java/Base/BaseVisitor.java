@@ -1309,12 +1309,12 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("visite create with assign ");
         createvariablewithassign variable_with_assign = new createvariablewithassign();
         if (ctx.create_varible_with_assign() != null) {
-            create_variable_withassign create = new create_variable_withassign();
+           // create_variable_withassign create = new create_variable_withassign();
 
-            Symbol symbol = new Symbol();
-            Type types = new Type();
+           // Symbol symbol = new Symbol();
+            //Type types = new Type();
             variable_with_assign.setVar_wiht_assign(visitCreate_varible_with_assign(ctx.create_varible_with_assign()));
-            create = (create_variable_withassign) variable_with_assign.getVar_wiht_assign();
+           // create = (create_variable_withassign) variable_with_assign.getVar_wiht_assign();
 //            for (int i = 0; i < create.getVar().getVariable_with_opretor().size(); i++) {
 //                symbol.setName(create.getVar().getVariable_with_opretor().get(i).getVariable_name());
 //            }
@@ -1364,6 +1364,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         currentScope = scopesStack.peek();
         Symbol createdSymbol = new Symbol();
         String name = ctx.assign_varible().use_random_name().get(0).getText();
+        //Error_in_Multiple_Declarations(name);
         createdSymbol.setName(name);
         createdSymbol.setIsParam(false);
         createdSymbol.setScope(currentScope);
@@ -1373,8 +1374,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         }
         createdSymbol.setType(addTypeForVariable(expression));
         currentScope.addSymbol(name, createdSymbol);
-
-
+       // System.out.println("------------------- checking it si well ---------------------- ");
+       // System.out.println("two variable how will pust them "+currentScope.getSymbolMap().size());
         return variable_with_assign;
     }
 
@@ -1981,6 +1982,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("creatingvariabelwithoutassing");
         creatingvariabelwithoutassing creatvaribelwihtout = new creatingvariabelwithoutassing();
         //  Error_ofusing_undeclared_variabler( ,ctx.varible_name().use_random_name().getText());
+        Error_in_Multiple_Declarations(ctx.varible_name().use_random_name().getText());
         creatvaribelwihtout.setN(visitUse_random_name(ctx.varible_name().use_random_name()));
         creatvaribelwihtout.setInstrucation_name(creatingvariabelwithoutassing.class.getName());
 
@@ -1994,7 +1996,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         variableSymbol.setScope(currentScope);
         variableSymbol.setType(type);
         currentScope.addSymbol(name, variableSymbol);
-
+       // System.out.println("------------------- checking it si well ---------------------- ");
+       // System.out.println("two variable how will pust them "+currentScope.getSymbolMap().size());
         return creatvaribelwihtout;
 
     }
@@ -2586,6 +2589,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         if (ctx.use_random_name() != null) {
             for (int i = 0; i < ctx.use_random_name().size(); i++) {
                 Variable_with_opretor variable_with_opretor = new Variable_with_opretor();
+                Error_in_Multiple_Declarations(ctx.use_random_name().get(i).getText());
                 variable_with_opretor.setVariable_name(visitUse_random_name(ctx.use_random_name().get(i)));
                 if (ctx.any_arithmetic_oprator() != null && ctx.any_arithmetic_oprator().size() != 0) {
                     variable_with_opretor.setOperator(ctx.any_arithmetic_oprator().get(i).getText());
@@ -2866,9 +2870,32 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
            System.out.println("variable"+symbole_name +"is declared befor ");
        }*/
         if (declared == false) {
-            System.out.println(" Error variable   " + symbole_name + "  is not declared befor ");
+            System.err.println(" Error variable   " + symbole_name + "  is not declared befor ");
         }
 
+    }
+    public void Error_in_Multiple_Declarations (String name   ){
+        boolean is_already_declared = false ;
+        //symbole.getName().equals()
+        if(scopesStack.peek().getSymbolMap().get(name)!=null)
+        {
+            System.err.println("variable"+ name +"can be declared at most once ");
+
+        }
+        else {
+           Scope scop = scopesStack.peek().getParent();
+            while(scop!=null)
+            {
+                if(scop.getSymbolMap().get(name )!=null){
+                    System.err.println("variable   "+    name     +  "  can be declared at most once");
+                    break;
+                }
+                else {
+                    scop = scop.getParent();
+
+                }
+            }
+        }
     }
 
     public void Error_UNdeclared_Function(String function_name) {
@@ -2882,7 +2909,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             } else isdeclared = false;
         }
         if (isdeclared == false) {
-            System.out.println(" Error  the function   " + function_name + "   is not  declared befor ");
+            System.err.println(" Error  the function   " + function_name + "   is not  declared befor ");
 
         }
 

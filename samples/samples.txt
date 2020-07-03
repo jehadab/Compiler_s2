@@ -1,11 +1,12 @@
+
 function sum (){
-x++;
-if(x<9){
-var x =0;
-while(x<9){
-x--;
+var x=0;
+if(true )
+{
+var x;
 }
-x++;
+while(true )
+{
+var x;
 }
-x--;
 }
