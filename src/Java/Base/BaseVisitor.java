@@ -1690,10 +1690,9 @@ public class BaseVisitor extends SQLBaseVisitor {
     }
 
     public Shortcut_Statments shortcut_Statments_Expression(SQLParser.ExpressionContext ctx) {
-        System.out.println("just to make me understand ");
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
-        if (ctx.intral_expression_value().varible_name() != null) {
-            Variable_Name variable_name = visitVarible_name(ctx.intral_expression_value().varible_name());
+        if (ctx.expression(0).intral_expression_value() != null) {
+            Variable_Name variable_name = visitVarible_name(ctx.expression(0).intral_expression_value().varible_name());
             // Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.);
             shortcut_statments.setShortcut_variable_name(variable_name.getVariable_name());
         }
@@ -1702,9 +1701,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         } else if (ctx.MINUS_MINUS() != null) {
             shortcut_statments.setOprator(ctx.MINUS_MINUS().getText());
         }
-
-        System.out.println("shortcut stored : " + shortcut_statments.getInstrucation_name());
-        System.out.println(shortcut_statments.getOprator());
 
         return shortcut_statments;
 
