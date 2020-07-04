@@ -681,15 +681,15 @@ public class BaseVisitor extends SQLBaseVisitor {
                     {
                         System.out.println("------------------------------------------------------------------------------------------------");
                     }
-//                    else{
-//                        if(!sementicCheckForExistedColumn(reslult_cloumnList.get(i).getExpr().getColumnName(),reslult_cloumnList.get(i).getExpr().getTableName()))
-//                            System.out.println("------------------------------------------------------------------------------------------------");
-//                    }
+                    else{
+                        if(!sementicCheckForExistedColumn(reslult_cloumnList.get(i).getExpr().getColumnName(),reslult_cloumnList.get(i).getExpr().getTableName()))
+                            System.out.println("------------------------------------------------------------------------------------------------");
+                    }
                 }
-                else{
+               /* else{
                     if(!sementicCheckForExistedColumn(reslult_cloumnList.get(i).getExpr().getColumnName(),select_core.getReslult_cloumnList().get(i).getTableName()))
                         System.out.println("------------------------------------------------------------------------------------------------");
-                }
+                }*/
 
             }
             select_core.setReslult_cloumnList(reslult_cloumnList);
@@ -860,6 +860,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                 tableOrSubQuery.setDataBaseName(visitDatabase_name(ctx.database_name()));
             }
             tableOrSubQuery.setTableName(visitTable_name(ctx.table_name()));
+            seminticCheckForUsingTable(tableOrSubQuery.getTableName());
             if (ctx.table_alias() != null) {
                 tableOrSubQuery.setTable_alias(visitTable_alias(ctx.table_alias()));
             }
@@ -1813,17 +1814,28 @@ public class BaseVisitor extends SQLBaseVisitor {
 
     public Shortcut_Statments shortcut_Statments_Expression(SQLParser.ExpressionContext ctx) {
         System.out.println("just to make me understand ");
+        boolean  go_to=false ;
+
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
         if (ctx.expression(0).intral_expression_value() != null) {
             Variable_Name variable_name = visitVarible_name(ctx.expression(0).intral_expression_value().varible_name());
             // Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.);
             shortcut_statments.setShortcut_variable_name(variable_name.getVariable_name());
+            if( Error_ofusing_undeclared_variabler(scopesStack.peek(), shortcut_statments.getShortcut_variable_name())== false)
+            {
+                System.err.println("variable    "+ctx.expression(0).intral_expression_value().varible_name().use_random_name().getText() +"   is not  declared befor ");
+            }
+            else go_to=true;
         }
         if (ctx.PLUS_PLUS() != null) {
             shortcut_statments.setOprator(ctx.PLUS_PLUS().getText());
         } else if (ctx.MINUS_MINUS() != null) {
             shortcut_statments.setOprator(ctx.MINUS_MINUS().getText());
         }
+        if(go_to==true)
+            if(Check_From_ShortCut_Type(shortcut_statments)==true)
+                System.err.println("Error  type  "+ shortcut_statments.getShortcut_variable_name()+" is not number ");
+
 
         System.out.println("shortcut stored : " + shortcut_statments.getInstrucation_name());
         System.out.println(shortcut_statments.getOprator());
@@ -2999,8 +3011,8 @@ public class BaseVisitor extends SQLBaseVisitor {
        }*/
         //if (declared == false) {
        // }
-        if (declared == false) {
-            System.out.println(" Error variable   " + symbole_name + "  is not declared befor ");
+        if (!declared) {
+            System.err.println(" Error variable   " + symbole_name + "  is not declared befor ");
         }
         return declared;
 
@@ -3252,6 +3264,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
         }
         if (haveVariable)
             resault = checkVariablesDeclrateInExpression(expression);
+
        //System.out.println("---->check about it "+resault);
         if (resault) {
             resault = checkExpressionTypeValid(expression);

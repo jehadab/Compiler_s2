@@ -1,3 +1,4 @@
-main(){
-u = b ;
+main (){
+
+for(var i = 2 ; ii ; jj++){}
 }
