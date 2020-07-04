@@ -1,8 +1,13 @@
-main(){
+main(){if(10>5){
+Create Table Student (Id number, Name string,
+DateOfBirthEpoch bignumber, HomeAddress Address,
+WorkAddress Address)type = "json" , path = "D://Desctop//table.path" ;
+
 Create Table Student (Id number, Name string,
 DateOfBirthEpoch bignumber, HomeAddress Address,
 WorkAddress Address)type = "json" , path = "D://Desctop//table.path" ;
 if(5<10){
-select Student.col from Studentf;
+select Studentd.* from Student;
+}
 }
 }

@@ -399,7 +399,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         return typeName;
     }
 
-
     @Override
     public Create_Type visitCreate_type(SQLParser.Create_typeContext ctx) {
         System.out.println("visit_creat_type");
@@ -1092,34 +1091,53 @@ public class BaseVisitor extends SQLBaseVisitor {
         return fk_origin_column_name;
     }
 
+    public boolean seminticCheckForTable(SQLParser.Table_nameContext ctx,TableName tableName ){
+        Scope currentScope = scopesStack.peek();
+        boolean test ;
+        //        for creating table
+        if(ctx.getParent() instanceof SQLParser.Create_table_stmtContext == true)
+        {
+            System.out.println("come from creating table ****************");
+            System.out.println("***************************************test test seminticCheckForTable test test*************************************");
+            while (currentScope != null)
+            {
+                test = currentScope.getTableMap().containsKey(tableName.getName());
+                if(test)
+                {
+                    System.err.println("your table name is found before you can not define the table name in the table name found before"+"the error in Line "+tableName.getLine()+"  column "+tableName.getCol());
+                    return false;
+                }
+                currentScope = currentScope.getParent();
+            }
+            return true;
+        }
+        else
+        {
+            System.out.println("***************************************test test seminticCheckForTable test test*************************************");
+
+            while (currentScope != null)
+            {
+                test = currentScope.getTableMap().containsKey(tableName.getName());
+                if(test)
+                {
+                    return true;
+                }
+                currentScope = currentScope.getParent();
+            }
+            System.err.println("your table name is not declare before you can not use the table before declare it"+"the error in Line "+tableName.getLine()+"  column "+tableName.getCol());
+            return false;
+        }
+    }
+
+
     @Override public TableName visitTable_name(SQLParser.Table_nameContext ctx)
     {
         System.out.println("visitTable_name");
         TableName tableName = new TableName();
         tableName.setName(ctx.use_random_name().RANDOM_NAME().getText());
         System.out.println("the table name is : "+tableName.getName());
-        Scope currentScope = scopesStack.peek();
-        boolean validTable = false ;
-        //        for creating table
-        if(ctx.getParent() instanceof SQLParser.Create_table_stmtContext == true){
-            System.out.println("come from creating table ****************");
-        }
-//        for using the table name in any statmant
-        else
-        {
-            boolean test ;
-            System.out.println("***************************************test test test test test test*************************************");
-            while (currentScope != null)
-            {
-                test = currentScope.getTableMap().containsKey(tableName.getName());
-                if(test)
-                {
-                    return tableName;
-                }
-                currentScope = currentScope.getParent();
-            }
-            System.err.println("your table name is not declare before you can not use the table before declare it"+"the error in Line "+tableName.getLine()+"  column "+tableName.getCol());
-        }
+        if(!seminticCheckForTable(ctx , tableName))
+            System.out.println("------------------------------------------------------------------------------------------------");
         return tableName;
     }
 
