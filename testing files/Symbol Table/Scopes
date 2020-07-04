@@ -198,3 +198,114 @@ while(true )
 var x;
 }
 }
+--------------------------------
+(adding function in short_cut)
+function  s (){
+var x= true;
+if(true)
+{
+x++;
+}
+x++;
+
+}
+---------------------------------
+function  s (){
+var x= true;
+
+x++;
+
+}
+-----------------------------
+function  s (){
+
+
+x++;
+
+}
+
+--------------------------------------
+symantic check if
+function s(){
+var x=true;
+
+if(x<9)
+{
+var x =true;
+if(x==4)
+{}
+}
+}
+---------------------------
+function s(){
+var x=true;
+
+if(x<9)
+{}
+
+}
+--------------------------
+function s(){
+var x=true;
+
+if(x<9)
+{}
+else if(c<9)
+{}
+
+}
+-----------------------
+function s(){
+while(x<9){}
+
+}
+----------------------------------
+function s(){
+var x = true ;
+while(x<9){}
+
+}
+-----------------------------
+function s(){
+var x = true ;
+do {
+x=9;
+}while(c<9);
+
+}
+----------------------------------
+function s(){
+var x = true ;
+do {
+x=0;
+var c;
+}while(c<9);
+
+}
+---------------------
+function s(){
+var c =0;
+var x = true ;
+do {
+x=0;
+var c;
+}while(c<9);
+
+}
+--------------------------
+switch
+function s(){
+var x=true;
+switch (x+9){
+            case '1':
+
+        }
+}
+--------------------------
+function s(){
+var u=6;
+switch (x){
+            case u<0:
+
+        }
+}

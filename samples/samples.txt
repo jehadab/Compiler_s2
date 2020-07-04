@@ -1,7 +1,4 @@
-main(){
+func(){
+for(var x =1;x>2 ; ++x + 5){}
 
-
-Create type Student (Id number, Name string);
-Create type oqba (s Student , ss number);
-
-select Student.tab from Student;
+}
