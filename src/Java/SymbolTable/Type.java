@@ -38,7 +38,6 @@ public class Type {
     public Map<String, Type> getColumns() {
         return this.columns;
     }
-
     public void setColumns(Map<String, Type> columns) {
         this.columns = columns;
     }

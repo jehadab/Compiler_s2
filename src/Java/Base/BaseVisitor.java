@@ -159,12 +159,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         } else if (ctx.create_type() != null) {
             s = visitCreate_type(ctx.create_type());
         }
-
-
         return s;
-
     }
-
     @Override
     public SelectFactoredStmt visitFactored_select_stmt(SQLParser.Factored_select_stmtContext ctx) {
         System.out.println("visitFactored_select_stmt");
@@ -240,7 +236,8 @@ public class BaseVisitor extends SQLBaseVisitor {
 //        }
         if (ctx.table_name() != null) {
             createTableStmt.setTableName(visitTable_name(ctx.table_name()));
-//            for store the name of the table in table in the SymbolTable
+            if(!seminticCheckForCreateTable(createTableStmt.getTableName()))
+                System.out.println("------------------------------------------------------------------------------------------------");
             String name = ctx.table_name().use_random_name().getText();
             table.setTable_name(name);
 
@@ -415,7 +412,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         }
         return typeName;
     }
-
 
     @Override
     public Create_Type visitCreate_type(SQLParser.Create_typeContext ctx) {
@@ -679,13 +675,21 @@ public class BaseVisitor extends SQLBaseVisitor {
             List<Reslult_Cloumn> reslult_cloumnList = new ArrayList<>();
             for (int i = 0; i < ctx.result_column().size(); i++) {
                 reslult_cloumnList.add(visitResult_column(ctx.result_column(i)));
-//                //                                               tablename.columnname
-////                if(select_core.getReslult_cloumnList().get(i).getHelper_value()==select_core.getReslult_cloumnList().get(i).getTable_with_dot_column()){
-//                    String table_name =  select_core.getReslult_cloumnList().get(i).getExpr().getTableName().getName();
-//                    System.out.println("the table name is for test 44444 :"+ table_name);
-//                    String column_name = select_core.getReslult_cloumnList().get(i).getExpr().getColumnName().getName();
-//                    System.out.println("the column name is for test 33333 :"+ column_name);
-////                }
+                if( reslult_cloumnList.get(i).getExpr().getTableName()!=null)
+                {
+                    if(!seminticCheckForUsingTable(reslult_cloumnList.get(i).getExpr().getTableName()))
+                    {
+                        System.out.println("------------------------------------------------------------------------------------------------");
+                    }
+//                    else{
+//                        if(!sementicCheckForExistedColumn(reslult_cloumnList.get(i).getExpr().getColumnName(),reslult_cloumnList.get(i).getExpr().getTableName()))
+//                            System.out.println("------------------------------------------------------------------------------------------------");
+//                    }
+                }
+                else{
+                    if(!sementicCheckForExistedColumn(reslult_cloumnList.get(i).getExpr().getColumnName(),select_core.getReslult_cloumnList().get(i).getTableName()))
+                        System.out.println("------------------------------------------------------------------------------------------------");
+                }
 
             }
             select_core.setReslult_cloumnList(reslult_cloumnList);
@@ -886,19 +890,42 @@ public class BaseVisitor extends SQLBaseVisitor {
         return tableOrSubQuery;
     }
 
+
+    public  boolean sementicCheckForExistedColumn(ColumnName columnName ,TableName tableName){
+        System.out.println("***************************************test test sementicCheckForExistedColumn test test*************************************");
+        Scope currentScope  = scopesStack.peek();
+        while (currentScope!=null){
+            if(currentScope.getTableMap().containsKey(tableName.getName())){
+            if(currentScope.getTableMap().get(tableName.getName()).getColumnMap().containsKey(columnName.getName()))
+            {
+                return true;
+            }
+            }
+            currentScope = currentScope.getParent();
+        }
+        System.err.println("this Column is not Declare in the table "+tableName.getName());
+         return false;
+    }
+
     @Override
     public Reslult_Cloumn visitResult_column(SQLParser.Result_columnContext ctx) {
         System.out.println("visitResult_column");
         Reslult_Cloumn reslult_cloumn = new Reslult_Cloumn();
-        if (ctx.STAR() != null) {
+        if (ctx.STAR() != null)
+        {
             reslult_cloumn.setStar(true);
-        } else if (ctx.table_name() != null && ctx.DOT() != null && ctx.STAR() != null) {
+        }
+        else if(ctx.table_name()!=null && ctx.DOT()!=null && ctx.STAR()!=null)
+        {
             reslult_cloumn.setTableName(visitTable_name(ctx.table_name()));
+//            todo fix accept context node for tableContext as parm in the sementicCheckForTable function
+            if(!seminticCheckForUsingTable(reslult_cloumn.getTableName()))
+                System.out.println("------------------------------------------------------------------------------------------------");
             reslult_cloumn.setStar(true);
-               }
-        else if(ctx.expr()!=null){
+        }
+        else if(ctx.expr()!=null)
+        {
             reslult_cloumn.setExpr(visitExpr(ctx.expr()));
-
             if (ctx.K_AS() != null && ctx.column_alias() != null) {
                 reslult_cloumn.setColumn_alias(visitColumn_alias(ctx.column_alias()));
             }
@@ -1033,7 +1060,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         if (ctx.database_name() != null) {
             expr.setDataBaseName(visitDatabase_name(ctx.database_name()));
         }
-        boolean validTable = false ;
         if (ctx.table_name() != null)
         {
             expr.setTableName(visitTable_name(ctx.table_name()));
@@ -1149,33 +1175,50 @@ public class BaseVisitor extends SQLBaseVisitor {
         return fk_origin_column_name;
     }
 
+    public boolean seminticCheckForCreateTable(TableName tableName ){
+        Scope currentScope = scopesStack.peek();
+        boolean test ;
+        //        for creating table
+            System.out.println("come from creating table ****************");
+            System.out.println("***************************************test test seminticCheckForTable test test*************************************");
+            while (currentScope != null)
+            {
+                test = currentScope.getTableMap().containsKey(tableName.getName());
+                if(test)
+                {
+                    System.err.println("your table name is found before you can not define the table name in the table name found before"+"the error in Line "+tableName.getLine()+"   column "+tableName.getCol());
+                    return false;
+                }
+                currentScope = currentScope.getParent();
+            }
+            return true;
+    }
+
+    public boolean seminticCheckForUsingTable(TableName tableName)
+    {
+        Scope currentScope = scopesStack.peek();
+        boolean test ;
+        System.out.println("***************************************test test seminticCheckForTable test test*************************************");
+        while (currentScope != null)
+        {
+            test = currentScope.getTableMap().containsKey(tableName.getName());
+            if(test)
+            {
+                return true;
+            }
+            currentScope = currentScope.getParent();
+        }
+        System.err.println("your table name is not declare before you can not use the table before declare it "+"the error in Line "+tableName.getLine()+"  column "+tableName.getCol());
+        return false;
+    }
+
+
     @Override public TableName visitTable_name(SQLParser.Table_nameContext ctx)
     {
         System.out.println("visitTable_name");
         TableName tableName = new TableName();
         tableName.setName(ctx.use_random_name().RANDOM_NAME().getText());
         System.out.println("the table name is : "+tableName.getName());
-        Scope currentScope = scopesStack.peek();
-        boolean validTable = false ;
-        //        for creating table
-        if(ctx.getParent() instanceof SQLParser.Create_table_stmtContext == true){
-            System.out.println("come from creating table ****************");
-        }
-//        for useing the table name in any statment
-        else{
-            boolean test ;
-            System.out.println("***************************************test test test test test test*************************************");
-            while (currentScope != null)
-            {
-                test = currentScope.getTableMap().containsKey(tableName.getName());
-                if(test )
-                {
-                    return tableName;
-                }
-                currentScope = currentScope.getParent();
-            }
-            System.err.println("your table name is not declare before you can not use the table before declare it"+"the error in Line "+tableName.getLine()+"  column "+tableName.getCol());
-        }
         return tableName;
     }
 
