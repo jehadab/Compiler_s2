@@ -1,9 +1,7 @@
-function  s (){
-var x= true;
-if(true)
-{
-x++;
-}
-x++;
-t++;
+function s(){
+var u=6;
+switch (x){
+            case u<0:
+
+        }
 }

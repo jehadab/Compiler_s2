@@ -1,5 +1,6 @@
 package Java.AST.instruction.Switch_rule;
 
+import Java.AST.assignmnet.assignment;
 import Java.AST.expr.Expression;
 import Java.AST.instruction.arithmetic_infunction_statment;
 import Java.AST.expr.Arithmatic_expr;
@@ -64,6 +65,15 @@ public class Switch extends non_functional_instructions  {
     String termenal_node;
     Expression expression;
 
+    public assignment getS() {
+        return s;
+    }
+
+    public void setS(assignment s) {
+        this.s = s;
+    }
+
+    assignment s ;
     List<Case>cases ;
     Deafult deafult ;
 

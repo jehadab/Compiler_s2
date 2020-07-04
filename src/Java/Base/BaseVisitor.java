@@ -2262,7 +2262,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         if_else ins = new if_else();
         ins.setInstrucation_name(if_else.class.getName());
         ins.setExpression(visitExpression(ctx.if_rule().expression()));
-
+        symanticCheck(ins.getExpression());
         Scope parentScope = scopesStack.peek();
         System.out.println(parentScope.getId());
 
@@ -2309,7 +2309,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
                     ins.add_Else_if_rule_in_if(else_if_rule);
                     System.out.println("else if:" + ins.getElse_if());
                     else_if_rule.setExpression(visitExpression(ctx.else_if_rule().get(i).expression()));
-
+                    symanticCheck(else_if_rule.getExpression());
                     Scope elseifScop = new Scope();
                     String elseifeName = ctx.else_if_rule().get(i).K_ELSE_IF().getText() + ctx.else_if_rule().get(i).hashCode();
                     elseifScop.setId(elseifeName);
@@ -2425,7 +2425,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         do_while ins = new do_while();
         ins.setInstrucation_name(do_while.class.getName());
         ins.setExpression(visitExpression(ctx.while_rule().expression()));
-
+        symanticCheck(ins.getExpression());
         Scope dowhileScope = new Scope();
         dowhileScope.setId(ctx.K_DO().getText() + "_" + ctx.hashCode());
         dowhileScope.setParent(scopesStack.peek());
@@ -2460,6 +2460,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         }
         if (ctx.expression() != null) {
             for_loop_rule.setExpression(visitExpression(ctx.expression()));
+
             symanticCheck(for_loop_rule.getExpression());
         }if(ctx.inside_for_loop(1) != null)
         { // right hand
@@ -2494,6 +2495,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         While_Rule ins = new While_Rule();
         ins.setInstrucation_name(While_Rule.class.getName());
         ins.setExpression(visitExpression(ctx.expression()));
+        symanticCheck(ins.getExpression());
         return ins;
     }
 
@@ -2753,18 +2755,28 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         switchScope.setParent(scopesStack.peek());
 
         if (ctx.use_random_name() != null) {
+            if(Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.use_random_name().getText())==false){
+                System.err.println(" Error variable   " + ctx.use_random_name().getText() + "  is not declared before ");
+            }
             ins.setVariable_name(visitUse_random_name(ctx.use_random_name()));
         } else if (ctx.ONE_CHAR_LETTER() != null) {
             ins.setTermenal_node(ctx.ONE_CHAR_LETTER().getSymbol().getText());
         } else if (ctx.NUMERIC_LITERAL() != null) {
             ins.setTermenal_node(ctx.NUMERIC_LITERAL().getSymbol().getText());
         } else if (ctx.call_function() != null) {
+            Error_UNdeclared_Function(ctx.call_function().use_random_name().getText());
             ins.setTermenal_node(ctx.call_function().getText());
         } else if (ctx.varible_from_object() != null) {
             ins.setTermenal_node(ctx.varible_from_object().getText());
         } else if (ctx.expression() != null) {
             ins.setExpression(visitExpression(ctx.expression()));
+            symanticCheck(ins.getExpression());
+            }
+        else if(ctx.genral_assign()!=null)
+        {
+            ins.setS(visitGenral_assign(ctx.genral_assign()));
         }
+
         scopesStack.push(switchScope);
         if (ctx.case_rule() != null) {
             for (int i = 0; i < ctx.case_rule().size(); i++) {
@@ -2789,6 +2801,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
         if (ctx.expression() != null) {
             case_ins.setExpression(visitExpression(ctx.expression()));
+            symanticCheck(case_ins.getExpression());
         } else if (ctx.any_name() != null) {
             case_ins.setVariable_name(ctx.any_name().getText());
         } else if (ctx.NUMERIC_LITERAL() != null) {
@@ -2864,9 +2877,9 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
        {
            System.out.println("variable"+symbole_name +"is declared befor ");
        }*/
-      //  if (declared == false) {
-        //    System.err.println(" Error variable   " + symbole_name + "  is not declared before ");
-        //}
+        //if (declared == false) {
+          // System.err.println(" Error variable   " + symbole_name + "  is not declared before ");
+       // }
         return declared;
 
     }
@@ -2882,7 +2895,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             } else isdeclared = false;
         }
         if (isdeclared == false) {
-            System.out.println(" Error  the function   " + function_name + "   is not  declared before ");
+            System.err.println(" Error  the function   " + function_name + "   is not  declared before ");
 
         }
 
@@ -3037,6 +3050,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                 ) {
             if (intralValue.getVariable_name() != null) {
                 resault = Error_ofusing_undeclared_variabler(scopesStack.peek(), intralValue.getVariable_name().getVariable_name());
+                //System.out.println(" chec--->"+resault);
             }
         }
         return resault;
@@ -3096,7 +3110,6 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
 
 
         resault = Error_ofusing_undeclared_variabler(scopesStack.peek(), leftSideVariableName);
-
         Type leftsideVariableType = getVariableType(leftSideVariableName);
         resault = compareTwoTypes(leftsideVariableType, getFirstExpritionType(ins.getVar().getExpression()));
         if (resault) {
@@ -3117,6 +3130,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
         }
         if (haveVariable)
             resault = checkVariablesDeclrateInExpression(expression);
+       //System.out.println("---->check about it "+resault);
         if (resault) {
             resault = checkExpressionTypeValid(expression);
         }
