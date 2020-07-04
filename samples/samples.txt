@@ -1,7 +1,1 @@
-function s(){
-var u=6;
-switch (x){
-            case u<0:
 
-        }
-}

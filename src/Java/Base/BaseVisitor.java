@@ -1613,7 +1613,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         }
         if (ctx.call_function() != null) {
             System.out.println(" visit call function ");
-
+            Error_UNdeclared_Function(ctx.call_function().use_random_name().getText());
             t.setCall(visitCall_function(ctx.call_function()));
         }
         if (ctx.assign_array() != null) {
@@ -1627,10 +1627,12 @@ public class BaseVisitor extends SQLBaseVisitor {
         if (ctx.assign_varible() != null) {
             System.out.println(" visit assign variable");
             t.setV(visitAssign_varible(ctx.assign_varible()));
+
         }
         if (ctx.expression() != null) {
             System.out.println("visit boolean ");
             t.setExpression(visitExpression(ctx.expression()));
+            symanticCheck(t.getExpression());
         }
 
         if (ctx.varible_from_object() != null) {
@@ -2398,6 +2400,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
 
         if (ctx.expression() != null) {
             inside_the_print.setExpression(visitExpression(ctx.expression()));
+            symanticCheck(inside_the_print.getExpression());
 
         } else if (ctx.varible_from_object() != null) {
             inside_the_print.setVariable_from_object(visitVarible_from_object(ctx.varible_from_object()));
@@ -2412,6 +2415,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
             inside_the_print.setVariable_name(visitUse_random_name(ctx.use_random_name()));
             System.out.println(inside_the_print.getVariable_name());
         } else if (ctx.call_function() != null) {
+            Error_UNdeclared_Function(ctx.call_function().use_random_name().getText());
             inside_the_print.setCallFunction(visitCall_function(ctx.call_function()));
             System.out.println(inside_the_print.getCallFunction());
         }
@@ -2520,6 +2524,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         ins.setFunction_name(ctx.use_random_name().getText());
         for (int i = 0; i < ctx.prameters().size(); i++) {
             ins.getParameters().add(visitPrameters(ctx.prameters(i)));
+
         }
         return ins;
     }
@@ -2534,8 +2539,10 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         else if (ctx.IDENTIFIER() != null) {
             parameter.setIdentifire(ctx.IDENTIFIER().getText());
         } else if (ctx.call_function() != null) {
+            Error_UNdeclared_Function(ctx.call_function().use_random_name().getText());
             parameter.setCallFunction(visitCall_function(ctx.call_function()));
         } else if (ctx.use_random_name() != null) {
+            Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.use_random_name().getText());
             parameter.setVariable_name(visitUse_random_name(ctx.use_random_name()));
         } else if (ctx.array_base_form_with_index() != null) {
             parameter.setArray_base_with_index(visitArray_base_form_with_index(ctx.array_base_form_with_index()));
@@ -2575,7 +2582,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         if (ctx.use_random_name() != null) {
             for (int i = 0; i < ctx.use_random_name().size(); i++) {
                 Variable_with_opretor variable_with_opretor = new Variable_with_opretor();
-                    // Error_in_Multiple_Declarations(ctx.use_random_name().get(i).getText()); // TODO: 7/4/2020  narjess
+                     Error_in_Multiple_Declarations(ctx.use_random_name().get(i).getText());
                 variable_with_opretor.setVariable_name(visitUse_random_name(ctx.use_random_name().get(i)));
                 if (ctx.any_arithmetic_oprator() != null && ctx.any_arithmetic_oprator().size() != 0) {
                     variable_with_opretor.setOperator(ctx.any_arithmetic_oprator().get(i).getText());
@@ -2587,6 +2594,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         if (ctx.expression() != null) {
             Expression expression = visitExpression(ctx.expression());
             var.setExpression(expression);
+            symanticCheck(var.getExpression());
         }
         if (ctx.factored_select_stmt() != null) {
             var.setFactored(visitFactored_select_stmt(ctx.factored_select_stmt()));

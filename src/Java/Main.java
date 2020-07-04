@@ -88,11 +88,8 @@ public class Main {
             }
 
         }
-int x =0;
-        switch (x=9){
-            case '1':
 
-        }
+
     }
 
     }
