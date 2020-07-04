@@ -1067,12 +1067,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         if (ctx.column_name() != null)
         {
             expr.setColumnName(visitColumn_name(ctx.column_name()));
-
- /*               boolean test  = currentScope.getTableMap().get(expr.getTableName().getName()).getColumnMap().containsKey(expr.getColumnName().getName());
-            if(test == true){
-                System.err.println("your column name is used before in the"+expr.getTableName().getName()+"the error in Line "+expr.getLine()+"  column "+expr.getCol());
-            }
-*/
         }
         if (ctx.unary_operator() != null && ctx.expr() != null) {
             System.out.println("hy");
@@ -2997,15 +2991,17 @@ public class BaseVisitor extends SQLBaseVisitor {
                 declared = false;
 
             }
-
         }
+        //   System.err.println(" Error variable   " + symbole_name + "  is not declared before ");
        /*if(declared==true )
        {
            System.out.println("variable"+symbole_name +"is declared befor ");
        }*/
         //if (declared == false) {
-          // System.err.println(" Error variable   " + symbole_name + "  is not declared before ");
        // }
+        if (declared == false) {
+            System.out.println(" Error variable   " + symbole_name + "  is not declared befor ");
+        }
         return declared;
 
     }
