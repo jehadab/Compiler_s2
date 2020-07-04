@@ -1,4 +1,14 @@
-func(){
-for(var x =1;x>2 ; ++x + 5){}
+main()
+{
+Create Table Student (Id number, Name string,
+ DateOfBirthEpoch bignumber, HomeAddress Address,
+ WorkAddress Address)type = "json" , path = "D://Desctop//table.path";
 
+select Student.tab from Student;
+
+}
+}else if (hoho){var hohoson;}
+else if(hoho2){var hoho2son;}
+else{var elseson;
+}
 }

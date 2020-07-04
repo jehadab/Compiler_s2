@@ -15,13 +15,5 @@ public class TableName extends UseRandomName {
     public void accept(AstVistor astVisitor) {
         astVisitor.visit(this);
     }
-    public boolean checkValidTable(Scope scope ,String table_name ){
-         while ( !validtablename || scope != null ){
-             if(scope.getTableMap().get(table_name) != null){
-                 validtablename = true;
-             }
-             scope = scope.getParent();
-         }
-         return validtablename;
-    }
+
 }

@@ -29,7 +29,7 @@ public class Main {
 
 
 
-            File file = new File("C://Users//Dell//Desktop//Sql_compiler//samples//samples.txt");
+            File file = new File("../../samples/samples.txt");
             String fileName = file.getAbsolutePath();
 
             CharStream cs = fromFileName(fileName);
@@ -71,13 +71,13 @@ public class Main {
             {
                 System.out.println("table: "+ ((Table) table).getTable_name());
                 System.out.println("the columns in this table : ");
-                System.out.println(" [  ");
-                for(int j = 0 ; j < ((Table) table).getColumnDefListList().size();j++){
-                    System.out.println(((Table) table).getColumnDefListList().get(j).getName()
-                            +"  the column type : "+ ((Table) table).getColumnDefListList().get(j).getTypeName().getName());
-                    System.out.println("  ");
-                }
-                System.out.println("  ] ");
+//                System.out.println(" [  ");
+//                for(int j = 0 ; j < ((Table) table).getColumnDefListList().size();j++){
+//                    System.out.println(((Table) table).getColumnDefListList().get(j).getName()
+//                            +"  the column type : "+ ((Table) table).getColumnDefListList().get(j).getTypeName().getName());
+//                    System.out.println("  ");
+//                }
+//                System.out.println("  ] ");
             }
             for (Object type :symbolTable.getScopes().get(i).getTypeMap().values().toArray()){
                 System.out.println("Types: "+((Type) type).getName());
