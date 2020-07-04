@@ -1,14 +1,7 @@
-main()
-{
-Create Table Student (Id number, Name string,
- DateOfBirthEpoch bignumber, HomeAddress Address,
- WorkAddress Address)type = "json" , path = "D://Desctop//table.path";
+main(){
+
+
+Create type Student (Id number, Name string);
+Create type oqba (s Student , ss number);
 
 select Student.tab from Student;
-
-}
-}else if (hoho){var hohoson;}
-else if(hoho2){var hoho2son;}
-else{var elseson;
-}
-}

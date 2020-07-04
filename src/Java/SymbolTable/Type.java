@@ -5,6 +5,8 @@
 
 package Java.SymbolTable;
 
+import Java.Main;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,23 +35,15 @@ public class Type {
         this.name = name;
     }
 
-    public void addColumnForType(String namecol,String typecol){
-
-        //columns.put(namecol ,typecol);todo mohammad
-    }
-
-
-//    public boolean checkValidTypewithScoop(Scope scope){
-//
-//    }
-
-
-    public Map<String, String> getColumns() {
-        //return this.columns; todo mohammad
-        return getColumns();
+    public Map<String, Type> getColumns() {
+        return this.columns;
     }
 
     public void setColumns(Map<String, Type> columns) {
         this.columns = columns;
+    }
+
+    public void addColumns(String string ,Type type ){
+        columns.put(string, type);
     }
 }

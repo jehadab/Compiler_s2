@@ -71,36 +71,44 @@ public class BaseVisitor extends SQLBaseVisitor {
         globalScope.setId("global_scope");
         scopesStack.push(globalScope);
 
-        if (ctx.create_aggregation_function().size() != 0) {
-            for (int i = 0; i < ctx.create_aggregation_function().size(); i++) {
-                p.getAg().add(visitCreate_aggregation_function(ctx.create_aggregation_function(i)));
+        for (int i = 0; i <ctx.children.size(); i++) {
+
+          //  if (ctx.create_aggregation_function().size() != 0) {
+                if(ctx.children.get(i) instanceof SQLParser.Create_aggregation_functionContext){
+
+                    p.getAg().add(visitCreate_aggregation_function(ctx.create_aggregation_function(i)));
+
+            }
+      //      else if (ctx.sql_stmt_list().size() != 0) {
+                   else if(ctx.children.get(i) instanceof SQLParser.Sql_stmt_listContext){
+
+                        for (int j = 0; j < ctx.sql_stmt_list().get(i).sql_stmt().size(); j++) {
+                        p.getSqlStmts().add(visitSql_stmt(ctx.sql_stmt_list().get(i).sql_stmt().get(j)));
+                    }
+            }
+//            else if (ctx.funtion() != null) {
+            if(ctx.children.get(i) instanceof SQLParser.FuntionContext){
+
+                System.out.println("visiting fucntion ");
+                System.out.println(" size of the function " + ctx.funtion().size());
+
+                    Scope functionScope = new Scope();
+                    functionScope.setId(ctx.funtion().get(i).function_header().use_random_name().getText() + "_" + ctx.funtion().get(i).hashCode());
+                    functionScope.setParent(scopesStack.peek());
+
+                    scopesStack.push(functionScope);
+
+                    p.getFunctions().add(visitFuntion(ctx.funtion(i)));
+
+                    Main.symbolTable.addScope(scopesStack.pop());
+
             }
         }
 
 
-        if (ctx.sql_stmt_list().size() != 0) {
-            for (int i = 0; i < ctx.sql_stmt_list().size(); i++) {
-                for (int j = 0; j < ctx.sql_stmt_list().get(i).sql_stmt().size(); j++) {
-                    p.getSqlStmts().add(visitSql_stmt(ctx.sql_stmt_list().get(i).sql_stmt().get(j)));
-                }
-            }
-        }
-        if (ctx.funtion() != null) {
 
-            System.out.println("visiting fucntion ");
-            System.out.println(" size of the function " + ctx.funtion().size());
-            for (int i = 0; i < ctx.funtion().size(); i++) {
-                Scope functionScope = new Scope();
-                functionScope.setId(ctx.funtion().get(i).function_header().use_random_name().getText() + "_" + ctx.funtion().get(i).hashCode());
-                functionScope.setParent(scopesStack.peek());
 
-                scopesStack.push(functionScope);
 
-                p.getFunctions().add(visitFuntion(ctx.funtion(i)));
-
-                Main.symbolTable.addScope(scopesStack.pop());
-            }
-        }
         p.setLine(ctx.getStart().getLine()); //get line number
         p.setCol(ctx.getStart().getCharPositionInLine()); // get col number
         Main.symbolTable.addScope(scopesStack.pop());
@@ -135,7 +143,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         Statement s = new Statement();
         if (ctx.factored_select_stmt() != null) {
             s = visitFactored_select_stmt(ctx.factored_select_stmt());
-        } else if (ctx.delete_stmt() != null) {
+        }
+        else if (ctx.delete_stmt() != null) {
             s = visitDelete_stmt(ctx.delete_stmt());// ... ignor this
         } else if (ctx.drop_table_stmt() != null) {
             s = visitDrop_table_stmt(ctx.drop_table_stmt());//... ignor this
@@ -237,11 +246,13 @@ public class BaseVisitor extends SQLBaseVisitor {
 
             if (ctx.column_def() != null) {
                 List<ColumnDef> columnDefs = new ArrayList<>();
+                Type type = new Type();
                 for (int i = 0; i < ctx.column_def().size(); i++) {
                     columnDefs.add(visitColumn_def(ctx.column_def(i)));
                     Column col  =  new Column();
-                    col.setColumn_name(columnDefs.get(i).getName());
-                    col.setColumn_type(columnDefs.get(i).getTypeName().getName());
+                    col.setColumn_name(columnDefs.get(i).getColumnName());
+                    col.setColumn_type(columnDefs.get(i).getType());
+                    table.addColumnMap(columnDefs.get(i).getColumnName() , col);
                 }
                 if(ctx.table_constraint()!=null){
                     List<TableConstraint> tableConstraints= new ArrayList<>();
@@ -300,15 +311,20 @@ public class BaseVisitor extends SQLBaseVisitor {
     public ColumnDef visitColumn_def(SQLParser.Column_defContext ctx) {
         System.out.println("visitColumn_def");
         ColumnDef colmndef = new ColumnDef();
+        Type type = new Type();
         if (ctx.column_name() != null) {
-            colmndef.setName(ctx.column_name().use_random_name().RANDOM_NAME().getText());
+            colmndef.setColumnName(ctx.column_name().use_random_name().RANDOM_NAME().getText());
             if (ctx.column_constraint() != null) {
                 for (int i = 0; i < ctx.column_constraint().size(); i++) {
                     colmndef.addItemToListOfColumnConstraint(visitColumn_constraint(ctx.column_constraint(i)));
                 }
             }
             if (ctx.type_name() != null) {
-                colmndef.setTypeName(visitType_name(ctx.type_name()));
+                TypeName typeName = (visitType_name(ctx.type_name()));
+                type.setName(typeName.getName());
+                colmndef.setType(type);
+                colmndef.setLim1(typeName.getLim1());
+                colmndef.setLim2(typeName.getLim2());
             }
         }
         return colmndef;
@@ -408,24 +424,59 @@ public class BaseVisitor extends SQLBaseVisitor {
         Type type = new Type();
         Create_Type create_type = new Create_Type();
         if (ctx.use_random_name() != null) {
-            create_type.setNameOfType(ctx.use_random_name().getText());
+//            create_type.setNameOfType(ctx.use_random_name().getText());
 //            todo check for the type name
-            type.setName(create_type.getNameOfType());
+            type.setName(ctx.use_random_name().getText());
             if (ctx.inside_create_type() != null) {
                 List<InsideCreateType> insideCreateTypes = new ArrayList<>();
                 for (int i = 0; i < ctx.inside_create_type().size(); i++) {
                     insideCreateTypes.add(visitInside_create_type(ctx.inside_create_type(i)));
-                    type.addColumnForType(insideCreateTypes.get(i).getNameOfColumnOfType(), insideCreateTypes.get(i).getType());
-                }
+//                    Column column = new Column();
+//                    column.setColumn_name(insideCreateTypes.get(i).getNameOfColumnOfType());
+//                    column.setColumn_type(insideCreateTypes.get(i).getType());
+                    type.addColumns(insideCreateTypes.get(i).getNameOfColumnOfType(), insideCreateTypes.get(i).getType());
 
-                create_type.setInsideCreateTypeList(insideCreateTypes);
+                }
+                create_type.setType(type);
+//                create_type.setInsideCreateTypeList(insideCreateTypes);
             }
             create_type.setName("Create_Type");
         }
         currentScope.addType(type.getName(), type);
 //        type.setScope(currentScope);
         Main.symbolTable.addType(type);
+        checkDecleratedType(create_type.getType());
+
         return create_type;
+    }
+    private boolean checkDecleratedType(Type type ){
+        boolean resault = false;
+        if(type.getName() != null){
+            if(type.getName().equals(Type.BOOLEAN_CONST)){
+                resault  = true ;
+            }else if(type.getName().equals(Type.NUMBER_CONST)){
+                resault  = true ;
+            }else if(type.getName().equals(Type.STRING_CONST)){
+                resault  = true ;
+            }
+            for (Object colType :type.getColumns().values().toArray()
+                 ) {
+                String name =  ((Type)colType).getName();
+                if(name.equals(Type.BOOLEAN_CONST)){
+                    resault  = true ;
+                }else if(name.equals(Type.NUMBER_CONST)){
+                    resault  = true ;
+                }else if(name.equals(Type.STRING_CONST)){
+                    resault  = true ;
+                }else if(!Main.symbolTable.getDeclaredTypes().contains(name)) {
+                    System.err.println(type.getName() + " did not exist ");
+
+                }
+
+
+            }
+        }
+        return resault;
     }
 
     @Override
@@ -435,9 +486,11 @@ public class BaseVisitor extends SQLBaseVisitor {
         if (ctx.use_random_name() != null) {
             insideCreateType.setNameOfColumnOfType(ctx.use_random_name().getText());
             System.out.println("the column of type is " + insideCreateType.getNameOfColumnOfType());
+            Type type = new Type() ;
             if (ctx.oneOftype_name() != null) {
 
-                insideCreateType.setType(ctx.oneOftype_name().getText());
+                type.setName(ctx.oneOftype_name().getText());
+                insideCreateType.setType(type);
             }
             return insideCreateType;
         }
@@ -988,12 +1041,12 @@ public class BaseVisitor extends SQLBaseVisitor {
         if (ctx.column_name() != null)
         {
             expr.setColumnName(visitColumn_name(ctx.column_name()));
-            if(validTable == true){
-                boolean test  = currentScope.getTableMap().get(expr.getTableName().getName()).getColumnMap().containsKey(expr.getColumnName().getName());
+
+ /*               boolean test  = currentScope.getTableMap().get(expr.getTableName().getName()).getColumnMap().containsKey(expr.getColumnName().getName());
             if(test == true){
                 System.err.println("your column name is used before in the"+expr.getTableName().getName()+"the error in Line "+expr.getLine()+"  column "+expr.getCol());
             }
-            }
+*/
         }
         if (ctx.unary_operator() != null && ctx.expr() != null) {
             System.out.println("hy");
@@ -1112,16 +1165,16 @@ public class BaseVisitor extends SQLBaseVisitor {
         else{
             boolean test ;
             System.out.println("***************************************test test test test test test*************************************");
-            while (!validTable)
+            while (currentScope != null)
             {
                 test = currentScope.getTableMap().containsKey(tableName.getName());
-                if(test == false && currentScope.getParent() == null)
+                if(test )
                 {
-                    System.err.println("your table name is not declare before you can not use the table before declare it"+"the error in Line "+tableName.getLine()+"  column "+tableName.getCol());
-                    validTable = true ;
+                    return tableName;
                 }
                 currentScope = currentScope.getParent();
             }
+            System.err.println("your table name is not declare before you can not use the table before declare it"+"the error in Line "+tableName.getLine()+"  column "+tableName.getCol());
         }
         return tableName;
     }
@@ -2012,8 +2065,9 @@ public class BaseVisitor extends SQLBaseVisitor {
         variableSymbol.setName(name);
         variableSymbol.setScope(currentScope);
         variableSymbol.setType(type);
-        currentScope.addSymbol(name, variableSymbol);
 
+//        if(Error_in_Multiple_Declarations(name))
+             currentScope.addSymbol(name, variableSymbol);
         return creatvaribelwihtout;
 
     }
@@ -2308,8 +2362,8 @@ public class BaseVisitor extends SQLBaseVisitor {
 
             /*if(ctx.if_rule().return_rule()!=null) {
                functional_instuctions  i = new if_else();
-i.setLoop((exting_oop) ctx.if_rule().return_rule().K_RETURN());
-i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().return_rule().K_RETURN()));
+            i.setLoop((exting_oop) ctx.if_rule().return_rule().K_RETURN());
+            i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().return_rule().K_RETURN()));
             }*/
             if (ctx.if_rule().return_rule() != null) {
                 returnes_rule r = new returnes_rule();
@@ -2494,7 +2548,7 @@ i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().retur
         Inside_for_loop inside_for_loop = new Inside_for_loop();
         if (ctx.expression() != null) {
             inside_for_loop.setExpression(visitExpression(ctx.expression()));
-        symanticCheck(inside_for_loop.getExpression());
+            symanticCheck(inside_for_loop.getExpression());
         }
         else if(ctx.assign_array() != null){
             inside_for_loop.setAssign_array(visitAssign_array(ctx.assign_array()));

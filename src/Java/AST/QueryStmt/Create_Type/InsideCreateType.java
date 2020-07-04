@@ -1,10 +1,11 @@
 package Java.AST.QueryStmt.Create_Type;
 
 import Java.AST.Node;
+import Java.SymbolTable.Type;
 
 public class InsideCreateType extends Node {
     private String nameOfColumnOfType ;
-    private String type;
+    private Type type;
 
     public String getNameOfColumnOfType() {
         return nameOfColumnOfType;
@@ -14,11 +15,11 @@ public class InsideCreateType extends Node {
         this.nameOfColumnOfType = nameOfColumnOfType;
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Type type) {
         this.type = type;
     }
 }

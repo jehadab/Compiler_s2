@@ -5,10 +5,7 @@ import Java.AST.Parse;
 import Java.AST.create.generalcreating;
 //import Java.AST.visitor_java.visite_general_creating;
 import Java.Base.BaseVisitor;
-import Java.SymbolTable.Symbol;
-import Java.SymbolTable.SymbolTable;
-import Java.SymbolTable.Table;
-import Java.SymbolTable.Type;
+import Java.SymbolTable.*;
 import generated.SQLBaseListener;
 import generated.SQLLexer;
 import generated.SQLParser;
@@ -71,6 +68,14 @@ public class Main {
             {
                 System.out.println("table: "+ ((Table) table).getTable_name());
                 System.out.println("the columns in this table : ");
+                for (Object col:((Table) table).getColumnMap().values().toArray()
+                     ) {
+                    System.out.println(((Column) col).getColumn_name()
+                            +"  the column type : "+
+                            ((Column) col).getColumn_type().getName());
+                    System.out.println("  ");
+                }
+                System.out.println("  ] ");
 //                System.out.println(" [  ");
 //                for(int j = 0 ; j < ((Table) table).getColumnDefListList().size();j++){
 //                    System.out.println(((Table) table).getColumnDefListList().get(j).getName()
@@ -82,8 +87,12 @@ public class Main {
             for (Object type :symbolTable.getScopes().get(i).getTypeMap().values().toArray()){
                 System.out.println("Types: "+((Type) type).getName());
                 System.out.println("the columns in this types : ");
-                System.out.println(" [  ");
-                System.out.println(((Type) type).getColumns());
+                System.out.print(" [  ");
+                for (Object col :((Type) type).getColumns().values().toArray()
+                     ) {
+
+                    System.out.print(((Type) col).getName()+ " ");
+                }
                 System.out.println("  ] ");
             }
 
