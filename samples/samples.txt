@@ -1,4 +1,1 @@
-main (){
-
-for(var i = 2 ; ii ; jj++){}
-}
+create type address (id number, name string, id boolean)
