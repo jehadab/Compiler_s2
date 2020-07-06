@@ -71,25 +71,28 @@ public class BaseVisitor extends SQLBaseVisitor {
         globalScope.setId("global_scope");
         scopesStack.push(globalScope);
 
+        for (int i = 0; i < ctx.funtion().size() ; i++) {
+            function_header header = new function_header();
+            header.setName((ctx.funtion().get(i).function_header().use_random_name().getText()));
+            Main.symbolTable.add_functions(header);
+        }
+
         for (int i = 0; i <ctx.children.size(); i++) {
 
-          //  if (ctx.create_aggregation_function().size() != 0) {
                 if(ctx.children.get(i) instanceof SQLParser.Create_aggregation_functionContext){
 
                     p.getAg().add(visitCreate_aggregation_function(ctx.create_aggregation_function(i)));
 
             }
-      //      else if (ctx.sql_stmt_list().size() != 0) {
                    else if(ctx.children.get(i) instanceof SQLParser.Sql_stmt_listContext){
 
                         for (int j = 0; j < ctx.sql_stmt_list().get(i).sql_stmt().size(); j++) {
                         p.getSqlStmts().add(visitSql_stmt(ctx.sql_stmt_list().get(i).sql_stmt().get(j)));
                     }
             }
-//            else if (ctx.funtion() != null) {
             if(ctx.children.get(i) instanceof SQLParser.FuntionContext){
 
-                System.out.println("visiting fucntion ");
+                System.out.println("visiting function ");
                 System.out.println(" size of the function " + ctx.funtion().size());
 
                     Scope functionScope = new Scope();
@@ -104,10 +107,6 @@ public class BaseVisitor extends SQLBaseVisitor {
 
             }
         }
-
-
-
-
 
         p.setLine(ctx.getStart().getLine()); //get line number
         p.setCol(ctx.getStart().getCharPositionInLine()); // get col number
@@ -231,9 +230,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         Scope currentScope = scopesStack.peek();
         Table table = new Table();
         CreateTableStmt createTableStmt = new CreateTableStmt();
-//        if(ctx.database_name()!=null) {
-//            createTableStmt.setDataBaseName(visitDatabase_name(ctx.database_name()));
-//        }
         if (ctx.table_name() != null) {
             createTableStmt.setTableName(visitTable_name(ctx.table_name()));
             if(!seminticCheckForCreateTable(createTableStmt.getTableName()))
@@ -262,7 +258,6 @@ public class BaseVisitor extends SQLBaseVisitor {
                     createTableStmt.setDeclareTypeTable(visitDeclare_type_table(ctx.declare_type_table()));
                     if (ctx.COMMA() != null && ctx.declare_path_table() != null) {
                         createTableStmt.setDeclarePathTable(visitDeclare_path_table(ctx.declare_path_table()));
-//
                     }
                 }
             } else if (ctx.select_stmt() != null) {
@@ -272,9 +267,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         }
         currentScope.addTable(table.getTable_name(),table);
         table.setPath_of_table(createTableStmt.getDeclarePathTable().getPath());
-//        System.out.println("the path of the table is : "+table.getPath_of_table());
         table.setExtension_of_table(createTableStmt.getDeclareTypeTable().getType());
-//        System.out.println("the extension of the table is : "+table.getExtension_of_table());
         createTableStmt.setName("Create Table");
 
 
@@ -420,25 +413,20 @@ public class BaseVisitor extends SQLBaseVisitor {
         Type type = new Type();
         Create_Type create_type = new Create_Type();
         if (ctx.use_random_name() != null) {
-//            create_type.setNameOfType(ctx.use_random_name().getText());
 //            todo check for the type name
             type.setName(ctx.use_random_name().getText());
             if (ctx.inside_create_type() != null) {
                 List<InsideCreateType> insideCreateTypes = new ArrayList<>();
                 for (int i = 0; i < ctx.inside_create_type().size(); i++) {
                     insideCreateTypes.add(visitInside_create_type(ctx.inside_create_type(i)));
-//                    Column column = new Column();
-//                    column.setColumn_name(insideCreateTypes.get(i).getNameOfColumnOfType());
-//                    column.setColumn_type(insideCreateTypes.get(i).getType());
+
                     type.addColumns(insideCreateTypes.get(i).getNameOfColumnOfType(), insideCreateTypes.get(i).getType());
                 }
                 create_type.setType(type);
-//                create_type.setInsideCreateTypeList(insideCreateTypes);
             }
             create_type.setName("Create_Type");
         }
         currentScope.addType(type.getName(), type);
-//        type.setScope(currentScope);
         Main.symbolTable.addType(type);
         Main.showSymboleTable();
         checkDecleratedType(create_type.getType());
@@ -461,7 +449,6 @@ public class BaseVisitor extends SQLBaseVisitor {
                      ) {
                     String name =  ((Type)colType).getName();
                     boolean found =false;
-//                    System.err.println("bbbbb "+type.getColumns().size());
                     if(((Type) colType).getColumns().size() == 0){
                         if(name.equals(Type.BOOLEAN_CONST)){
                             resault = true ;
@@ -472,10 +459,8 @@ public class BaseVisitor extends SQLBaseVisitor {
                         }else
                             for (Type subtype :Main.symbolTable.getDeclaredTypes()) {
                                 if(!subtype.getName().equals(((Type) colType).getName())){
-                                    //System.err.println(name + " did not exist ");
                                 }
                         }
-                       // if(found)
 
                     }
                         else
@@ -1365,88 +1350,40 @@ public class BaseVisitor extends SQLBaseVisitor {
         funcdec.setBody(visitFunction_body(ctx.function_body()));
 
         return funcdec;
-        // we should also visite function body also
     }
-    // @Override public function_body visitFunction_body(SQLParser.Function_bodyContext ctx) {
-    //   System.out.println("function header ");
-    // function_body body = new function_body();
-    //body.setGeneral(visitGrnral_creating(ctx.));
-    //return body ;
-    //}
+
 
     public function_header visitFunction_header(SQLParser.Function_headerContext ctx) {
         System.out.println("function_header ");
         function_header header = new function_header();
-//
-//        Scope functionScop = new Scope();
-//        String functionName = ctx.use_random_name().getText();
-//        functionScop.setId(functionName);
-//        Main.symbolTable.addScope(functionScop)
+
         header.setName(ctx.use_random_name().getText());
-        //System.out.println( " the value here "+ctx.args().size());
-        Main.symbolTable.add_functions(header);
-        //System.out.println("changing size"+Main.symbolTable.getFunctions().size());
+
         for (int i = 0; i < ctx.args().size(); i++) {
-            //header.additemtoarglist();
-            //header.setArg((List<args>) visitArgs(ctx.args().get(i)));
-            //System.out.pr var e []=select all clum1 , colum2 from b  where a.o=l.u order by hintln(  " what will return "+ctx.args().get(i).grnral_creating().creat_without_assign().create_varible_without_assign().varible_name().use_random_name().RANDOM_NAME().getSymbol().getText());
-            //header.additemtoarglist(ctx.args().get(i));
+
             header.add_item_to_arglist(visitArgs(ctx.args(i)));
-            // if(header.additemtoarglist(visitCreating_with_assign(ctx.creating_with_assign(i))));
         }
         for (int j = 0; j < ctx.creating_with_assign().size(); j++) {
             header.add_item_to_with_assign_var_list(visitCreating_with_assign(ctx.creating_with_assign(j)));
         }
-        // System.out.println("testing ");
-        //  System.out.println("size of array list "+header.getArg().size());
-        // header.pri();
-        // we should use for loop
-        // set list of parameteres
+
 
         return header;
     }
 
 
-    /*  @Override
-      public instructions visitNonfunctional_instruction(SQLParser.Nonfunctional_instructionContext ctx) {
-          System.out.println("visit nonfunctional instruction");
-          non_functional_instructions instruction = new non_functional_instructions();
 
-          if(ctx.use_random_name() != null)
-          {
-              instruction = visitOne_line_if_statment_rule(ctx.one_line_if_statment_rule());
-          }
-          return instruction;
-      }*/
     @Override
     public args visitArgs(SQLParser.ArgsContext ctx) {
-        //List<args> arg = new ArrayList<args>();
         args temp = new args();
         System.out.println("visite args ");
-        // arg.add(visitGrnral_creating(ctx.grnral_creating(0)));
-
-        /// arg.add(visitGrnral_creating(ctx.grnral_creating()));
-
-        //if(ctx.creat_without_assign()!=null)
-        //{ temp.setCreating(visitGrnral_creating(ctx.grnral_creating()));
-
-        //}
-
         if (ctx.creat_without_assign() != null) {
             visitCreat_without_assign(ctx.creat_without_assign());
         }
-
-
-        // return arg;
         return temp;
     }
 
-    //@Override public createarrywithoutassign visitCreate_Array_without_assign(SQLParser.Create_Array_without_assignContext ctx) {
-    //  System.out.println("create Array wihtout assign ");
-    //createarrywithoutassign arra = new createarrywithoutassign();
 
-
-    //}
     @Override
     public gneralcreating visitGrnral_creating(SQLParser.Grnral_creatingContext ctx) {
         System.out.println("general creating ");
@@ -1463,7 +1400,6 @@ public class BaseVisitor extends SQLBaseVisitor {
             general.setInstrucation_name(general.getWithassign().getInstrucation_name());
 
         }
-        //System.out.println("check what is going on "+general.toString());
         return general;
     }
 
@@ -1512,8 +1448,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         boolean symanticCheck = true;
         if (variable_with_assign.getVar().getExpression() != null) {
             expression = variable_with_assign.getVar().getExpression();
-//            Error_ofusing_undeclared_variabler(scopesStack.peek(),variable_with_assign.getVar().getVariable_with_opretor().get(0).getVariable_name());
-            symanticCheck(expression);
+            symanticCheck = symanticCheck(variable_with_assign);
             createdSymbol.setType(addTypeForVariable(expression, symanticCheck));
 
         }else if(variable_with_assign.getVar().getFactored() != null){
@@ -1567,7 +1502,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         array_value_form leftvalue = new array_value_form();
         System.out.println(" value is the array");
         if (ctx.array_identifier_form() != null)
-        ///  {leftvalue.setID(visitArray_identifier_form(ctx.array_identifier_form()));}
         {
             leftvalue.setID(visitArray_identifier_form(ctx.array_identifier_form()));
 
@@ -1640,19 +1574,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         return forms;
     }
 
-    /* @Override public  ArrayList<Token> visitArray_integer_form(SQLParser.Array_integer_formContext ctx) {
-         ArrayList<Token > t = new  ArrayList<Token >();
-
-         for(int i=0;i<ctx..size();i++)
-         {
-
-             t.add(ctx.IDENTIFIER(i).getSymbol());
-         }
-         return t;
-     }
-
-
-     }*/ // arithmatic one we need it ......
     @Override
     public ArrayList<Token> visitArray_charecter_form(SQLParser.Array_charecter_formContext ctx) {
         ArrayList<Token> t = new ArrayList<Token>();
@@ -1669,8 +1590,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     public creat_json_with_assign visitCreate_json_with_assign(SQLParser.Create_json_with_assignContext ctx) {
         System.out.println("visite create json wiht assign ");
         creat_json_with_assign jsowith = new creat_json_with_assign();
-        // if else = {}
-        //else visite use randomname
+
         jsowith.setAssingit(visitAssign_json(ctx.assign_json()));
         jsowith.setInstrucation_name(creat_json_with_assign.class.getName());
 
@@ -1700,7 +1620,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         jsonstatment inside_json = new jsonstatment();
         for (int i = 0; i < ctx.inside_json_statmnet().size(); i++) {
             inside_json.additemtojsonstatment(visitInside_json_statmnet(ctx.inside_json_statmnet().get(i)));
-            //System.out.println(" justing testing it "+ctx.inside_json_statmnet().get(i).getText());
         }
 
         return inside_json;
@@ -1805,7 +1724,6 @@ public class BaseVisitor extends SQLBaseVisitor {
     @Override
     public Expression visitExpression(SQLParser.ExpressionContext ctx) {
         Expression expression = new Expression();
-        //cleanExpressionTree(ctx);
         expression.setExpression_list(expression_algorthim(ctx));
 
         int x = 1, y = 2, z = 3;
@@ -1853,17 +1771,12 @@ public class BaseVisitor extends SQLBaseVisitor {
     }
 
     public Shortcut_Statments shortcut_Statments_Expression(SQLParser.ExpressionContext ctx) {
-        boolean  go_to=false ;
 
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
+        shortcut_statments.setInstrucation_name("Shortcut_Statments");
         if (ctx.expression(0).intral_expression_value() != null) {
             Variable_Name variable_name = visitVarible_name(ctx.expression(0).intral_expression_value().varible_name());
-            // Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.);
             shortcut_statments.setShortcut_variable_name(variable_name.getVariable_name());
-            if( !Error_ofusing_undeclared_variabler(scopesStack.peek() , variable_name.getVariable_name()))
-            {
-                go_to = true;
-            }
 
         }
         if (ctx.PLUS_PLUS() != null) {
@@ -1871,13 +1784,11 @@ public class BaseVisitor extends SQLBaseVisitor {
         } else if (ctx.MINUS_MINUS() != null) {
             shortcut_statments.setOprator(ctx.MINUS_MINUS().getText());
         }
-        if(go_to==true)
-            if(Check_From_ShortCut_Type(shortcut_statments)==true)
-                System.err.println("Error  type  "+ shortcut_statments.getShortcut_variable_name()+" is not number ");
-
 
         System.out.println("shortcut stored : " + shortcut_statments.getInstrucation_name());
         System.out.println(shortcut_statments.getOprator());
+
+        symanticCheck(shortcut_statments);
 
         return shortcut_statments;
 
@@ -1992,15 +1903,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         variable_name.setVariable_name(ctx.getText());
         System.out.println("variable stored : " + variable_name.getVariable_name());
 
-  /*      Scope currentScope = scopesStack.peek();
-        Symbol variableSymbol = new Symbol();
-        variableSymbol.setName(variable_name.getVariable_name());
-        variableSymbol.setIsParam(false);
-        variableSymbol.setScope(currentScope);
-        //variableSymbol.setType(); //todo type
-        currentScope.addSymbol(variable_name.getVariable_name(),variableSymbol);*/
-
-
         return variable_name;
     }
 
@@ -2021,18 +1923,14 @@ public class BaseVisitor extends SQLBaseVisitor {
         if (ctx.IDENTIFIER() != null) {
             value.setTypes(ctx.IDENTIFIER().getSymbol());
 
-            //System.out.println("value of identifir "+ctx.IDENTIFIER().getSymbol().getText());
         } else if (ctx.K_NULL() != null) {
 
             value.setTypes(ctx.K_NULL().getSymbol());
-            //System.out.println("value of null"+ctx.K_NULL().getSymbol().getText());
 
         } else if (ctx.NUMERIC_LITERAL() != null) {
             value.setTypes(ctx.NUMERIC_LITERAL().getSymbol());
-            //  System.out.println("value of numeric letter "+ctx.NUMERIC_LITERAL().getSymbol().getText());
         } else if (ctx.json_statment() != null) {
             value.setStatmnet(visitJson_statment(ctx.json_statment())); // calling it our we should assign to it
-            /// System.out.println("value of json statment "+ctx.json_statment().inside_json_statmnet().);
         } else if (ctx.varible_name() != null) {
             value.setName(visitUse_random_name(ctx.varible_name().use_random_name()));
         } else if (ctx.varible_from_object() != null) {
@@ -2053,9 +1951,7 @@ public class BaseVisitor extends SQLBaseVisitor {
             for (int i = 0; i < ctx.varible_name().size(); i++) {
                 objectes.setName(visitUse_random_name(ctx.varible_name(i).use_random_name()));
 
-                //objectes.setName(visitUse_random_name(ctx.varible_name().use_random_name()));
             }
-            //visitUse_random_name(ctx.varible_name().use_random_name()) ;
         }
         return objectes;
     }
@@ -2064,18 +1960,12 @@ public class BaseVisitor extends SQLBaseVisitor {
     public createwihtoutassign visitCreat_without_assign(SQLParser.Creat_without_assignContext ctx) {
         createwihtoutassign wihtoutassign = new createwihtoutassign();
         System.out.println("visit creating without assign ");
-        // wihtoutassign =  visitCreate_varible_without_assign(ctx.create_varible_without_assign());
         if (ctx.create_varible_without_assign() != null) {
             wihtoutassign.setVar(visitCreate_varible_without_assign(ctx.create_varible_without_assign()));
-            //  System.out.println("woooo"+wihtoutassign.getVar().getInstrucation_name());
             wihtoutassign.setInstrucation_name(wihtoutassign.getVar().getInstrucation_name());
         }
         if (ctx.create_Array_without_assign() != null) {
             wihtoutassign.setArray(visitCreate_Array_without_assign(ctx.create_Array_without_assign()));
-            //  createarrywithoutassign s = new createarrywithoutassign();
-            // s=visitCreate_Array_without_assign(ctx.create_Array_without_assign());
-            //System.out.println("still checking it well "+s.getInstrucation_name());
-            //wihtoutassign.setInstrucation_name( visitCreate_Array_without_assign(ctx.create_Array_without_assign()).getInstrucation_name());
             wihtoutassign.setInstrucation_name(wihtoutassign.getArray().getInstrucation_name());
         }
         if (ctx.create_json_object_without_assign() != null) {
@@ -2091,7 +1981,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("visite json wihtout assign ");
         create_json_wihtout_assign json_without_assign = new create_json_wihtout_assign();
         json_without_assign.setForm(visitJson_name(ctx.json_name()));
-        ////general.setInstrucation_name( gneralcreating.class.getName());
         json_without_assign.setInstrucation_name(create_json_wihtout_assign.class.getName());
 
         return json_without_assign;
@@ -2102,7 +1991,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("json name ");
 
         jsonform form = new jsonform();
-        //visitUse_random_name(ctx.use_random_name());
         form.setName(visitUse_random_name(ctx.use_random_name()));
         return form;
     }
@@ -2112,9 +2000,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("creaitng array wihtout assing ");
         createarrywithoutassign wihtoutassing = new createarrywithoutassign();
         wihtoutassing.setWihtoutindex(visitArray_base_form_without_index(ctx.array_base_form_without_index()));
-        ////general.setInstrucation_name( gneralcreating.class.getName());
         wihtoutassing.setInstrucation_name(createarrywithoutassign.class.getName());
-        //ystem.out.println(" we are here checking it "+wihtoutassing.getInstrucation_name() );
 
         return wihtoutassing;
     }
@@ -2124,7 +2010,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("creating array base form ");
         arrayformwithoutindex wihtoutindex = new arrayformwithoutindex();
         wihtoutindex.setName(visitArray_name(ctx.array_name()));
-        //System.out.println( " array name "+wihtoutindex.getName());
         return wihtoutindex;
     }
 
@@ -2141,8 +2026,6 @@ public class BaseVisitor extends SQLBaseVisitor {
     public creatingvariabelwithoutassing visitCreate_varible_without_assign(SQLParser.Create_varible_without_assignContext ctx) {
         System.out.println("creatingvariabelwithoutassing");
         creatingvariabelwithoutassing creatvaribelwihtout = new creatingvariabelwithoutassing();
-        //  Error_ofusing_undeclared_variabler( ,ctx.varible_name().use_random_name().getText());
-       // Error_in_Multiple_Declarations(ctx.varible_name().use_random_name().getText());
         creatvaribelwihtout.setN(visitUse_random_name(ctx.varible_name().use_random_name()));
         creatvaribelwihtout.setInstrucation_name(creatingvariabelwithoutassing.class.getName());
 
@@ -2155,7 +2038,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         variableSymbol.setName(name);
         variableSymbol.setScope(currentScope);
         variableSymbol.setType(type);
-        if(Error_in_Multiple_Declarations(ctx.varible_name().use_random_name().getText())==false)
+        if(Error_in_Multiple_Declarations(ctx.varible_name().use_random_name().getText()))
         {currentScope.addSymbol(name, variableSymbol);}
 
         return creatvaribelwihtout;
@@ -2170,27 +2053,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         if (ctx.RANDOM_NAME() != null) {
             name = ctx.RANDOM_NAME().getSymbol().getText();
         }
-
-
-       /* StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-        StackTraceElement stackTraceElement = stacktrace[3];
-        String callingmethodName = stackTraceElement.getMethodName();
-        String createVariableMethode = "visitCreate_varible_with_assign";
-
-        if(callingmethodName.equals(createVariableMethode))
-        {
-            Scope currentScope =  scopesStack.peek();
-            Symbol variableSymbol = new Symbol();
-            variableSymbol.setIsParam(false);
-            variableSymbol.setName(name);
-            variableSymbol.setScope(currentScope);
-//        variableSymbol.setType(); //todo add type
-            currentScope.addSymbol(name , variableSymbol);
-
-        }
-*/
-
-
         System.out.println("visitUse_random_name: " + name);
         return name;
     }
@@ -2201,8 +2063,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         function_body function_body = new function_body();
         instructions ins;
 
-//        Scope functionScope = Main.symbolTable.getScopes().get(Main.symbolTable.getScopes().size() - 1);
-//        scopesStack.push(functionScope);
 
 
         for (int i = 0; i < ctx.children.size(); i++) {
@@ -2213,49 +2073,11 @@ public class BaseVisitor extends SQLBaseVisitor {
                 function_body.addNode(visitSub_function_body((SQLParser.Sub_function_bodyContext) ctx.children.get(i)));
             }
         }
-
-        // System.out.println(((While_Rule)function_body.getInstructions().get(2)).getBoolean_infunction_statment().getBoolean_exprs().get(0).getBoolean_exprs_list().get(0).getTermenal_node());
-
-       /* for(int i =0 ; i<ctx.sub_function_body().instructions().size() ; i++)
-        {
-          System.out.println(function_body.getInstructions().get(i).getInstrucation_name());
-            //System.out.println(((returnes_rule)((do_while)function_body.getInstructions().get(i)).getInstructions().get(i)).getT().getName());
-   //System.out.println("return rule test :"+((if_else)function_body.getInstructions().get(i)).getLoop());
-
-        }*/
-       /* if(ctx.sub_function_body()!=null)
-
-        {
-            function_body.setSub_one(visitSub_function_body(ctx.sub_function_body()));
-        }*/
         if (ctx.return_rule() != null) {
             function_body.setR(visitReturn_rule(ctx.return_rule()));
         }
-
-        /*System.out.println("checkng if it  is working well");
-        for(int i=0;i<function_body.getSub_one().getInstructions().size();i++)
-        {
-            System.out.println("in the index "+i+ " the instruction we have "+function_body.getSub_one().getInstructions().get(i).getInstrucation_name());
-        }*/
         return function_body;
     }
-
-    /* public sub_function_body visitSub_function_body(SQLParser.Sub_function_bodyContext ctx){
-         sub_function_body s = new sub_function_body();
-         if(ctx.instructions()!=null)
-         {
-             for(int i=0;i<ctx.instructions().size();i++) {
-                 //System.out.println("the instruction "+ctx.instructions()
-                 instructions in = new instructions();
-                 in= visitInstructions(ctx.instructions(i));
-                 System.out.println("judt checking what is wrong with it "+in.getInstrucation_name());
-                 //s.add_instruction_to_list(visitInstructions(ctx.instructions(i)));
-             }
-         }
-
-        return s;
-
-     }*/
     @Override
     public sub_function_body visitSub_function_body(SQLParser.Sub_function_bodyContext ctx) {
         sub_function_body sub_function_body = new sub_function_body();
@@ -2363,8 +2185,6 @@ public class BaseVisitor extends SQLBaseVisitor {
     @Override
     public instructions visitInstructions(SQLParser.InstructionsContext ctx) {
         System.out.println("visit instruction");
-        //System.out.println(ctx.getText());
-        //System.out.println(ctx.functional_instruction().instructions(0).functional_instruction());
 
         instructions instructions = new instructions();
 
@@ -2385,7 +2205,6 @@ public class BaseVisitor extends SQLBaseVisitor {
             } else if (ctx.functional_instruction().switch_rule() != null) {
                 instructions = visitSwitch_rule(ctx.functional_instruction().switch_rule());
             } else if (ctx.functional_instruction().for_loop_rule() != null) {
-                //instructions = visitFor_loop_rule(ctx.functional_instruction().for_loop_rule());
                 instructions = visitFunctional_instruction(ctx.functional_instruction());
             }
 
@@ -2393,7 +2212,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         } else if (ctx.nonfunctional_instruction() != null) {
             if (ctx.nonfunctional_instruction().grnral_creating() != null) {
                 instructions = visitGrnral_creating(ctx.nonfunctional_instruction().grnral_creating());
-                // System.out.println("check what we have in gneral creating "+instructions.getInstrucation_name());
             } else if (ctx.nonfunctional_instruction().genral_assign() != null) {
                 instructions = visitGenral_assign(ctx.nonfunctional_instruction().genral_assign());
             } else if (ctx.nonfunctional_instruction().call_function() != null) {
@@ -2415,8 +2233,6 @@ public class BaseVisitor extends SQLBaseVisitor {
             //todo complete it else if (ctx.nonfunctional_instruction().one_line_if_instruction()!=null)
 
         }
-        // for(int i=0;i<ctx.functional_instruction().instructions().size();i++)
-        //   System.out.println("^^^^^^^^"+ctx.functional_instruction().instructions(i).toString());
 
         return instructions;
     }
@@ -2443,25 +2259,12 @@ public class BaseVisitor extends SQLBaseVisitor {
                 ins.addinstruction(visitInstructions(ctx.if_rule().instructions(i)));
             }
 
-            // System.out.println("check the value in the returnign in if "+ctx.if_rule().returning_in_if().getText().toString().toString());
-            //   if(ctx.if_rule().returning_in_if()!=null) {
-            //System.out.println("here we are ");
-            //ins.setR(visitReturning_in_if(ctx.if_rule().returning_in_if())
-            // ins.setLoop( (exting_oop) visitReturn_rule(ctx.if_rule().return_rule()));
-            // exting_oop e ;
-
-            /*if(ctx.if_rule().return_rule()!=null) {
-               functional_instuctions  i = new if_else();
-            i.setLoop((exting_oop) ctx.if_rule().return_rule().K_RETURN());
-            i.setLoop(visitExiting_loops((SQLParser.Exiting_loopsContext)ctx.if_rule().return_rule().K_RETURN()));
-            }*/
             if (ctx.if_rule().return_rule() != null) {
                 returnes_rule r = new returnes_rule();
                 r = visitReturn_rule(ctx.if_rule().return_rule());
                 exting_oop e = new exting_oop();
                 e.setR(r);
                 ins.setLoop(e);
-                // System.out.println("****************the id for object exiting loop "+e.toString());
             }
 
             Main.symbolTable.addScope(scopesStack.pop());
@@ -2493,7 +2296,6 @@ public class BaseVisitor extends SQLBaseVisitor {
                         exting_oop e = new exting_oop();
                         e.setR(r);
                         ins.setLoop(e);
-                        //System.out.println("****************the id for object exiting loop "+e.toString());
 
                     }
                     Main.symbolTable.addScope(scopesStack.pop());
@@ -2530,7 +2332,6 @@ public class BaseVisitor extends SQLBaseVisitor {
 
             }
         }
-        // testing it
 
         return ins;
 
@@ -2867,13 +2668,6 @@ public class BaseVisitor extends SQLBaseVisitor {
     @Override
     public Shortcut_Statments visitShortcut_statments(SQLParser.Shortcut_statmentsContext ctx) {
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
-        boolean  go_to=false ;
-       if( Error_ofusing_undeclared_variabler(scopesStack.peek(), ctx.use_random_name().getText())== false)
-       {
-           System.err.println("variable    "+ctx.use_random_name().getText() +"   is not  declared befor ");
-       }
-       else go_to=true;
-
         if (ctx.use_random_name() != null) {
             shortcut_statments.setShortcut_variable_name(visitUse_random_name(ctx.use_random_name()));
 
@@ -2887,14 +2681,10 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         System.out.println("shortcut stored : " + shortcut_statments.getInstrucation_name());
         System.out.println(shortcut_statments.getOprator());
-        if(go_to==true)
-        if(Check_From_ShortCut_Type(shortcut_statments)==true)
-            System.err.println("Error  type  "+ shortcut_statments.getShortcut_variable_name()+" is not number ");
 
-
+        symanticCheck(shortcut_statments);
         return shortcut_statments;
     }
-
     @Override
     public array_base_fom_with_index visitArray_base_form_with_index(SQLParser.Array_base_form_with_indexContext ctx) {
 
@@ -2934,8 +2724,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         switchScope.setParent(scopesStack.peek());
 
         if (ctx.use_random_name() != null) {
-            if(Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.use_random_name().getText())==false){
-                System.err.println(" Error variable   " + ctx.use_random_name().getText() + "  is not declared before ");
+            if(Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.use_random_name().getText())){
             }
             ins.setVariable_name(visitUse_random_name(ctx.use_random_name()));
         } else if (ctx.ONE_CHAR_LETTER() != null) {
@@ -2945,6 +2734,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         } else if (ctx.call_function() != null) {
             Error_UNdeclared_Function(ctx.call_function().use_random_name().getText());
             ins.setTermenal_node(ctx.call_function().getText());
+
         } else if (ctx.varible_from_object() != null) {
             ins.setTermenal_node(ctx.varible_from_object().getText());
         } else if (ctx.expression() != null) {
@@ -3022,27 +2812,12 @@ public class BaseVisitor extends SQLBaseVisitor {
     }
 
     /*---------------------------- function for symantic check */
-    public void if_the_operator_equal_notequal_assignment_is_ture_or_not(Symbol symbol_1, Symbol symbol_2) {
-        if (symbol_1.getType().getName() != symbol_2.getType().getName()) {
-            System.out.println("error can not assignment two variable with diffrenete types");
 
-        }
-    }
-
-    public void if_GreaterThan_SmallerThan(Symbol symbol_1, Symbol symbol_2) {
-        if (symbol_1.getType().getName() != symbol_2.getType().getName()) {
-            System.out.println("error can not equal or not to diffrente type");
-        }
-        if ((symbol_1.getType().getName() == Type.BOOLEAN_CONST && symbol_2.getType().getName() == Type.BOOLEAN_CONST) || (symbol_1.getType().getName() == Type.STRING_CONST && symbol_2.getType().getName() == Type.STRING_CONST)) {
-            System.out.println("operator < or > or <= or >= can not be applied to " + symbol_1.getType().getName() + "and" + symbol_2.getType().getName());
-        }
-        // we could use it in loops
-    }
 
     public boolean Error_ofusing_undeclared_variabler(Scope scope, String symbole_name) {
         boolean declared = false;
-        while (scope.getId() != "global_scope") {
-            if (scope.getSymbolMap().get(symbole_name) != null) {
+        while (scope.getParent() != null) {
+            if (scope.getSymbolMap().containsKey(symbole_name)) {
                 declared = true;
                 break;
             } else {
@@ -3051,13 +2826,6 @@ public class BaseVisitor extends SQLBaseVisitor {
 
             }
         }
-        //   System.err.println(" Error variable   " + symbole_name + "  is not declared before ");
-       /*if(declared==true )
-       {
-           System.out.println("variable"+symbole_name +"is declared befor ");
-       }*/
-        //if (declared == false) {
-       // }
         if (!declared) {
             System.err.println(" Error variable   " + symbole_name + "  is not declared before ");
         }
@@ -3065,26 +2833,25 @@ public class BaseVisitor extends SQLBaseVisitor {
 
     }
 
-    public void Error_UNdeclared_Function(String function_name) {
-        boolean isdeclared = false;
+    public boolean Error_UNdeclared_Function(String function_name) {
         for (int i = 0; i < Main.symbolTable.getFunctions().size(); i++) {
-            //System.out.println(" in the i"+i+Main.symbolTable.getFunctions().get(i).getName());
-            //System.out.println("from the passing "+function_name);
-            if (function_name.equals(Main.symbolTable.getFunctions().get(i).getName()) == true) {
-                isdeclared = true;
-                break;
-            } else isdeclared = false;
+
+            if (Main.symbolTable.getFunctions().get(i).getName().equals(function_name)) {
+                return true;
+            }
         }
-        if (isdeclared == false) {
             System.err.println(" Error  the function   " + function_name + "   is not  declared before ");
 
-        }
 
+        return false;
     }
 
 
+
     public boolean compareTwoTypes(Type firstType, Type secondType) {
-        if (secondType.getName().equals(Type.UNDEFINDED)) {
+        if (secondType.getName().equals(Type.UNDEFINDED)
+                || secondType.getName().equals("did not find variable")
+                || firstType.getName().equals("did not find variable")) {
             return false;
         } else if (firstType.getName().equals(secondType.getName())) {
             return true;
@@ -3128,8 +2895,8 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
 
       Symbol sym = scopesStack.peek().getSymbolMap().get(short_cut.getShortcut_variable_name());
       if (sym != null) {
-          if (sym.getType().getName().equals(Type.NUMBER_CONST)==false ) {
-              isnot_shortcut = true;
+          if (sym.getType().getName().equals(Type.NUMBER_CONST) ) {
+              System.err.println("can't applied :" + short_cut.getOprator()+ "with type: "+sym.getType());
 
           }
       }
@@ -3140,9 +2907,9 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
               if(scop.getSymbolMap().get(short_cut.getShortcut_variable_name())!=null)
               {
                   Symbol s = scop.getSymbolMap().get(short_cut.getShortcut_variable_name());
-                  if (s.getType().getName().equals(Type.NUMBER_CONST)==false ) {
-                      isnot_shortcut = true;
-                      break;
+                  if (s.getType().getName().equals(Type.NUMBER_CONST)) {
+                      return true;
+
                   }
               }
               else if (scop.getSymbolMap().get(short_cut.getShortcut_variable_name())==null) { scop=scop.getParent();}
@@ -3157,10 +2924,8 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
     public Type getVariableType(String variableName) {
         Scope currentScope = scopesStack.peek();
         Type variableType = new Type();
-        variableType.setName("did not find variable");
         while (currentScope.getParent() != null) {
             if (currentScope.getSymbolMap().containsKey(variableName)) {
-//                System.err.println("ggggggggggg"+currentScope.getSymbolMap().containsKey(variableName));
                 return currentScope.getSymbolMap().get(variableName).getType();
             } else {
                 currentScope = currentScope.getParent();
@@ -3191,18 +2956,23 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                 type.setName(Type.STRING_CONST);
                 types.add(type);
             } else if (intral_expression_value.getVariable_name() != null) {
-                type.setName(getVariableType(intral_expression_value.getVariable_name().getVariable_name()).getName());
-                if (type.getName().equals(Type.UNDEFINDED)) {
-                    undefinedVar = true;
+                if(Error_ofusing_undeclared_variabler(scopesStack.peek(),intral_expression_value.getVariable_name().getVariable_name()))
+                {
+                    type.setName(getVariableType(intral_expression_value.getVariable_name().getVariable_name()).getName());
+                    if (type.getName().equals(Type.UNDEFINDED)) {
+                        undefinedVar = true;
+                    }
+                    types.add(type);
                 }
-                types.add(type);
+
 
             }
 
         }
         if (types.size() == 1 && !undefinedVar) {
             return true;
-        } else {
+        }
+        else {
             for (int i = 0; i < types.size(); i++) {
                 if (types.get(i).getName().equals(Type.UNDEFINDED)) {
                     System.err.println("trying to assign undefined variable ");
@@ -3211,8 +2981,12 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
             }
             for (int i = 0; i < types.size() - 1; i++) {
                 if (types.get(i).getName().equals(types.get(i + 1).getName())) {
+                }
+                else if(  (types.get(i).getName().equals(Type.UNDEFINDED)) || types.get(i+1 ).getName().equals(Type.UNDEFINDED) )
+                {
 
-                } else {
+                }
+                else {
                     // error in expression types
                     System.err.println("Can't applied operation between " + types.get(i).getName() + " And " + types.get(i + 1).getName());
                     valid = false;
@@ -3231,7 +3005,6 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                 ) {
             if (intralValue.getVariable_name() != null) {
                 resault = Error_ofusing_undeclared_variabler(scopesStack.peek(), intralValue.getVariable_name().getVariable_name());
-                //System.out.println(" chec--->"+resault);
             }
         }
         return resault;
@@ -3255,6 +3028,23 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
         if (expression_list.getLeft_expr() != null) {
             extractDataFromExpretion(expression_list.getLeft_expr(), expression_lists);
         }
+        if(expression_list.getOne_line_if_expression()!= null){
+            if(expression_list.getOne_line_if_expression().getBoolean_condition() != null){
+                extractDataFromExpretion(expression_list.getOne_line_if_expression().getBoolean_condition(),expression_lists);
+            }if(expression_list.getOne_line_if_expression().getFirstelement() != null){
+                extractDataFromExpretion(expression_list.getOne_line_if_expression().getFirstelement(),expression_lists);
+
+            }if(expression_list.getOne_line_if_expression().getSecond_element() != null){
+                extractDataFromExpretion(expression_list.getOne_line_if_expression().getSecond_element(),expression_lists);
+            }
+        }
+        if(expression_list.getShortcut_statments() != null){
+            Intral_Expression_Value intral_expression_value = new Intral_Expression_Value();
+            Variable_Name variable_name = new Variable_Name();
+            variable_name.setVariable_name(expression_list.getShortcut_statments().getShortcut_variable_name());
+            intral_expression_value.setVariable_name(variable_name );
+            expression_lists.add(intral_expression_value);
+        }
     }
 
     private boolean symanticCheck() {
@@ -3262,6 +3052,28 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
 
 
         return resault;
+    }
+    public boolean symanticCheck(Shortcut_Statments shortcut_statments){
+        Scope scope  = scopesStack.peek();
+        boolean found = false;
+        while (scope.getParent() != null) {
+            if (scope.getSymbolMap().containsKey(shortcut_statments.getShortcut_variable_name())) {
+                found = true;
+                break;
+            } else {
+                scope = scope.getParent();
+                found = false;
+
+            }
+        }
+        if(found){
+            Type type = getVariableType(shortcut_statments.getShortcut_variable_name());
+            if(!type.getName().equals(Type.NUMBER_CONST ) ){
+                System.err.println("Can't applied :"+ shortcut_statments.getOprator() + " to type: " + type.getName());
+            }
+
+        }
+        return found;
     }
 
     /*    private boolean symanticCheck(assignment ins) {
@@ -3291,10 +3103,13 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
 
 
         resault = Error_ofusing_undeclared_variabler(scopesStack.peek(), leftSideVariableName);
-        Type leftsideVariableType = getVariableType(leftSideVariableName);
-        resault = compareTwoTypes(leftsideVariableType, getFirstExpritionType(ins.getVar().getExpression()));
-        if (resault) {
-            leftsideVariableType.setName(getFirstExpritionType(ins.getVar().getExpression()).getName());
+        if(resault){
+            Type leftsideVariableType = getVariableType(leftSideVariableName);
+            resault = compareTwoTypes(leftsideVariableType, getFirstExpritionType(ins.getVar().getExpression()));
+            if (resault) {
+                leftsideVariableType.setName(getFirstExpritionType(ins.getVar().getExpression()).getName());
+            }
+
         }
 
 
@@ -3304,28 +3119,17 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
     private boolean symanticCheck(Expression expression) {
         boolean resault = true;
         boolean haveVariable = false;
-        for (Intral_Expression_Value intralValue : convertExpretionListToArray(expression)
-                ) {
-            haveVariable = intralValue.getVariable_name() != null;
-            break;
-
-
-        }    for (Intral_Expression_Value intralValue : convertExpretionListToArray(expression)
-                ) {
-
-            if( intralValue.getVariable_name() != null)
-                Error_ofusing_undeclared_variabler(scopesStack.peek(),intralValue.getVariable_name().getVariable_name());
-
-
-        }
-        if (haveVariable)
-            resault = checkVariablesDeclrateInExpression(expression);
-
-       //System.out.println("---->check about it "+resault);
-        if (resault) {
             resault = checkExpressionTypeValid(expression);
-        }
+
         return resault;
+    }
+    private boolean symanticCheck(create_variable_withassign create_variable){
+        boolean resault,resault2 ;
+        resault = Error_in_Multiple_Declarations(create_variable.getVar().getVariable_with_opretor().get(0).getVariable_name());
+        resault2 =  symanticCheck(create_variable.getVar().getExpression());
+
+        return resault && resault2;
+
     }
 
 
@@ -3352,36 +3156,35 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
             System.out.println("-Symbol: " + ((Symbol) symbol).getName());
             System.out.println("-Symbol Scope: " + ((Symbol) symbol).getScope().getId());
             System.out.println("-Symbol type: " + ((Symbol) symbol).getType().getName());
-
-
         }
     }
     public boolean  Error_in_Multiple_Declarations (String name   ){
-        boolean is_already_declared = false ;
-        //symbole.getName().equals()
-        if(scopesStack.peek().getSymbolMap().get(name)!=null)
+        boolean is_already_declared = true ;
+        Scope scope = scopesStack.peek().getParent();
+        if(scopesStack.peek().getSymbolMap().containsKey(name))
         {
-            is_already_declared=true;
+            is_already_declared=false;
             System.err.println("variable    "+ name +"    can be declared at most once ");
 
         }
         else {
-            Scope scop = scopesStack.peek().getParent();
-            while(scop!=null)
+
+            while(scope!=null)
             {
-                if(scop.getSymbolMap().get(name )!=null){
+                if(scope.getSymbolMap().containsKey(name)){
                     System.err.println("variable   "+    name     +  "  can be declared at most once");
-                    is_already_declared=true;
+                    is_already_declared=false;
                     break;
                 }
                 else {
-                    scop = scop.getParent();
-
+                    scope = scope.getParent();
                 }
             }
         }
         return is_already_declared;
     }
+
+
 
 }
 

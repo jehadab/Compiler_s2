@@ -38,6 +38,8 @@ public class Main {
             p.accept(new Java.Visitor.BaseAst_Visitor());
 
 
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,7 +101,6 @@ public class Main {
 
         }
     }
-int x ;
 
     }
 

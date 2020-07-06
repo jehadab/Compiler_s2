@@ -1,1 +1,7 @@
-create type address (id number, name string, id boolean)
+func(){
+  var x = func1();
+var xx = func2();
+}
+func1(){
+return 4;
+}
