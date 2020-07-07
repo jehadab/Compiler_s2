@@ -2132,8 +2132,8 @@ public class BaseVisitor extends SQLBaseVisitor {
             foreachScope.setParent(scopesStack.peek());
             foreachScope.setId(ctx.foreach().K_FOREACH().getText() + "_" + ctx.foreach().hashCode());
 
-            instructions = visitForeach(ctx.foreach());
             scopesStack.push(foreachScope);
+            instructions = visitForeach(ctx.foreach());
 
             for (int i = 0; i < ctx.instructions().size(); i++) {
                 instructions.getInstructions().add(visitInstructions(ctx.instructions(i)));
@@ -2457,9 +2457,13 @@ public class BaseVisitor extends SQLBaseVisitor {
         else if(ctx.assign_array() != null){
             inside_for_loop.setAssign_array(visitAssign_array(ctx.assign_array()));
         } else if (ctx.assign_varible() != null) {
-            inside_for_loop.setVar(visitAssign_varible(ctx.assign_varible()));
-
-        } else if (ctx.shortcut_statments() != null) {
+            // must change in g4 to general assign
+            assignment assignment = new assignment();
+            assignment.setVar(visitAssign_varible(ctx.assign_varible()));
+            inside_for_loop.setVar(assignment.getVar());
+            symanticCheck(assignment);
+        }
+        else if (ctx.shortcut_statments() != null) {
             inside_for_loop.setShortcut_statments(visitShortcut_statments(ctx.shortcut_statments()));
         } else if (ctx.create_Array_without_assign() != null) {
             inside_for_loop.setCreate_arry_without_assign(visitCreate_Array_without_assign(ctx.create_Array_without_assign()));
@@ -2483,8 +2487,12 @@ public class BaseVisitor extends SQLBaseVisitor {
         Foreach ins = new Foreach();
         ins.setInstrucation_name(Foreach.class.getName());
         ins.setLoop_variable(visitUse_random_name(ctx.use_random_name(0)));
-        ins.setLoop_variable(visitUse_random_name(ctx.use_random_name(1)));
+        Error_in_Multiple_Declarations(ins.getLoop_variable());
+        ins.setObject_variable(visitUse_random_name(ctx.use_random_name(1)));
+        Error_ofusing_undeclared_variabler(scopesStack.peek(),ins.getObject_variable());
         ArrayList<Object> d = new ArrayList<Object>();
+
+
 
         return ins;
     }
@@ -2668,6 +2676,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     @Override
     public Shortcut_Statments visitShortcut_statments(SQLParser.Shortcut_statmentsContext ctx) {
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
+
         if (ctx.use_random_name() != null) {
             shortcut_statments.setShortcut_variable_name(visitUse_random_name(ctx.use_random_name()));
 
@@ -2681,7 +2690,7 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         System.out.println("shortcut stored : " + shortcut_statments.getInstrucation_name());
         System.out.println(shortcut_statments.getOprator());
-
+        Error_ofusing_undeclared_variabler(scopesStack.peek(),shortcut_statments.getShortcut_variable_name());
         symanticCheck(shortcut_statments);
         return shortcut_statments;
     }

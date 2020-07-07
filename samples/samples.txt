@@ -1,7 +1,7 @@
-func(){
-  var x = func1();
-var xx = func2();
-}
-func1(){
-return 4;
+function s(){
+var x = true ;
+do {
+x=9;
+}while(c<9);
+
 }
