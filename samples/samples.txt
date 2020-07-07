@@ -1,10 +1,3 @@
-func(){
-var x = 9;
-var y = x;
-if(y > 9){
-for (var I = 0 ; I < 9 ; i++){
-	print(ii);
-}
-}
-return 3;
-}
+create type address(id number , ye boolean);
+create table g ( h number, home_address address, name number   ) type = "json" , path ="t"
+select h from g;
