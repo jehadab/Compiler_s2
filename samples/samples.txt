@@ -1,7 +1,10 @@
 func(){
-  var x = func1();
-var xx = func2();
+var x = 9;
+var y = x;
+if(y > 9){
+for (var I = 0 ; I < 9 ; i++){
+	print(ii);
 }
-func1(){
-return 4;
+}
+return 3;
 }
