@@ -9,3 +9,4 @@ create type s( idd number , name string )
 create  type address(id number , ye boolean,student s );
 create table g (  home_address  address , home  address) type = "json" , path ="t"
 select h from g;
+...
