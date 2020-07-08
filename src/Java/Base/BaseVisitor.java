@@ -873,7 +873,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                 tableOrSubQuery.setDataBaseName(visitDatabase_name(ctx.database_name()));
             }
             tableOrSubQuery.setTableName(visitTable_name(ctx.table_name()));
-            seminticCheckForUsingTable(tableOrSubQuery.getTableName());
+            if(seminticCheckForUsingTable(tableOrSubQuery.getTableName()))
             FLAT(ctx.table_name().use_random_name().getText());
             if (ctx.table_alias() != null) {
                 tableOrSubQuery.setTable_alias(visitTable_alias(ctx.table_alias()));
@@ -3199,8 +3199,6 @@ Table temp_table = new Table();
           break;
       else current_scope=current_scope.getParent();
   }
-
-  //System.out.println(" print what we have in the tabel " + temp_table.getColumnMap().values().iterator().next().getColumn_name().toString());
     ArrayList<Column> col = new ArrayList<Column>();
     Iterator itr =col.iterator();
     itr=temp_table.getColumnMap().values().iterator();
@@ -3210,39 +3208,51 @@ Table temp_table = new Table();
         System.out.println( "   colum name    "+c.getColumn_name()+"    type of the columne    "+c.getColumn_type().getName());
         if(!c.getColumn_type().getName().equals(Type.NUMBER_CONST)&&!c.getColumn_type().getName().equals(Type.BOOLEAN_CONST)&&!c.getColumn_type().getName().equals(Type.STRING_CONST))
         {
-
+if(checkDecleratedType(c.getColumn_type()));
 FLAT(c.getColumn_type());
         }
     }
 
 }
-public void FLAT( Type p){
+public void FLAT( Type p) {
+boolean we_have_another_type=true;
     ArrayList<Type> col = new ArrayList<Type>();
-    Iterator itr =col.iterator();
-    Scope current_scope=scopesStack.peek();
-    Type temp_type = new Type();
-    while(current_scope!=null){
-        temp_type=current_scope.getTypeMap().get(p);
-        if(temp_type!=null)
+    Iterator itr = col.iterator();
+    Map<String, Type> maps = new HashMap();
+    while(we_have_another_type==true) {
+        we_have_another_type=false;
+        for (int i = 0; i < Main.symbolTable.getDeclaredTypes().size(); i++) {
+            if (Main.symbolTable.getDeclaredTypes().get(i).getName().equals(p.getName())) {
+                itr = Main.symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
+                maps = Main.symbolTable.getDeclaredTypes().get(i).getColumns();
+                while (itr.hasNext()) {
+
+                    Type types = (Type) itr.next();
+                    if (types.getName().equals(Type.STRING_CONST) || types.getName().equals(Type.BOOLEAN_CONST) || types.getName().equals(Type.NUMBER_CONST)) {
+                        System.out.println(" column name    " + get_ky(maps, types.getName()));
+                        System.out.println(" type name is     " + types.getName());
+
+                    }
+
+
+                }
+            }
             break;
-        else current_scope=current_scope.getParent();
-    }
-for(int i=0;i<Main.symbolTable.getDeclaredTypes().size();i++)
-{
-    if(Main.symbolTable.getDeclaredTypes().get(i).getName().equals(p.getName()))
-    {
-
-        itr=Main.symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
-        while(itr.hasNext())
-        {
-            Type types = (Type) itr.next();
-            System.out.println( "    type of the columne    "+types.getName());
-
         }
     }
-
 }
+public  static <String , Type> String get_ky( Map<String, Type> maping , String  typess){
+    Java.SymbolTable.Type t= new Java.SymbolTable.Type();
+for(String key :maping.keySet()){
 
+    t= (Java.SymbolTable.Type) maping.get(key);
+    if(typess.equals(t.getName()))
+    {
+
+        return key;
+    }
+}
+return null;
 }
 }
 
