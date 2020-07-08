@@ -246,6 +246,8 @@ public class BaseVisitor extends SQLBaseVisitor {
                     col.setColumn_name(columnDefs.get(i).getColumnName());
                     col.setColumn_type(columnDefs.get(i).getType());
                     table.addColumnMap(columnDefs.get(i).getColumnName() , col);
+                    checkDecleratedType(col.getColumn_type());
+
                 }
                 if(ctx.table_constraint()!=null){
                     List<TableConstraint> tableConstraints= new ArrayList<>();
@@ -467,17 +469,22 @@ public class BaseVisitor extends SQLBaseVisitor {
                                     System.err.println("Type: "+ name + " did not exist ");
                                 }
                         }
-
                     }
                         else
                             checkDecleratedType((Type) colType);
                 }
-            }else
+            }else{
+                boolean found = false;
                 for (Type subtype :Main.symbolTable.getDeclaredTypes()) {
-                    if(!subtype.getName().equals(((Type) type).getName())){
-                        System.err.println(type.getName() + " did not exist ");
-                        return false;
+                    if(subtype.getName().equals(((Type) type).getName())){
+                        resault = true;
+                        found=true;
+                        break;
                     }
+                }
+                if(!found){
+                    System.err.println(type.getName() + " did not exist ");
+                }
             }
             //System.err.println(type.getName() + " did not exist ");
         }
