@@ -921,7 +921,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
        OPEN_BRACKET (sub_function_body | instructions )* CLOSE_BRACKET
       ;
 
-   instructions // todo switch in instraction
+   instructions
      :(functional_instruction | nonfunctional_instruction )
    ;
 

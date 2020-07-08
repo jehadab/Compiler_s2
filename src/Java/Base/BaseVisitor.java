@@ -472,7 +472,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                     return true;
                 }
             }
-            System.err.println(type.getName() + " did not exist ");
+            //System.err.println(type.getName() + " did not exist ");
         }
         return resault;
     }
@@ -2385,7 +2385,6 @@ public class BaseVisitor extends SQLBaseVisitor {
             inside_the_print.setVariable_name(visitUse_random_name(ctx.use_random_name()));
             System.out.println(inside_the_print.getVariable_name());
         } else if (ctx.call_function() != null) {
-            Error_UNdeclared_Function(ctx.call_function().use_random_name().getText());
             inside_the_print.setCallFunction(visitCall_function(ctx.call_function()));
             System.out.println(inside_the_print.getCallFunction());
         }
@@ -2552,7 +2551,14 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         if (ctx.assign_varible() != null) {
             ins.setVar(visitAssign_varible(ctx.assign_varible()));
-            symanticCheck(ins);
+            if(ins.getVar().getExpression() != null){
+                symanticCheck(ins);
+            }
+            else if(ins.getVar().getFactored() != null){
+
+            }else if(ins.getVar().getSelect() != null){
+
+            }
         } else if (ctx.assign_array() != null) {
             ins.setArray(visitAssign_array(ctx.assign_array()));
         } else if (ctx.assign_json() != null) {
@@ -2738,6 +2744,9 @@ public class BaseVisitor extends SQLBaseVisitor {
         switchScope.setId(ctx.K_SWITCH().getText() + "_" + ctx.hashCode());
         switchScope.setParent(scopesStack.peek());
 
+        scopesStack.push(switchScope);
+
+
         if (ctx.use_random_name() != null) {
             if(Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.use_random_name().getText())){
             }
@@ -2761,7 +2770,6 @@ public class BaseVisitor extends SQLBaseVisitor {
             ins.setS(visitGenral_assign(ctx.genral_assign()));
         }
 
-        scopesStack.push(switchScope);
         if (ctx.case_rule() != null) {
             for (int i = 0; i < ctx.case_rule().size(); i++) {
                 ins.getCases().add(visitCase_rule(ctx.case_rule(i)));
@@ -3060,6 +3068,9 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
             intral_expression_value.setVariable_name(variable_name );
             expression_lists.add(intral_expression_value);
         }
+        if(expression_list.getBracket_expression() != null){
+            extractDataFromExpretion(expression_list.getBracket_expression().getExpression_list(),expression_lists);
+        }
     }
 
     private boolean symanticCheck() {
@@ -3216,11 +3227,11 @@ Table temp_table = new Table();
     while(itr.hasNext())
     {
         Column c= (Column) itr.next();
-        System.out.println( "   colum name    "+c.getColumn_name()+"    type of the columne    "+c.getColumn_type().getName());
+        System.out.println( "colum name    "+c.getColumn_name()+"    type of the columne    "+c.getColumn_type().getName());
         if(!c.getColumn_type().getName().equals(Type.NUMBER_CONST)&&!c.getColumn_type().getName().equals(Type.BOOLEAN_CONST)&&!c.getColumn_type().getName().equals(Type.STRING_CONST))
         {
 
-FLAT(c.getColumn_type());
+            FLAT(c.getColumn_type());
         }
     }
 

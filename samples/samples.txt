@@ -1,3 +1,5 @@
-create type address(id number , ye boolean);
-create table g ( h number, home_address address, name number   ) type = "json" , path ="t"
-select h from g;
+function k(var x ){
+switch (x  ){
+case (y):
+}
+}
