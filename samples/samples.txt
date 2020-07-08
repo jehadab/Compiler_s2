@@ -1,5 +1,8 @@
+
+create type type0 (id1 number);
+create type type1 (id1 type0);
+create type x (id2 number,t1 type1, t2 type0 , t3 t );
+create table users (id x ) type= "csv", path = "C:";
 function k(var x ){
-switch (x  ){
-case (y):
-}
+
 }

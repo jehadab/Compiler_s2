@@ -456,9 +456,15 @@ public class BaseVisitor extends SQLBaseVisitor {
                             resault = true ;
                         }else if(name.equals(Type.STRING_CONST)){
                             resault = true ;
-                        }else
-                            for (Type subtype :Main.symbolTable.getDeclaredTypes()) {
-                                if(!subtype.getName().equals(((Type) colType).getName())){
+                        }else{
+                                for (Type subtype :Main.symbolTable.getDeclaredTypes()) {
+                                    if(subtype.getName().equals(((Type) colType).getName())){
+                                        found = true;
+                                       break;
+                                    }
+                            }
+                                if (!found){
+                                    System.err.println("Type: "+ name + " did not exist ");
                                 }
                         }
 
@@ -468,9 +474,10 @@ public class BaseVisitor extends SQLBaseVisitor {
                 }
             }else
                 for (Type subtype :Main.symbolTable.getDeclaredTypes()) {
-                if(subtype.getName().equals(((Type) type).getName())){
-                    return true;
-                }
+                    if(!subtype.getName().equals(((Type) type).getName())){
+                        System.err.println(type.getName() + " did not exist ");
+                        return false;
+                    }
             }
             //System.err.println(type.getName() + " did not exist ");
         }
