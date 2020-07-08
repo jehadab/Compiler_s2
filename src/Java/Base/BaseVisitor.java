@@ -246,6 +246,8 @@ public class BaseVisitor extends SQLBaseVisitor {
                     col.setColumn_name(columnDefs.get(i).getColumnName());
                     col.setColumn_type(columnDefs.get(i).getType());
                     table.addColumnMap(columnDefs.get(i).getColumnName() , col);
+                    checkDecleratedType(col.getColumn_type());
+
                 }
                 if(ctx.table_constraint()!=null){
                     List<TableConstraint> tableConstraints= new ArrayList<>();
@@ -456,9 +458,15 @@ public class BaseVisitor extends SQLBaseVisitor {
                             resault = true ;
                         }else if(name.equals(Type.STRING_CONST)){
                             resault = true ;
-                        }else
-                            for (Type subtype :Main.symbolTable.getDeclaredTypes()) {
-                                if(!subtype.getName().equals(((Type) colType).getName())){
+                        }else{
+                                for (Type subtype :Main.symbolTable.getDeclaredTypes()) {
+                                    if(subtype.getName().equals(((Type) colType).getName())){
+                                        found = true;
+                                       break;
+                                    }
+                            }
+                                if (!found){
+                                    System.err.println("Type: "+ name + " did not exist ");
                                 }
                         }
 
@@ -466,13 +474,20 @@ public class BaseVisitor extends SQLBaseVisitor {
                         else
                             checkDecleratedType((Type) colType);
                 }
-            }else
+            }else{
+                boolean found = false;
                 for (Type subtype :Main.symbolTable.getDeclaredTypes()) {
-                if(subtype.getName().equals(((Type) type).getName())){
-                    return true;
+                    if(subtype.getName().equals(((Type) type).getName())){
+                        resault = true;
+                        found=true;
+                        break;
+                    }
+                }
+                if(!found){
+                    System.err.println(type.getName() + " did not exist ");
                 }
             }
-            System.err.println(type.getName() + " did not exist ");
+            //System.err.println(type.getName() + " did not exist ");
         }
         return resault;
     }
@@ -873,7 +888,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                 tableOrSubQuery.setDataBaseName(visitDatabase_name(ctx.database_name()));
             }
             tableOrSubQuery.setTableName(visitTable_name(ctx.table_name()));
-            if(seminticCheckForUsingTable(tableOrSubQuery.getTableName()))
+            seminticCheckForUsingTable(tableOrSubQuery.getTableName());
             FLAT(ctx.table_name().use_random_name().getText());
             if (ctx.table_alias() != null) {
                 tableOrSubQuery.setTable_alias(visitTable_alias(ctx.table_alias()));
@@ -2140,6 +2155,7 @@ public class BaseVisitor extends SQLBaseVisitor {
 
             instructions = visitForeach(ctx.foreach());
             scopesStack.push(foreachScope);
+            instructions = visitForeach(ctx.foreach());
 
             for (int i = 0; i < ctx.instructions().size(); i++) {
                 instructions.getInstructions().add(visitInstructions(ctx.instructions(i)));
@@ -2385,7 +2401,6 @@ public class BaseVisitor extends SQLBaseVisitor {
             inside_the_print.setVariable_name(visitUse_random_name(ctx.use_random_name()));
             System.out.println(inside_the_print.getVariable_name());
         } else if (ctx.call_function() != null) {
-            Error_UNdeclared_Function(ctx.call_function().use_random_name().getText());
             inside_the_print.setCallFunction(visitCall_function(ctx.call_function()));
             System.out.println(inside_the_print.getCallFunction());
         }
@@ -2463,9 +2478,13 @@ public class BaseVisitor extends SQLBaseVisitor {
         else if(ctx.assign_array() != null){
             inside_for_loop.setAssign_array(visitAssign_array(ctx.assign_array()));
         } else if (ctx.assign_varible() != null) {
-            inside_for_loop.setVar(visitAssign_varible(ctx.assign_varible()));
-
-        } else if (ctx.shortcut_statments() != null) {
+            // must change in g4 to general assign
+            assignment assignment = new assignment();
+            assignment.setVar(visitAssign_varible(ctx.assign_varible()));
+            inside_for_loop.setVar(assignment.getVar());
+            symanticCheck(assignment);
+        }
+        else if (ctx.shortcut_statments() != null) {
             inside_for_loop.setShortcut_statments(visitShortcut_statments(ctx.shortcut_statments()));
         } else if (ctx.create_Array_without_assign() != null) {
             inside_for_loop.setCreate_arry_without_assign(visitCreate_Array_without_assign(ctx.create_Array_without_assign()));
@@ -2489,8 +2508,12 @@ public class BaseVisitor extends SQLBaseVisitor {
         Foreach ins = new Foreach();
         ins.setInstrucation_name(Foreach.class.getName());
         ins.setLoop_variable(visitUse_random_name(ctx.use_random_name(0)));
-        ins.setLoop_variable(visitUse_random_name(ctx.use_random_name(1)));
+        Error_in_Multiple_Declarations(ins.getLoop_variable());
+        ins.setObject_variable(visitUse_random_name(ctx.use_random_name(1)));
+        Error_ofusing_undeclared_variabler(scopesStack.peek(),ins.getObject_variable());
         ArrayList<Object> d = new ArrayList<Object>();
+
+
 
         return ins;
     }
@@ -2544,7 +2567,14 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         if (ctx.assign_varible() != null) {
             ins.setVar(visitAssign_varible(ctx.assign_varible()));
-            symanticCheck(ins);
+            if(ins.getVar().getExpression() != null){
+                symanticCheck(ins);
+            }
+            else if(ins.getVar().getFactored() != null){
+
+            }else if(ins.getVar().getSelect() != null){
+
+            }
         } else if (ctx.assign_array() != null) {
             ins.setArray(visitAssign_array(ctx.assign_array()));
         } else if (ctx.assign_json() != null) {
@@ -2674,6 +2704,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     @Override
     public Shortcut_Statments visitShortcut_statments(SQLParser.Shortcut_statmentsContext ctx) {
         Shortcut_Statments shortcut_statments = new Shortcut_Statments();
+
         if (ctx.use_random_name() != null) {
             shortcut_statments.setShortcut_variable_name(visitUse_random_name(ctx.use_random_name()));
 
@@ -2687,7 +2718,7 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         System.out.println("shortcut stored : " + shortcut_statments.getInstrucation_name());
         System.out.println(shortcut_statments.getOprator());
-
+        Error_ofusing_undeclared_variabler(scopesStack.peek(),shortcut_statments.getShortcut_variable_name());
         symanticCheck(shortcut_statments);
         return shortcut_statments;
     }
@@ -2729,6 +2760,9 @@ public class BaseVisitor extends SQLBaseVisitor {
         switchScope.setId(ctx.K_SWITCH().getText() + "_" + ctx.hashCode());
         switchScope.setParent(scopesStack.peek());
 
+        scopesStack.push(switchScope);
+
+
         if (ctx.use_random_name() != null) {
             if(Error_ofusing_undeclared_variabler(scopesStack.peek(),ctx.use_random_name().getText())){
             }
@@ -2752,7 +2786,6 @@ public class BaseVisitor extends SQLBaseVisitor {
             ins.setS(visitGenral_assign(ctx.genral_assign()));
         }
 
-        scopesStack.push(switchScope);
         if (ctx.case_rule() != null) {
             for (int i = 0; i < ctx.case_rule().size(); i++) {
                 ins.getCases().add(visitCase_rule(ctx.case_rule(i)));
@@ -3051,6 +3084,9 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
             intral_expression_value.setVariable_name(variable_name );
             expression_lists.add(intral_expression_value);
         }
+        if(expression_list.getBracket_expression() != null){
+            extractDataFromExpretion(expression_list.getBracket_expression().getExpression_list(),expression_lists);
+        }
     }
 
     private boolean symanticCheck() {
@@ -3199,13 +3235,15 @@ Table temp_table = new Table();
           break;
       else current_scope=current_scope.getParent();
   }
+
+  //System.out.println(" print what we have in the tabel " + temp_table.getColumnMap().values().iterator().next().getColumn_name().toString());
     ArrayList<Column> col = new ArrayList<Column>();
     Iterator itr =col.iterator();
     itr=temp_table.getColumnMap().values().iterator();
     while(itr.hasNext())
     {
         Column c= (Column) itr.next();
-        System.out.println( "   colum name    "+c.getColumn_name()+"    type of the columne    "+c.getColumn_type().getName());
+        System.out.println( "colum name    "+c.getColumn_name()+"    type of the columne    "+c.getColumn_type().getName());
         if(!c.getColumn_type().getName().equals(Type.NUMBER_CONST)&&!c.getColumn_type().getName().equals(Type.BOOLEAN_CONST)&&!c.getColumn_type().getName().equals(Type.STRING_CONST))
         {
 if(checkDecleratedType(c.getColumn_type()));
@@ -3215,30 +3253,27 @@ FLAT(c.getColumn_type());
 
 }
 public void FLAT( Type p) {
-boolean we_have_another_type=true;
     ArrayList<Type> col = new ArrayList<Type>();
     Iterator itr = col.iterator();
-    Map<String, Type> maps = new HashMap();
-    while(we_have_another_type==true) {
-        we_have_another_type=false;
-        for (int i = 0; i < Main.symbolTable.getDeclaredTypes().size(); i++) {
-            if (Main.symbolTable.getDeclaredTypes().get(i).getName().equals(p.getName())) {
-                itr = Main.symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
-                maps = Main.symbolTable.getDeclaredTypes().get(i).getColumns();
-                while (itr.hasNext()) {
-
-                    Type types = (Type) itr.next();
-                    if (types.getName().equals(Type.STRING_CONST) || types.getName().equals(Type.BOOLEAN_CONST) || types.getName().equals(Type.NUMBER_CONST)) {
-                        System.out.println(" column name    " + get_ky(maps, types.getName()));
-                        System.out.println(" type name is     " + types.getName());
-
-                    }
-
-
-                }
-            }
+    Scope current_scope = scopesStack.peek();
+    Type temp_type = new Type();
+    while (current_scope != null) {
+        temp_type = current_scope.getTypeMap().get(p);
+        if (temp_type != null)
             break;
+        else current_scope = current_scope.getParent();
+    }
+    for (int i = 0; i < Main.symbolTable.getDeclaredTypes().size(); i++) {
+        if (Main.symbolTable.getDeclaredTypes().get(i).getName().equals(p.getName())) {
+
+            itr = Main.symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
+            while (itr.hasNext()) {
+                Type types = (Type) itr.next();
+                System.out.println("    type of the columne    " + types.getName());
+
+            }
         }
+
     }
 }
 public  static <String , Type> String get_ky( Map<String, Type> maping , String  typess){
