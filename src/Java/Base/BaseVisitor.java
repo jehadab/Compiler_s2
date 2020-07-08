@@ -437,6 +437,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     }
     private boolean checkDecleratedType(Type type ){
         boolean resault = false;
+        Type type1 = new Type();
         if(type.getName() != null){
             if(type.getName().equals(Type.BOOLEAN_CONST)){
                 return true ;
@@ -1472,8 +1473,11 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         }else if(variable_with_assign.getVar().getFactored() != null){
             Type type = new Type();
-            Error_in_Multiple_Declarations(variable_with_assign.getVar().getVariable_with_opretor().get(0).getVariable_name());
-            createdSymbol.setType(type);
+            if(Error_in_Multiple_Declarations(variable_with_assign.getVar().getVariable_with_opretor().get(0).getVariable_name())){
+                type = getSelectType(variable_with_assign.getVar().getFactored());
+            }
+                createdSymbol.setType(type);
+
         }
 
         currentScope.addSymbol(name, createdSymbol);
@@ -2153,7 +2157,6 @@ public class BaseVisitor extends SQLBaseVisitor {
             foreachScope.setParent(scopesStack.peek());
             foreachScope.setId(ctx.foreach().K_FOREACH().getText() + "_" + ctx.foreach().hashCode());
 
-            instructions = visitForeach(ctx.foreach());
             scopesStack.push(foreachScope);
             instructions = visitForeach(ctx.foreach());
 
@@ -2571,9 +2574,10 @@ public class BaseVisitor extends SQLBaseVisitor {
                 symanticCheck(ins);
             }
             else if(ins.getVar().getFactored() != null){
-
-            }else if(ins.getVar().getSelect() != null){
-
+               Type type = getVariableType(ins.getVar().getVariable_with_opretor().get(0).getVariable_name());
+               if(type.getName() != null){
+                   compareTwoTypes(type,getSelectType(ins.getVar().getFactored()));
+               }
             }
         } else if (ctx.assign_array() != null) {
             ins.setArray(visitAssign_array(ctx.assign_array()));
@@ -3255,6 +3259,51 @@ if(checkDecleratedType(c.getColumn_type()));
     }
 
 }
+
+    public Type getSelectType (SelectFactoredStmt selectFactoredStmt){
+        Type type = new Type();
+        String typeName = "";
+
+        for (int i = 0; i < selectFactoredStmt.getSelect_core().getTableOrSubQueryList().size() ; i++) {
+
+            if(typeName.isEmpty())
+                typeName =  selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(i).getTableName().getName();
+            else
+                typeName = typeName.concat( "_"+ selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(i).getTableName().getName());
+
+        }
+        for (int i = 0; i <selectFactoredStmt.getSelect_core().getReslult_cloumnList().size() ; i++) {
+            if(selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).isStar()){
+                Scope currentScope = scopesStack.peek();
+                boolean found = false;
+                while (currentScope != null)
+                {
+                    found = currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(i).getTableName().getName());
+                    if(found)
+                    {
+                        break;
+                    }
+                    currentScope = currentScope.getParent();
+                }
+                if(found){
+                    Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(i).getTableName().getName());
+                    Iterator<Column> columns = table.getColumnMap().values().iterator();
+                    while (columns.hasNext())
+                    {
+                        typeName =  typeName.concat("_"+columns.next().getColumn_name()) ;
+
+                    }
+                }
+            }
+            else {
+                typeName = typeName.concat("_"+ selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr().getColumnName().getName());
+            }
+        }
+        type.setName(typeName);
+        return type;
+
+    }
+
     public void FLAT( Type p) {
 
         boolean we_have_another_type=false ;

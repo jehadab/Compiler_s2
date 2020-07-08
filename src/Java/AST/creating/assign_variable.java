@@ -9,7 +9,7 @@ import Java.AST.expr.Expression;
 import java.util.ArrayList;
 import java.util.List;
 
-public class assign_variable extends Node {   // to do the arithmatic structure one ....
+public class assign_variable extends Node {
     select_stmt select ;
     SelectFactoredStmt factored;
     public assign_variable(){

@@ -1,7 +1,7 @@
+create table users (id number,name string  ) type = "json", path= "C:";
+create table users1 (id number,name string  ) type = "json", path= "C:";
 
-create type f(naming string , aging number );
-create type r (namesss string , sgeeee number , tyyyy f )
-create type s (idddd number , nameeee string, ooo r );
-create  type address( nameuuuuu string  ,idopoi number ,new s );
-create table g (  home_address  address ) type = "json" , path ="t"
-select h from g;
+fun(){
+var x = select id from users;
+ var x = select id from users1;
+}

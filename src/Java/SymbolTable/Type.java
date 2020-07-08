@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class Type {
     private String name;
-    private Map<String, Type> columns = new HashMap();
+    private Map<String , Type> columns = new HashMap();
     private Scope scope;
     public static final String NUMBER_CONST = "number";
     public static final String STRING_CONST = "string";
