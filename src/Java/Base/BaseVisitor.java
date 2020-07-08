@@ -3247,37 +3247,58 @@ Table temp_table = new Table();
         if(!c.getColumn_type().getName().equals(Type.NUMBER_CONST)&&!c.getColumn_type().getName().equals(Type.BOOLEAN_CONST)&&!c.getColumn_type().getName().equals(Type.STRING_CONST))
         {
 if(checkDecleratedType(c.getColumn_type()));
-FLAT(c.getColumn_type());
-        }
+            {
+                FLAT(c.getColumn_type());
+
+
+            }        }
     }
 
 }
     public void FLAT( Type p) {
-        boolean we_have_another_type=true;
+
+        boolean we_have_another_type=false ;
         ArrayList<Type> col = new ArrayList<Type>();
         Iterator itr = col.iterator();
         Map<String, Type> maps = new HashMap();
-        while(we_have_another_type==true) {
-            we_have_another_type=false;
             for (int i = 0; i < Main.symbolTable.getDeclaredTypes().size(); i++) {
+             //   System.out.println("size of array_list "+Main.symbolTable.getDeclaredTypes().get(i).getName());
                 if (Main.symbolTable.getDeclaredTypes().get(i).getName().equals(p.getName())) {
                     itr = Main.symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
                     maps = Main.symbolTable.getDeclaredTypes().get(i).getColumns();
                     while (itr.hasNext()) {
-
                         Type types = (Type) itr.next();
-                        if (types.getName().equals(Type.STRING_CONST) || types.getName().equals(Type.BOOLEAN_CONST) || types.getName().equals(Type.NUMBER_CONST)) {
-                            System.out.println(" column name    " + get_ky(maps, types.getName()));
-                            System.out.println(" type name is     " + types.getName());
-
-                        }
-
+                            if (types.getName().equals(Type.STRING_CONST) || types.getName().equals(Type.BOOLEAN_CONST) || types.getName().equals(Type.NUMBER_CONST)) {
+                                System.out.println(" column name    " + get_ky(maps, types.getName()));
+                                System.out.println(" type name is     " + types.getName());
+                               // return ;
+                            }
+                            else FLAT(types);
 
                     }
                 }
-                break;
+
+            }
+
+    }
+    public boolean complixity_type(Type t){
+    boolean complix=false ;
+        ArrayList<Type> col = new ArrayList<Type>();
+        Iterator itr = col.iterator();
+        for (int i = 0; i < Main.symbolTable.getDeclaredTypes().size(); i++) {
+            if (Main.symbolTable.getDeclaredTypes().get(i).getName().equals(t.getName())) {
+                itr = Main.symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
+                while (itr.hasNext()) {
+                    Type types = (Type) itr.next();
+                    if (!types.getName().equals(Type.STRING_CONST) &&! types.getName().equals(Type.BOOLEAN_CONST) && !types.getName().equals(Type.NUMBER_CONST)) {
+                        complix=true;
+
+                    }
+
+                }
             }
         }
+        return complix;
     }
     public  static <String , Type> String get_ky( Map<String, Type> maping , String  typess){
         Java.SymbolTable.Type t= new Java.SymbolTable.Type();
