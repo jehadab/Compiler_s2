@@ -1185,7 +1185,13 @@ public class BaseVisitor extends SQLBaseVisitor {
         return fk_origin_column_name;
     }
 
-
+    @Override public TableName visitTable_name(SQLParser.Table_nameContext ctx) {
+        System.out.println("visitTable_name");
+        TableName tableName = new TableName();
+        tableName.setName(ctx.use_random_name().RANDOM_NAME().getText());
+        System.out.println("the table name is : " + tableName.getName());
+        return tableName;
+    }
     public boolean semnticCheakforExstingColumnFromTableOrSub_Qurey(List<TableOrSubQuery> tableOrSubQueryList,ColumnName columnName){
         System.out.println("***************************************test test semnticCheakforExstingColumnFromTableOrSubQurey test test*************************************");
         Scope currentScope = scopesStack.peek();
@@ -1246,14 +1252,10 @@ public class BaseVisitor extends SQLBaseVisitor {
     }
 
 
-    @Override public TableName visitTable_name(SQLParser.Table_nameContext ctx)
-    {
-        System.out.println("visitTable_name");
-        TableName tableName = new TableName();
-        tableName.setName(ctx.use_random_name().RANDOM_NAME().getText());
-        System.out.println("the table name is : "+tableName.getName());
-        return tableName;
-    }
+
+
+
+
 
     @Override
     public ColumnName visitColumn_name(SQLParser.Column_nameContext ctx) {
@@ -1318,6 +1320,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("visitTable_alias");
         Table_alias table_alias = new Table_alias();
         if (ctx.IDENTIFIER() != null) {
+
             table_alias.setName(ctx.IDENTIFIER().getText());
             System.out.println("the table alias is : " + table_alias.getName());
         }
@@ -1620,6 +1623,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         jsonstatment inside_json = new jsonstatment();
         for (int i = 0; i < ctx.inside_json_statmnet().size(); i++) {
             inside_json.additemtojsonstatment(visitInside_json_statmnet(ctx.inside_json_statmnet().get(i)));
+            //System.out.println(" justing testing it "+ctx.inside_json_statmnet().get(i).getText());
         }
 
         return inside_json;
@@ -1724,6 +1728,7 @@ public class BaseVisitor extends SQLBaseVisitor {
     @Override
     public Expression visitExpression(SQLParser.ExpressionContext ctx) {
         Expression expression = new Expression();
+        //cleanExpressionTree(ctx);
         expression.setExpression_list(expression_algorthim(ctx));
 
         int x = 1, y = 2, z = 3;
@@ -3110,7 +3115,6 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
         String leftSideVariableName = ins.getVar().getVariable_with_opretor().get(0).getVariable_name();
         resault = symanticCheck(ins.getVar().getExpression());
 
-
         resault = Error_ofusing_undeclared_variabler(scopesStack.peek(), leftSideVariableName);
         if(resault){
             Type leftsideVariableType = getVariableType(leftSideVariableName);
@@ -3192,10 +3196,11 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
         }
         return is_already_declared;
     }
-
-
+/*------ FLAT  FUNCTIONS---------------------------------*/
 
 }
+
+
 
 
 

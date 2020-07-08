@@ -43,7 +43,7 @@ var x=0;
 x--;
 }
 --------------------------------------
-function sum (){
+ ---- function sum (){
 x++;
 if(x<9){
 var x =0;
@@ -76,7 +76,7 @@ x--;
 }
 }
 ---------------------------------------------------
-calling function (error)
+calling function (error) // working
 function sum (){
 sum();
 }
@@ -106,7 +106,7 @@ var x;
 }
 }
 --------------------------------
-function sum (){
+function sum (){ // working
 var x   ;
 {var x;
 var x;
@@ -114,7 +114,7 @@ var x;
 
 }
 -------------------------------------
-function sum (){
+function sum (){  // working
 var x;
 var x;
 var x;
@@ -132,12 +132,12 @@ var x = 9;
 
 }
 ------------------------------------------------
-function sum (){
+function sum (){ // working
 var x =0;
 var x = p;
 }
 ------------------------------------
-function sum (){
+function sum (){ // working
 var x =0;
 {
 {
@@ -150,7 +150,7 @@ var x;
 }
 }
 ----------------------------
-function sum (){
+function sum (){ // workin
 if(true )
 {
 var x;
@@ -162,7 +162,7 @@ var x;
 }
 --------------------------------------------
 
-function sum (){
+function sum (){ // working
 if(true )
 {
 var x;
@@ -210,7 +210,7 @@ x++;
 
 }
 ---------------------------------
-function  s (){
+function  s (){  //working
 var x= true;
 
 x++;
@@ -223,9 +223,15 @@ function  s (){
 x++;
 
 }
+----------------------------------
+function  s (){ giv me null pointer exception
 
+x=p+0;
+
+
+}
 --------------------------------------
-symantic check if
+symantic check if //working
 function s(){
 var x=true;
 
@@ -237,7 +243,7 @@ if(x==4)
 }
 }
 ---------------------------
-function s(){
+function s(){ // workng
 var x=true;
 
 if(x<9)
@@ -245,7 +251,7 @@ if(x<9)
 
 }
 --------------------------
-function s(){
+function s(){   //working
 var x=true;
 
 if(x<9)
@@ -255,18 +261,18 @@ else if(c<9)
 
 }
 -----------------------
-function s(){
+function s(){ //working
 while(x<9){}
 
 }
 ----------------------------------
-function s(){
+function s(){ // working
 var x = true ;
 while(x<9){}
 
 }
 -----------------------------
-function s(){
+function s(){   // working
 var x = true ;
 do {
 x=9;
@@ -274,7 +280,7 @@ x=9;
 
 }
 ----------------------------------
-function s(){
+function s(){ //working
 var x = true ;
 do {
 x=0;
@@ -293,7 +299,7 @@ var c;
 
 }
 --------------------------
-switch
+switch   //working
 function s(){
 var x=true;
 switch (x+9){
@@ -301,11 +307,13 @@ switch (x+9){
 
         }
 }
---------------------------
-function s(){
+---------------- ----------
+function s(){ // working
 var u=6;
 switch (x){
             case u<0:
 
         }
+        print (llll);s
+        return j;
 }

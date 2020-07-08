@@ -1,7 +1,10 @@
-function s(){
-var x = true ;
-do {
-x=9;
-}while(c<9);
-
+func(){
+var x = 9;
+var y = x;
+if(y > 9){
+for (var I = 0 ; I < 9 ; i++){
+	print(ii);
+}
+}
+return 3;
 }
