@@ -1,4 +1,0 @@
-create type s (nnnn string , m number )
-create  type address( nameuuuuu string  ,idopoi number );
-create table g (   j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
-select h from g;

@@ -3252,14 +3252,14 @@ public Flat_result FLAT(String table_name ) {
 
         if (!c.getColumn_type().getName().equals(Type.NUMBER_CONST) && !c.getColumn_type().getName().equals(Type.BOOLEAN_CONST) && !c.getColumn_type().getName().equals(Type.STRING_CONST)) {
            // System.out.println("somthing is not working "+result.getFlat().size());
-            if (checkDecleratedType(c.getColumn_type())) ;
-            {
+            //if (checkDecleratedType(c.getColumn_type())) ;
+           // {
                 //System.out.println("give me the flat size"+result.getFlat().size());
 
                 FLAT(c.getColumn_type(),result.getFlat());
 
 
-            }
+            //}
         } else if (c.getColumn_type().getName().equals(Type.NUMBER_CONST) || c.getColumn_type().getName().equals(Type.BOOLEAN_CONST) || c.getColumn_type().getName().equals(Type.STRING_CONST)) {
             Flat_object object = new Flat_object();
             object.setColumn_name(c.getColumn_name());
