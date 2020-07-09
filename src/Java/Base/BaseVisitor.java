@@ -1236,7 +1236,7 @@ public class BaseVisitor extends SQLBaseVisitor {
 
             currentScope = scopesStack.peek();
         }
-        System.err.println("the cloumn "+columnName.getName()+" not found in any table in table or subquery term the error in line : "+columnName.getLine()+" and column : "+columnName.getCol());
+        System.err.println("the cloumn :"+columnName.getName()+" not found in any table in table or subquery term the error in line : "+columnName.getLine()+" and column : "+columnName.getCol());
         return false;
     }
 
@@ -1273,7 +1273,7 @@ public class BaseVisitor extends SQLBaseVisitor {
             }
             currentScope = currentScope.getParent();
         }
-        System.err.println("your table name is not declare before you can not use the table before declare it "+"the error in Line "+tableName.getLine()+"  column "+tableName.getCol());
+        System.err.println("your table name : "+tableName.getName() +" is not declare before you can not use the table before declare it "+"the error in Line "+tableName.getLine()+"  column "+tableName.getCol());
         return false;
     }
 
@@ -3344,72 +3344,56 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
     /*------ FLAT  FUNCTIONS---------------------------------*/
 public Flat_result FLAT(String table_name ){
     System.out.println("-----------------testing the FLAT Function ------------------");
-
     Scope current_scope = scopesStack.peek();
     Table temp_table = new Table();
+    boolean found = false ;
     while (current_scope != null) {
         temp_table = current_scope.getTableMap().get(table_name);
-        if (temp_table != null)
+        if (temp_table != null){
+            found = true;
             break;
+        }
         else current_scope = current_scope.getParent();
     }
-
-    //System.out.println(" print what we have in the tabel " + temp_table.getColumnMap().values().iterator().next().getColumn_name().toString());
-    ArrayList<Column> col = new ArrayList<Column>();
-    Iterator itr = col.iterator();
-    itr = temp_table.getColumnMap().values().iterator();
     Flat_result result = new Flat_result();
-    result.setName(temp_table.getTable_name());
-    while (itr.hasNext()) {
+    if(found){
+        ArrayList<Column> col = new ArrayList<Column>();
+        Iterator itr = col.iterator();
+        itr = temp_table.getColumnMap().values().iterator();
+        result.setName(temp_table.getTable_name());
+        while (itr.hasNext()) {
 
-        Column c = (Column) itr.next();
+            Column c = (Column) itr.next();
 
-        if (!c.getColumn_type().getName().equals(Type.NUMBER_CONST) && !c.getColumn_type().getName().equals(Type.BOOLEAN_CONST) && !c.getColumn_type().getName().equals(Type.STRING_CONST)) {
-           // System.out.println("somthing is not working "+result.getFlat().size());
-            //if (checkDecleratedType(c.getColumn_type())) ;
-           // {
-                //System.out.println("give me the flat size"+result.getFlat().size());
+            if (!c.getColumn_type().getName().equals(Type.NUMBER_CONST) && !c.getColumn_type().getName().equals(Type.BOOLEAN_CONST) && !c.getColumn_type().getName().equals(Type.STRING_CONST)) {
 
                 FLAT(c.getColumn_type(),result.getFlat());
+            } else if (c.getColumn_type().getName().equals(Type.NUMBER_CONST) || c.getColumn_type().getName().equals(Type.BOOLEAN_CONST) || c.getColumn_type().getName().equals(Type.STRING_CONST)) {
 
-
-            //}
-        } else if (c.getColumn_type().getName().equals(Type.NUMBER_CONST) || c.getColumn_type().getName().equals(Type.BOOLEAN_CONST) || c.getColumn_type().getName().equals(Type.STRING_CONST)) {
-            Flat_object object = new Flat_object();
-            object.setColumn_name(c.getColumn_name());
-            object.setType_name(c.getColumn_type().getName());
-            result.getFlat().add(object);
-            //System.out.println("size of it will be "+result.getFlat().size());
-
+                Flat_object object = new Flat_object();
+                object.setColumn_name(c.getColumn_name());
+                object.setType_name(c.getColumn_type().getName());
+                result.getFlat().add(object);
+            }
         }
-      //  System.out.println(" the size is in "+result.getFlat().size());
-        //show_the_flat_result(result.getFlat());
 
     }
-    //show_the_flat_result(result.getFlat());
-    //System.out.println(" what we will get from the array_list the function return "+result.getFlat().size());
-   // System.out.println("the types and columnes we will get the tabel name from "+result.getName());
+
     return result;
 }
     public void  FLAT( Type p,ArrayList<Flat_object> F ) {
-       //System.out.println(" we are in the type function check waht we will get  the size "+F.size());
-        //System.out.println("-----------------------------------------");
-        //show_the_flat_result(F);
-       // show_the_flat_result(F);
         boolean we_have_another_type=false ;
         ArrayList<Type> col = new ArrayList<Type>();
         Iterator itr = col.iterator();
         Map<String, Type> maps = new HashMap();
             for (int i = 0; i < Main.symbolTable.getDeclaredTypes().size(); i++) {
-             //   System.out.println("size of array_list "+Main.symbolTable.getDeclaredTypes().get(i).getName());
                 if (Main.symbolTable.getDeclaredTypes().get(i).getName().equals(p.getName())) {
                     itr = Main.symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
                     maps = Main.symbolTable.getDeclaredTypes().get(i).getColumns();
                     while (itr.hasNext()) {
                         Type types = (Type) itr.next();
                             if (types.getName().equals(Type.STRING_CONST) || types.getName().equals(Type.BOOLEAN_CONST) || types.getName().equals(Type.NUMBER_CONST)) {
-                               // System.out.println(" column name    " + get_ky(maps, types.getName()));
-                                //System.out.println(" type name is     " + types.getName());
+
                                 Flat_object object = new Flat_object();
                                 object.setColumn_name(get_ky(maps, types.getName()));
                                 object.setType_name(types.getName());

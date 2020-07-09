@@ -1,9 +1,1 @@
-create table users (id number, name string, city_id number) type = "s" ,path="s";
-create table cities (id number, name string) type = "s" ,path="s";
-
-ff(){
-var xx = select * from users where city_id in (select id from cities);
-var vv = select * from users where city_id in (select * from cities);
-var vv = select * from users where city_id in (select name from cities);
-
-}
+select x from y;
