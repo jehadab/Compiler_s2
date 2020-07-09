@@ -1,1 +1,9 @@
-select x from y;
+create table users (id number,name string  ) type = "json", path= "C:";
+create table users1 (id number,name string  ) type = "json", path= "C:";
+create table x (tt number  ) type = "json", path= "C:";
+
+fun(){
+var x = select users.id ,x.tt from users join users on id;
+  x = select id from users;
+
+}

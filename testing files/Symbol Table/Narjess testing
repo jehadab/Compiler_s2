@@ -1,29 +1,3 @@
-func(){
-
-var x ;
-y = 5 ;
-while(z){
-var wowo = wowo2 ;
-do{
-var dodo;
-}while(wowo3 != wowo4);
-
-}
-foreach(var each1:each2){
-for (var fofo =1 ; fofo2 <4 ; fofo++){
-}
-}
-
-}
-
-
-func(){
-var x1;
-{var x2 ;
-{var x3 }{var xx2}var xx1;}
-}
-
------------------------------------------------------------------
 using variable undeclared (errr)
 function g (){
 var x=0;
