@@ -1,7 +1,4 @@
-
-create type f(naming string , aging number );
-create type r (namesss string , sgeeee number , tyyyy f )
-create type s (idddd number , nameeee string, ooo r );
-create  type address( nameuuuuu string  ,idopoi number ,new s );
-create table g (  home_address  address ) type = "json" , path ="t"
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number );
+create table g (   j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
 select h from g;

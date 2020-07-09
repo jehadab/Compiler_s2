@@ -318,3 +318,28 @@ switch (x){
         return j;
 }
 -----------------
+resting for flat function :
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number, d s  );
+create table g (   d s , j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+--------------------------------------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number, d s  );
+create table g (   j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-------------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number, d s  );
+create table g (   bbgbg s ,  d s , j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number );
+create table g (   bbgbg s ,  d s , j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-----------------------------------------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number );
+create table g (   j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;

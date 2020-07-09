@@ -889,7 +889,10 @@ public class BaseVisitor extends SQLBaseVisitor {
             }
             tableOrSubQuery.setTableName(visitTable_name(ctx.table_name()));
             seminticCheckForUsingTable(tableOrSubQuery.getTableName());
-            FLAT(ctx.table_name().use_random_name().getText());
+          Flat_result r =FLAT(ctx.table_name().use_random_name().getText());
+            show_the_flat_result(r.getFlat());
+            System.out.println(" what we will get from the array_list the function return "+r.getFlat().size());
+             System.out.println("the types and columnes we will get the tabel name from "+r.getName());
             if (ctx.table_alias() != null) {
                 tableOrSubQuery.setTable_alias(visitTable_alias(ctx.table_alias()));
             }
@@ -3225,38 +3228,60 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
         return is_already_declared;
     }
 /*------ FLAT  FUNCTIONS---------------------------------*/
-public void FLAT(String table_name ){
+public Flat_result FLAT(String table_name ) {
     System.out.println("-----------------testing the FLAT Function ------------------");
-Scope current_scope=scopesStack.peek();
-Table temp_table = new Table();
-  while(current_scope!=null){
-      temp_table=current_scope.getTableMap().get(table_name);
-      if(temp_table!=null)
-          break;
-      else current_scope=current_scope.getParent();
-  }
 
-  //System.out.println(" print what we have in the tabel " + temp_table.getColumnMap().values().iterator().next().getColumn_name().toString());
-    ArrayList<Column> col = new ArrayList<Column>();
-    Iterator itr =col.iterator();
-    itr=temp_table.getColumnMap().values().iterator();
-    while(itr.hasNext())
-    {
-        Column c= (Column) itr.next();
-        System.out.println( "colum name    "+c.getColumn_name()+"    type of the columne    "+c.getColumn_type().getName());
-        if(!c.getColumn_type().getName().equals(Type.NUMBER_CONST)&&!c.getColumn_type().getName().equals(Type.BOOLEAN_CONST)&&!c.getColumn_type().getName().equals(Type.STRING_CONST))
-        {
-if(checkDecleratedType(c.getColumn_type()));
-            {
-                FLAT(c.getColumn_type());
-
-
-            }        }
+    Scope current_scope = scopesStack.peek();
+    Table temp_table = new Table();
+    while (current_scope != null) {
+        temp_table = current_scope.getTableMap().get(table_name);
+        if (temp_table != null)
+            break;
+        else current_scope = current_scope.getParent();
     }
 
-}
-    public void FLAT( Type p) {
+    //System.out.println(" print what we have in the tabel " + temp_table.getColumnMap().values().iterator().next().getColumn_name().toString());
+    ArrayList<Column> col = new ArrayList<Column>();
+    Iterator itr = col.iterator();
+    itr = temp_table.getColumnMap().values().iterator();
+    Flat_result result = new Flat_result();
+    result.setName(temp_table.getTable_name());
+    while (itr.hasNext()) {
 
+        Column c = (Column) itr.next();
+
+        if (!c.getColumn_type().getName().equals(Type.NUMBER_CONST) && !c.getColumn_type().getName().equals(Type.BOOLEAN_CONST) && !c.getColumn_type().getName().equals(Type.STRING_CONST)) {
+           // System.out.println("somthing is not working "+result.getFlat().size());
+            if (checkDecleratedType(c.getColumn_type())) ;
+            {
+                //System.out.println("give me the flat size"+result.getFlat().size());
+
+                FLAT(c.getColumn_type(),result.getFlat());
+
+
+            }
+        } else if (c.getColumn_type().getName().equals(Type.NUMBER_CONST) || c.getColumn_type().getName().equals(Type.BOOLEAN_CONST) || c.getColumn_type().getName().equals(Type.STRING_CONST)) {
+            Flat_object object = new Flat_object();
+            object.setColumn_name(c.getColumn_name());
+            object.setType_name(c.getColumn_type().getName());
+            result.getFlat().add(object);
+            //System.out.println("size of it will be "+result.getFlat().size());
+
+        }
+      //  System.out.println(" the size is in "+result.getFlat().size());
+        //show_the_flat_result(result.getFlat());
+
+    }
+    //show_the_flat_result(result.getFlat());
+    //System.out.println(" what we will get from the array_list the function return "+result.getFlat().size());
+   // System.out.println("the types and columnes we will get the tabel name from "+result.getName());
+    return result;
+}
+    public void  FLAT( Type p,ArrayList<Flat_object> F ) {
+       //System.out.println(" we are in the type function check waht we will get  the size "+F.size());
+        //System.out.println("-----------------------------------------");
+        //show_the_flat_result(F);
+       // show_the_flat_result(F);
         boolean we_have_another_type=false ;
         ArrayList<Type> col = new ArrayList<Type>();
         Iterator itr = col.iterator();
@@ -3269,13 +3294,21 @@ if(checkDecleratedType(c.getColumn_type()));
                     while (itr.hasNext()) {
                         Type types = (Type) itr.next();
                             if (types.getName().equals(Type.STRING_CONST) || types.getName().equals(Type.BOOLEAN_CONST) || types.getName().equals(Type.NUMBER_CONST)) {
-                                System.out.println(" column name    " + get_ky(maps, types.getName()));
-                                System.out.println(" type name is     " + types.getName());
-                               // return ;
+                               // System.out.println(" column name    " + get_ky(maps, types.getName()));
+                                //System.out.println(" type name is     " + types.getName());
+                                Flat_object object = new Flat_object();
+                                object.setColumn_name(get_ky(maps, types.getName()));
+                                object.setType_name(types.getName());
+                                F.add(object);
                             }
-                            else FLAT(types);
+                            else {
+                               // ArrayList<Flat_object> FF = new ArrayList<Flat_object>();
+                                        FLAT(types, F);
+
+                            }
 
                     }
+                   // System.out.println("the final size we will get "+F.size());
                 }
 
             }
@@ -3312,6 +3345,17 @@ if(checkDecleratedType(c.getColumn_type()));
             }
         }
         return null;
+    }
+    public void show_the_flat_result(ArrayList<Flat_object> FLATING ){
+
+
+    for(int i=0;i<FLATING.size();i++)
+    {
+        System.out.println(" the index is "+i);
+        System.out.println(" the column name is "+FLATING.get(i).getColumn_name());
+        System.out.println(" the type is "+FLATING.get(i).getType_name());
+    }
+
     }
 }
 
