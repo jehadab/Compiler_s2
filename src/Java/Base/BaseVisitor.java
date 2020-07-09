@@ -76,14 +76,20 @@ public class BaseVisitor extends SQLBaseVisitor {
             header.setName((ctx.funtion().get(i).function_header().use_random_name().getText()));
             Main.symbolTable.add_functions(header);
         }
-
+       // System.out.println("aggregation function size"+ctx.create_aggregation_function().size());
+        for(int i=0;i<ctx.create_aggregation_function().size();i++)
+        {
+            AggregationFunction agg_function = new AggregationFunction();
+            agg_function.setAggregationFunctionName(ctx.create_aggregation_function().get(i).use_random_name(0).getText());
+            Main.symbolTable.getAgg().add(agg_function);
+        }
+        System.out.println("list size of aggregation function "+Main.symbolTable.getAgg().size());
         for (int i = 0; i <ctx.children.size(); i++) {
 
-                if(ctx.children.get(i) instanceof SQLParser.Create_aggregation_functionContext){
+                    if(ctx.children.get(i) instanceof SQLParser.Create_aggregation_functionContext){
+                        p.getAg().add(visitCreate_aggregation_function(ctx.create_aggregation_function(i)));
 
-                    p.getAg().add(visitCreate_aggregation_function(ctx.create_aggregation_function(i)));
-
-            }
+                }
                    else if(ctx.children.get(i) instanceof SQLParser.Sql_stmt_listContext){
 
                         for (int j = 0; j < ctx.sql_stmt_list().get(i).sql_stmt().size(); j++) {
@@ -107,7 +113,8 @@ public class BaseVisitor extends SQLBaseVisitor {
 
             }
         }
-
+      //  System.out.println("the aggreation funtion we have symbole tabel  "+Main.symbolTable.getAgg().size());
+        //System.out.println("the aggreation funtion we have in the parse  "+p.getAg().size());
         p.setLine(ctx.getStart().getLine()); //get line number
         p.setCol(ctx.getStart().getCharPositionInLine()); // get col number
         Main.symbolTable.addScope(scopesStack.pop());
@@ -898,7 +905,7 @@ public class BaseVisitor extends SQLBaseVisitor {
             seminticCheckForUsingTable(tableOrSubQuery.getTableName());
           Flat_result r =FLAT(ctx.table_name().use_random_name().getText());
             show_the_flat_result(r.getFlat());
-            System.out.println(" what we will get from the array_list the function return "+r.getFlat().size());
+            System.out.println(" what we will get from the array_list the function Flat  return "+r.getFlat().size());
              System.out.println("the types and columnes we will get the tabel name from "+r.getName());
             if (ctx.table_alias() != null) {
                 tableOrSubQuery.setTable_alias(visitTable_alias(ctx.table_alias()));
@@ -1119,6 +1126,17 @@ public class BaseVisitor extends SQLBaseVisitor {
             (expr).setRight(visitExpr(ctx.expr(1)));
             System.out.println("fill right");
         }
+        if(ctx.function_name()!=null){
+            System.out.println("visit the function name ");
+            expr.setFunction_name(ctx.function_name().use_random_name().getText());
+          if(Error_UNdeclared_aggregation_Function(ctx.function_name().use_random_name().getText())==true)
+          {
+
+              System.err.println("error group by clause can not contain aggregation function");
+          }
+
+        }
+
         return expr;
     }
 
@@ -2667,7 +2685,6 @@ public class BaseVisitor extends SQLBaseVisitor {
         if (ctx.use_random_name() != null) {
             A.setAggregationFunctionName(visitUse_random_name(ctx.use_random_name(0)));
         }
-
         //A.setJat_path(ctx.IDENTIFIER().toString());
         A.setClassName(ctx.use_random_name(1).getText());
         A.setMethodName(ctx.use_random_name(2).getText());
@@ -2898,9 +2915,19 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         return false;
     }
+    public boolean Error_UNdeclared_aggregation_Function(String function_name) {
+        for (int i = 0; i < Main.symbolTable.getAgg().size(); i++) {
+
+            if (Main.symbolTable.getAgg().get(i).getAggregationFunctionName().equals(function_name)) {
+                return true;
+            }
+
+        }
+       // System.err.println(" Error  the function   " + function_name + "   is not  declared before ");
 
 
-
+        return false;
+    }
     public boolean compareTwoTypes(Type firstType, Type secondType) {
         if (secondType.getName().equals(Type.UNDEFINDED)
                 || secondType.getName().equals("did not find variable")

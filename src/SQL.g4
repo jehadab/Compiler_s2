@@ -48,7 +48,7 @@ sql_stmt_list
 sql_stmt
 // : ( K_EXPLAIN ( K_QUERY K_PLAN )? )? ( alter_table_stmt
  :                                     (
-                                        create_aggregation_function
+                                       create_aggregation_function
                                         |alter_table_stmt
 //                                      | analyze_stmt
 //                                      | attach_stmt
@@ -79,6 +79,7 @@ sql_stmt
 //                                      | select_stmt
                                       | update_stmt
                                       | create_type
+
 //                                      | update_stmt_limited
 //                                      | vacuum_stmt
                                        )
@@ -881,17 +882,17 @@ any_name
  | STRING_LITERAL
  //| '(' any_name ')'
  ;
-create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name OPEN_PAR
+create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION  use_random_name  OPEN_PAR IDENTIFIER
+                                                                              COMMA
+                                                                               use_random_name
+                                                                               COMMA
+                                                                               use_random_name
+                                                                               COMMA
+                                                                               use_random_name
+                                                                               COMMA
+                                                                               OPEN_SQER_BAR (parames? (COMMA parames)*)  CLOSE_SQER_PAR CLOSE_PAR
   //jar_pathe
-  IDENTIFIER
-  COMMA
-   use_random_name
-   COMMA
-   use_random_name
-   COMMA
-   use_random_name
-   COMMA
-   OPEN_SQER_BAR (parames? (COMMA parames)*)  CLOSE_SQER_PAR CLOSE_PAR;
+ ;
 
   // jar_pathe: (use_random_name ':' '/' use_random_name) ('/' use_random_name)*| use_random_name;
       parames: K_STRING |K_NUMBER| K_BOOLEAN  |table_name |column_name;
@@ -908,7 +909,10 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION use_random_name
 
          use_random_name
          OPEN_PAR
-         (( args (COMMA args)*) (COMMA (creating_with_assign))*)?
+        (
+               (( args (COMMA args)*) (COMMA (creating_with_assign))*)?
+               )
+
          CLOSE_PAR
          ;
    function_body:

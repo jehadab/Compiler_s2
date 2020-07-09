@@ -18,6 +18,16 @@ private DataBaseName dataBaseName;
 private TableName tableName;
 private ColumnName columnName;
 
+    public String getFunction_name() {
+        return Function_name;
+    }
+
+    public void setFunction_name(String function_name) {
+        Function_name = function_name;
+    }
+
+    private  String Function_name ;
+
     @Override
     public void accept(AstVistor astVisitor) {
         astVisitor.visit(this);

@@ -321,3 +321,14 @@ select h from g;
 testing the teacher symboles :
 symbole 12 is working fro flat function
 symbole 8 is not working we should check it
+---------------------------------------------------------------------
+create aggregation function sum ("ggg",n,n,h,[string])
+create aggregation function avg ("ggg",n,n,h,[string])
+create aggregation function hhh ("ggg",n,n,h,[string])
+create aggregation function multi ("ggg",n,n,h,[string])
+---------------------------------------------------------------------------
+
+function sum (){
+
+}
+create aggregation function j ("dd",classname , methodname , typename , [string ]);

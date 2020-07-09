@@ -14,7 +14,7 @@ public class SymbolTable {
     private ArrayList<Scope> scopes = new ArrayList();
     private ArrayList<Type> declaredTypes = new ArrayList();
     private ArrayList<function_header> functions= new ArrayList<function_header>();
-
+private ArrayList<AggregationFunction> agg = new ArrayList<AggregationFunction>();
     public SymbolTable() {
     }
 
@@ -44,6 +44,14 @@ public void add_functions(function_header new_function ){this.functions.add(new_
 
     public void addScope(Scope scope) {
         this.scopes.add(scope);
+    }
+
+    public ArrayList<AggregationFunction> getAgg() {
+        return agg;
+    }
+
+    public void setAgg(ArrayList<AggregationFunction> agg) {
+        this.agg = agg;
     }
 
     public void addType(Type type) {
