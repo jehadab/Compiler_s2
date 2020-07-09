@@ -234,8 +234,8 @@ public class BaseVisitor extends SQLBaseVisitor {
             createTableStmt.setTableName(visitTable_name(ctx.table_name()));
             if(!seminticCheckForCreateTable(createTableStmt.getTableName()))
                 System.out.println("------------------------------------------------------------------------------------------------");
-            String name = ctx.table_name().use_random_name().getText();
-            table.setTable_name(name);
+                String name = ctx.table_name().use_random_name().getText();
+                table.setTable_name(name);
 
             if (ctx.column_def() != null) {
                 List<ColumnDef> columnDefs = new ArrayList<>();
@@ -247,7 +247,6 @@ public class BaseVisitor extends SQLBaseVisitor {
                     col.setColumn_type(columnDefs.get(i).getType());
                     table.addColumnMap(columnDefs.get(i).getColumnName() , col);
                     checkDecleratedType(col.getColumn_type());
-
                 }
                 if(ctx.table_constraint()!=null){
                     List<TableConstraint> tableConstraints= new ArrayList<>();
@@ -706,6 +705,9 @@ public class BaseVisitor extends SQLBaseVisitor {
                 if (ctx.having_expr() != null) {
                     System.out.println("set having value ");
                     select_core.setHavingExpr(visitExpr(ctx.having_expr().expr()));
+                    if(ctx.having_expr().expr().function_name() == null){
+                        System.err.println("Must set Having function group");
+                    }
                 }
             }
 
@@ -816,6 +818,9 @@ public class BaseVisitor extends SQLBaseVisitor {
                     if (ctx.having_expr() != null) {
                         System.out.println("the having value is ");
                         selectOrValue.setHaving_expr(visitExpr(ctx.having_expr().expr()));
+                        if(ctx.having_expr().expr().function_name() == null){
+                            System.err.println("Must set Having function group");
+                        }
 
                     }
 
@@ -852,12 +857,13 @@ public class BaseVisitor extends SQLBaseVisitor {
                 for (int i = 0; i < ctx.join_operator().size(); i++) {
                     join_opreators.add(visitJoin_operator(ctx.join_operator(i)));
                     join_constrains.add(visitJoin_constraint(ctx.join_constraint(i)));
+                    if(ctx.join_constraint(i).K_ON() == null){
+                        System.err.println("Missing On join Constraint");
+                    }
                 }
                 join_clause.setJoin_opreatorList(join_opreators);
 
             }
-
-
         }
         return join_clause;
     }
@@ -3232,43 +3238,102 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
         }
         return is_already_declared;
     }
+
     public Type getSelectType (SelectFactoredStmt selectFactoredStmt){
         Type type = new Type();
         String typeName = "";
 
-        for (int i = 0; i < selectFactoredStmt.getSelect_core().getTableOrSubQueryList().size() ; i++) {
+        if(selectFactoredStmt.getSelect_core().getJoin_clause() == null){
+            for (int i = 0; i < selectFactoredStmt.getSelect_core().getTableOrSubQueryList().size() ; i++) {
 
-            if(typeName.isEmpty())
-                typeName =  selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(i).getTableName().getName();
-            else
-                typeName = typeName.concat( "_"+ selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(i).getTableName().getName());
+                    if(typeName.isEmpty())
+                        typeName =  selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(i).getTableName().getName();
+                    else
+                        typeName = typeName.concat( "+"+ selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(i).getTableName().getName());
 
-        }
-        for (int i = 0; i <selectFactoredStmt.getSelect_core().getReslult_cloumnList().size() ; i++) {
-            if(selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).isStar()){
-                Scope currentScope = scopesStack.peek();
-                boolean found = false;
-                while (currentScope != null)
-                {
-                    found = currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(i).getTableName().getName());
-                    if(found)
-                    {
-                        break;
+                for (int j = 0; j <selectFactoredStmt.getSelect_core().getReslult_cloumnList().size() ; j++) {
+                    if(selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).isStar()){
+                        Scope currentScope = scopesStack.peek();
+                        boolean found = false;
+                        while (currentScope != null)
+                        {
+                            found = currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(j).getTableName().getName());
+                            if(found)
+                            {
+                                break;
+                            }
+                            currentScope = currentScope.getParent();
+                        }
+                        if(found){
+                            Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(j).getTableName().getName());
+                            Iterator<Column> columns = table.getColumnMap().values().iterator();
+                            while (columns.hasNext())
+                            {
+                                typeName =  typeName.concat("_"+columns.next().getColumn_name()) ;
+
+                            }
+                        }
                     }
-                    currentScope = currentScope.getParent();
-                }
-                if(found){
-                    Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(i).getTableName().getName());
-                    Iterator<Column> columns = table.getColumnMap().values().iterator();
-                    while (columns.hasNext())
-                    {
-                        typeName =  typeName.concat("_"+columns.next().getColumn_name()) ;
-
+                    else {
+                        typeName = typeName.concat("_"+ selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getColumnName().getName());
                     }
                 }
             }
-            else {
-                typeName = typeName.concat("_"+ selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr().getColumnName().getName());
+        }
+        else if(selectFactoredStmt.getSelect_core().getJoin_clause() != null){
+            typeName = selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQuery().getTableName().getName();
+            for (int i = 0; i < selectFactoredStmt.getSelect_core().getReslult_cloumnList().size(); i++) {
+                if(selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).isStar()){
+                    Scope currentScope = scopesStack.peek();
+                    boolean found = false;
+                    while (currentScope != null)//set type for left hand of join
+                    {
+                        found = currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQuery().getTableName().getName());
+                        if(found)
+                        {
+                            break;
+                        }
+                        currentScope = currentScope.getParent();
+                    }
+                    if(found){
+                        Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQuery().getTableName().getName());
+                        Iterator<Column> columns = table.getColumnMap().values().iterator();
+                        while (columns.hasNext())
+                        {
+                            typeName =  typeName.concat("_"+columns.next().getColumn_name()) ;
+
+                        }
+                    }
+                    // set type for right hand of join
+                    for (TableOrSubQuery tableOrSubQuery:selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQueryList()
+                         ) {
+                         found = false;
+                         typeName = typeName.concat("+"+tableOrSubQuery.getTableName().getName());
+                        while (currentScope != null)
+                        {
+                            found = currentScope.getTableMap().containsKey(tableOrSubQuery.getTableName().getName());
+                            if(found)
+                            {
+                                break;
+                            }
+                            currentScope = currentScope.getParent();
+                        }
+                        if(found){
+                            Table table = currentScope.getTableMap().get(tableOrSubQuery.getTableName().getName());
+                            Iterator<Column> columns = table.getColumnMap().values().iterator();
+                            while (columns.hasNext())
+                            {
+                                typeName =  typeName.concat("_"+columns.next().getColumn_name()) ;
+
+                            }
+                        }
+                    }
+
+                }
+                else if (selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr() != null){
+                    typeName= typeName.concat("_"+selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr().getColumnName().getName());
+
+                }
             }
         }
         type.setName(typeName);
