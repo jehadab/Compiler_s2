@@ -87,7 +87,8 @@ public class BaseVisitor extends SQLBaseVisitor {
         for (int i = 0; i <ctx.children.size(); i++) {
 
             if(ctx.children.get(i) instanceof SQLParser.Create_aggregation_functionContext){
-                p.getAg().add(visitCreate_aggregation_function( ((SQLParser.Create_aggregation_functionContext)ctx.children.get(i))));
+                p.getAg().add(visitCreate_aggregation_function(
+                        ((SQLParser.Create_aggregation_functionContext)ctx.children.get(i))));
             }
             else if(ctx.children.get(i) instanceof SQLParser.Sql_stmt_listContext){
                 for (int j = 0; j < ((SQLParser.Sql_stmt_listContext) ctx.children.get(i)).sql_stmt().size(); j++) {
@@ -110,6 +111,7 @@ public class BaseVisitor extends SQLBaseVisitor {
 
             }
         }
+
       //  System.out.println("the aggreation funtion we have symbole tabel  "+Main.symbolTable.getAgg().size());
         //System.out.println("the aggreation funtion we have in the parse  "+p.getAg().size());
         p.setLine(ctx.getStart().getLine()); //get line number
@@ -883,11 +885,19 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 select_core.setList_of_exprList(list_of_exprs);
             }
         }
+        if(ctx.expr() != null)
+        {
+            ArrayList<Expr> group_expr_arrayList = new ArrayList<>();
+            for (int i = 0; i <ctx.expr().size() ; i++) {
+                group_expr_arrayList.add(visitExpr(ctx.expr(i)));
+            }
+            select_core.setExprList_Group(group_expr_arrayList);
+
+        }
+
 
         return select_core;
     }
-
-
 
     @Override public WhereWithInForSelect visitWhere_with_in_for_select(SQLParser.Where_with_in_for_selectContext ctx)
     {
@@ -1271,13 +1281,12 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         if(ctx.function_name()!=null){
             System.out.println("visit the function name ");
             expr.setFunction_name(ctx.function_name().use_random_name().getText());
-          if(Error_UNdeclared_aggregation_Function(ctx.function_name().use_random_name().getText())==true)
+          if(Error_UNdeclared_aggregation_Function(ctx.function_name().use_random_name().getText()))
           {
-
               System.err.println("error group by clause can not contain   "+ctx.function_name().use_random_name().getText()+"   aggregation function");
           }
         }
-        else if(ctx.OPEN_PAR() != null){
+        else if(ctx.OPEN_PAR() != null && ctx.expr()!= null){
             expr = visitExpr(ctx.expr(0));
         }
 

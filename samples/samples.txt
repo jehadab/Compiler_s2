@@ -1,3 +1,5 @@
 create aggregation function f ("dff",classname , methodname , typename , [string ])
-create aggregation function f ("dff",classname , methodname , typename , [string ])
-select g from a group by f();
+create table users (id number, string name, city_id number) type = "json" path= "C:";
+function  sum (){
+select * from users group by f();
+}
