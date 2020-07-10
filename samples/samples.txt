@@ -1,5 +1,2 @@
-
-create aggregation function j ("dd",classname , methodname , typename , [string ])
-
-
-
+create aggregation function f ("dff",classname , methodname , typename , [string ])
+create aggregation function z ("dff",classname , methodname , typename , [string ])

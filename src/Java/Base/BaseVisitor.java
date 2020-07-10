@@ -1132,7 +1132,7 @@ public class BaseVisitor extends SQLBaseVisitor {
           if(Error_UNdeclared_aggregation_Function(ctx.function_name().use_random_name().getText())==true)
           {
 
-              System.err.println("error group by clause can not contain aggregation function");
+              System.err.println("error group by clause can not contain   "+ctx.function_name().use_random_name().getText()+"   aggregation function");
           }
 
         }
