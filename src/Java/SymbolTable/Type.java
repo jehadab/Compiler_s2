@@ -15,7 +15,7 @@ public class Type {
     private Map<String , Type> columns = new HashMap();
     private Scope scope;
     public static final String NUMBER_CONST = "number";
-    public static final String STRING_CONST = "string";
+    public static final String STRING_CONST = "name";
     public static final String BOOLEAN_CONST = "boolean";
     public static final String UNDEFINDED = "undefined";
 

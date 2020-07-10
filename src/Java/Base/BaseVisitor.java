@@ -247,9 +247,11 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         System.out.println("visitCreate_table_stmt");
         Scope currentScope = scopesStack.peek();
         Table table = new Table();
+        Type tableType = new Type();
         CreateTableStmt createTableStmt = new CreateTableStmt();
         if (ctx.table_name() != null) {
             createTableStmt.setTableName(visitTable_name(ctx.table_name()));
+            tableType.setName(createTableStmt.getTableName().getName());
             if(!seminticCheckForCreateTable(createTableStmt.getTableName()))
                 System.out.println("------------------------------------------------------------------------------------------------");
 
@@ -258,7 +260,6 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             currentScope.addTable(table.getTable_name(),table);
             if (ctx.column_def() != null) {
                 List<ColumnDef> columnDefs = new ArrayList<>();
-                Type type = new Type();
                 for (int i = 0; i < ctx.column_def().size(); i++) {
                     columnDefs.add(visitColumn_def(ctx.column_def(i)));
                     Column col  =  new Column();
@@ -269,6 +270,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                     }
                     col.setColumn_type(columnDefs.get(i).getType());
                     table.addColumnMap(columnDefs.get(i).getColumnName() , col);
+                    tableType.addColumns(columnDefs.get(i).getColumnName(),col.getColumn_type());
                     checkDecleratedType(col.getColumn_type());
                 }
                 if(ctx.table_constraint()!=null){
@@ -289,6 +291,8 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             }
 
         }
+
+        Main.symbolTable.getDeclaredTypes().add(tableType);
         currentScope.addTable(table.getTable_name(),table);
         table.setPath_of_table(createTableStmt.getDeclarePathTable().getPath());
         table.setExtension_of_table(createTableStmt.getDeclareTypeTable().getType());
@@ -343,6 +347,8 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         }
         return colmndef;
     }
+
+
 
 
     @Override
@@ -524,7 +530,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                     }
                 }
                 if(!found){
-                    System.err.println(type.getName() + " did not exist ");
+                    System.err.println("Type: "+type.getName() + " did not exist ");
                 }
             }
             //System.err.println(type.getName() + " did not exist ");
@@ -1079,7 +1085,6 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
 
 
     public  boolean sementicCheckForExistedColumn(ColumnName columnName ,TableName tableName){
-        System.out.println("***************************************test test sementicCheckForExistedColumn test test*************************************");
         Scope currentScope  = scopesStack.peek();
         while (currentScope!=null){
             if(currentScope.getTableMap().containsKey(tableName.getName())){
@@ -1274,7 +1279,9 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
 
               System.err.println("error group by clause can not contain   "+ctx.function_name().use_random_name().getText()+"   aggregation function");
           }
-
+        }
+        else if(ctx.OPEN_PAR() != null){
+            expr = visitExpr(ctx.expr(0));
         }
 
         return expr;
@@ -1377,7 +1384,6 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         return tableName;
     }
     public boolean semnticCheakforExstingColumnFromTableOrSub_Qurey(List<TableOrSubQuery> tableOrSubQueryList,ColumnName columnName){
-        System.out.println("***************************************test test semnticCheakforExstingColumnFromTableOrSubQurey test test*************************************");
         Scope currentScope = scopesStack.peek();
         for (int i = 0 ; i < tableOrSubQueryList.size();i++)
         {
@@ -1402,14 +1408,12 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         Scope currentScope = scopesStack.peek();
         boolean test ;
         //        for creating table
-        System.out.println("come from creating table ****************");
-        System.out.println("***************************************test test seminticCheckForTable test test*************************************");
         while (currentScope != null)
         {
             test = currentScope.getTableMap().containsKey(tableName.getName());
             if(test)
             {
-                System.err.println("your table name is found before you can not define the table name in the table name found before"+"the error in Line "+tableName.getLine()+"   column "+tableName.getCol());
+                System.err.println("your table name : "+ tableName.getName() +"is found before you can not define the table name in the table name found before"+"the error in Line "+tableName.getLine()+"   column "+tableName.getCol());
                 return false;
             }
             currentScope = currentScope.getParent();
@@ -1421,7 +1425,6 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
     {
         Scope currentScope = scopesStack.peek();
         boolean test ;
-        System.out.println("***************************************test test seminticCheckForTable test test*************************************");
         while (currentScope != null)
         {
             test = currentScope.getTableMap().containsKey(tableName.getName());
@@ -1642,6 +1645,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             Type type = new Type();
             if(Error_in_Multiple_Declarations(variable_with_assign.getVar().getVariable_with_opretor().get(0).getVariable_name())){
                 type = getSelectType(variable_with_assign.getVar().getFactored());
+                Main.symbolTable.getDeclaredTypes().add(type);
             }
                 createdSymbol.setType(type);
 
@@ -2744,7 +2748,10 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             else if(ins.getVar().getFactored() != null){
                Type type = getVariableType(ins.getVar().getVariable_with_opretor().get(0).getVariable_name());
                if(type.getName() != null){
-                   compareTwoTypes(type,getSelectType(ins.getVar().getFactored()));
+                   Type selectType = getSelectType(ins.getVar().getFactored());
+                   compareTwoTypes(type,selectType);
+                   if(type.getName() != null)
+                   Main.symbolTable.getDeclaredTypes().add(selectType);
                }
             }
         } else if (ctx.assign_array() != null) {
@@ -3510,7 +3517,6 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
 
     /*------ FLAT  FUNCTIONS---------------------------------*/
 public Flat_result FLAT(String table_name ){
-    System.out.println("-----------------testing the FLAT Function ------------------");
     Scope current_scope = scopesStack.peek();
     Table temp_table = new Table();
     boolean found = false ;

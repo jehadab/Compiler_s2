@@ -161,7 +161,6 @@ create_table_stmt
 //   ( '(' column_def ( ',' table_constraint | ',' column_def )* ')' ( K_WITHOUT IDENTIFIER )?
    ( OPEN_PAR column_def ( ',' table_constraint | ',' column_def )* CLOSE_PAR
    declare_type_table
-   COMMA
    declare_path_table)
    | K_AS select_stmt
 //   ) (unknown)?
@@ -1618,7 +1617,7 @@ K_WHILE :  W H I L E ;
 K_CONTINUE : C O N T I N U E ;
 K_JSON : J S O N ;
 K_AGGREGATION : A G G  R E G A T I O N ;
-K_STRING: S T R I N G  ;
+K_STRING: CapS T R I N G  ;
 K_BOOLEAN : B O O L E A N ;
 K_NUMBER : N U M B E R ;
 K_PATH : P A T H ;
@@ -1700,3 +1699,6 @@ fragment W : [wW];
 fragment X : [xX];
 fragment Y : [yY];
 fragment Z : [zZ];
+fragment CapS : [S];
+fragment CapN : [N];
+

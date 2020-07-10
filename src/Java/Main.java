@@ -15,6 +15,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
@@ -23,7 +24,7 @@ public class Main {
     public static SymbolTable symbolTable = new SymbolTable();
     public static void main(String[] args) {
         try {
-            File file = new File("C://Users//Dell//IdeaProjects//LOLO//samples//samples.txt");
+            File file = new File("..//..//samples//samples.txt");
             String fileName = file.getAbsolutePath();
 
             CharStream cs = fromFileName(fileName);
@@ -91,6 +92,21 @@ public class Main {
 //                }
 //                System.out.println("  ] ");
 //            }
+
+        }
+        System.out.println();
+        for (Type type:symbolTable.getDeclaredTypes()
+             ) {
+            System.out.println("type : " + type.getName() );
+            for (Object column: type.getColumns().values().toArray()
+                 ) {
+                Type c = (Type) column;
+                System.out.println("column name : " + c.getName());
+//                System.out.println("column type : " + ((Column)column).getColumn_type().getName());
+
+            }
+
+
 
         }
     }
