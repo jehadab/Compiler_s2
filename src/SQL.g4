@@ -890,7 +890,7 @@ any_name
  //| '(' any_name ')'
  ;
 create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION  use_random_name  OPEN_PAR IDENTIFIER
-                                                                              COMMA
+                                                                               COMMA
                                                                                use_random_name
                                                                                COMMA
                                                                                use_random_name

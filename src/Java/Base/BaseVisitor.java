@@ -86,30 +86,27 @@ public class BaseVisitor extends SQLBaseVisitor {
         System.out.println("list size of aggregation function "+Main.symbolTable.getAgg().size());
         for (int i = 0; i <ctx.children.size(); i++) {
 
-                    if(ctx.children.get(i) instanceof SQLParser.Create_aggregation_functionContext){
-                        p.getAg().add(visitCreate_aggregation_function(ctx.create_aggregation_function(i)));
-
-                }
-                   else if(ctx.children.get(i) instanceof SQLParser.Sql_stmt_listContext){
-
-                        for (int j = 0; j < ctx.sql_stmt_list().get(i).sql_stmt().size(); j++) {
-                        p.getSqlStmts().add(visitSql_stmt(ctx.sql_stmt_list().get(i).sql_stmt().get(j)));
-                    }
+            if(ctx.children.get(i) instanceof SQLParser.Create_aggregation_functionContext){
+                p.getAg().add(visitCreate_aggregation_function( ((SQLParser.Create_aggregation_functionContext)ctx.children.get(i))));
             }
-            if(ctx.children.get(i) instanceof SQLParser.FuntionContext){
-
+            else if(ctx.children.get(i) instanceof SQLParser.Sql_stmt_listContext){
+                for (int j = 0; j < ((SQLParser.Sql_stmt_listContext) ctx.children.get(i)).sql_stmt().size(); j++) {
+                    p.getSqlStmts().add(visitSql_stmt(((SQLParser.Sql_stmt_listContext) ctx.children.get(i)).sql_stmt().get(j)));
+                }
+            }
+            else if(ctx.children.get(i) instanceof SQLParser.FuntionContext){
                 System.out.println("visiting function ");
                 System.out.println(" size of the function " + ctx.funtion().size());
 
-                    Scope functionScope = new Scope();
-                    functionScope.setId(((SQLParser.FuntionContext)(ctx.children.get(i))).function_header().use_random_name().getText() + "_" + (((SQLParser.FuntionContext)(ctx.children.get(i))).hashCode()));
-                    functionScope.setParent(scopesStack.peek());
+                Scope functionScope = new Scope();
+                functionScope.setId(((SQLParser.FuntionContext)(ctx.children.get(i))).function_header().use_random_name().getText() + "_" + (((SQLParser.FuntionContext)(ctx.children.get(i))).hashCode()));
+                functionScope.setParent(scopesStack.peek());
 
-                    scopesStack.push(functionScope);
+                scopesStack.push(functionScope);
 
-                    p.getFunctions().add(visitFuntion((SQLParser.FuntionContext)ctx.children.get(i)));
+                p.getFunctions().add(visitFuntion((SQLParser.FuntionContext)ctx.children.get(i)));
 
-                    Main.symbolTable.addScope(scopesStack.pop());
+                Main.symbolTable.addScope(scopesStack.pop());
 
             }
         }
