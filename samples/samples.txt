@@ -1,9 +1,9 @@
-create aggregation function f ("dff",classname , methodname , typename , [string ])
-create aggregation function f ("dff",classname , methodname , typename , [string ])
-select g from a group by f();
-
 create table users (id number, string name, city_id number) type = "json" path= "C:";
 create table cities (id number, string name) type = "json" path= "C:";
+
 ff(){
-var vv = select * from users where city_id in (select string from cities);
+var xx = select * from users where city_id in (select id from cities);
+var vv = select * from users where city_id in (select * from cities);
+var vv = select * from users where city_id in (select name from cities);
+
 }

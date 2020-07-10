@@ -792,16 +792,16 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
 
                 }
 
-                if(test1 &&select_core.getWhereWithInForSelect().getSelect_core().getReslult_cloumnList().get(0).isStar()==false){
+                if(test1 &&!select_core.getWhereWithInForSelect().getSelect_core().getReslult_cloumnList().get(0).isStar()){
                 Type first_column_type = findTheColumnType(
                         select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName().getName()
                         ,select_core.getTableOrSubQueryList().get(0).getTableName().getName());
                 Type second_column_type = findTheColumnType(
                         select_core.getWhereWithInForSelect().getSelect_core().getReslult_cloumnList().get(0).getExpr().getColumnName().getName()
                         ,select_core.getWhereWithInForSelect().getSelect_core().getTableOrSubQueryList().get(0).getTableName().getName());
-                compareTwoTypes(first_column_type,second_column_type);
+                if(first_column_type.getName() != null && second_column_type.getName()!= null)
+                    compareTwoTypes(first_column_type,second_column_type);
                 }
-
             }
         }
         if (ctx.result_column() != null) {
