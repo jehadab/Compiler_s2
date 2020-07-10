@@ -1,2 +1,2 @@
 create aggregation function f ("dff",classname , methodname , typename , [string ])
-select * from g  group by jj ();
+select * from g  group by jj ()  ;
