@@ -1,0 +1,369 @@
+using variable undeclared (errr)
+function g (){
+var x=0;
+if(c<9)
+{
+x++;
+}
+x++;
+}
+--------------------------------
+func(){
+x++;
+if(x<9)
+{
+var x=0;
+}
+x--;
+}
+--------------------------------------
+ ---- function sum (){
+x++;
+if(x<9){
+var x =0;
+while(x<9){
+x--;
+}
+x++;
+}
+x++;
+}
+------------------------------------
+function sum (){ // we can not do declared in if
+x++;
+if(x<9)
+var x=0;
+while(true )
+x++;
+x--;
+
+}
+
+----------------------------------
+function sum (){
+x++;
+if(x<9)
+{var x=0;
+while(true )
+x++;
+x--;
+}
+}
+---------------------------------------------------
+calling function (error) // working
+function sum (){
+sum();
+}
+function div(){
+sum();
+}
+function Find(){
+help();
+}
+function help (){
+sum();
+}
+function testing (){
+help();
+}
+-------------------------------------------------
+(Multi declared variable in the same scope  )
+function sum (){
+var x   ;
+{var x;
+var x;
+}
+if(true ){
+var x;
+
+ var x;
+}
+}
+--------------------------------
+function sum (){ // working
+var x   ;
+{var x;
+var x;
+}
+
+}
+-------------------------------------
+function sum (){  // working
+var x;
+var x;
+var x;
+}
+----------------------------------------
+function sum (){ // give me error in the table name
+var x =0;
+var x = select * from s;
+
+}
+--------------------------------------
+function sum (){
+var x =0;
+var x = 9;
+
+}
+------------------------------------------------
+function sum (){ // working
+var x =0;
+var x = p;
+}
+------------------------------------
+function sum (){ // working
+var x =0;
+{
+{
+{
+{
+var x;
+}
+}
+}
+}
+}
+----------------------------
+function sum (){ // workin
+if(true )
+{
+var x;
+while(true )
+{
+var x;
+}
+}
+}
+--------------------------------------------
+
+function sum (){ // working
+if(true )
+{
+var x;
+}
+while(true )
+{
+var x ;
+}
+}
+--------------------
+
+function sum (){
+var x;
+if(true )
+{
+var x;
+}
+while(true )
+{
+var x;
+}
+}
+-----------------------------------
+
+function sum (){
+var x=0;
+if(true )
+{
+var x;
+}
+while(true )
+{
+var x;
+}
+}
+--------------------------------
+(adding function in short_cut)
+function  s (){
+var x= true;
+if(true)
+{
+x++;
+}
+x++;
+
+}
+---------------------------------
+function  s (){  //working
+var x= true;
+
+x++;
+
+}
+-----------------------------
+function  s (){
+
+
+x++;
+
+}
+----------------------------------
+function  s (){ giv me null pointer exception
+
+x=p+0;
+
+
+}
+--------------------------------------
+symantic check if //working
+function s(){
+var x=true;
+
+if(x<9)
+{
+var x =true;
+if(x==4)
+{}
+}
+}
+---------------------------
+function s(){ // workng
+var x=true;
+
+if(x<9)
+{}
+
+}
+--------------------------
+function s(){   //working
+var x=true;
+
+if(x<9)
+{}
+else if(c<9)
+{}
+
+}
+-----------------------
+function s(){ //working
+while(x<9){}
+
+}
+----------------------------------
+function s(){ // working
+var x = true ;
+while(x<9){}
+
+}
+-----------------------------
+function s(){   // working
+var x = true ;
+do {
+x=9;
+}while(c<9);
+
+}
+----------------------------------
+function s(){ //working
+var x = true ;
+do {
+x=0;
+var c;
+}while(c<9);
+
+}
+---------------------
+function s(){
+var c =0;
+var x = true ;
+do {
+x=0;
+var c;
+}while(c<9);
+
+}
+--------------------------
+switch   //working
+function s(){
+var x=true;
+switch (x+9){
+            case '1':
+
+        }
+}
+---------------- ----------
+function s(){ // working
+var u=6;
+switch (x){
+            case u<0:
+
+        }
+        print (llll);s
+        return j;
+}
+-----------------
+resting for flat function :
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number, d s  );
+create table g (   d s , j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+--------------------------------------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number, d s  );
+create table g (   j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-------------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number, d s  );
+create table g (   bbgbg s ,  d s , j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number );
+create table g (   bbgbg s ,  d s , j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-----------------------------------------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number );
+create table g (   j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-----------------------------------------
+testing the teacher symboles :
+symbole 12 is working fro flat function
+symbole 8 is not working we should check it
+---------------------------------------------------------------------
+create aggregation function sum ("ggg",n,n,h,[string])
+create aggregation function avg ("ggg",n,n,h,[string])
+create aggregation function hhh ("ggg",n,n,h,[string])
+create aggregation function multi ("ggg",n,n,h,[string])
+---------------------------------------------------------------------------
+
+function sum (){
+
+}
+create aggregation function j ("dd",classname , methodname , typename , [string ]);
+-------------------------------------------------------------------------------------------
+it give me this sample
+create table users (id number) type= "csv" path = "C:"
+
+func (){
+
+var cc = select name from users ;
+
+var c = select id from users where (name = "ff");
+}
+null pointer exception
+---------------
+create table users (id number, string name, city_id number) type = “json” path= “C:”;
+create table cities (id number, string name) type = “json” path= “C:”;
+
+ff(){
+var xx = select * from users where city_id in (select id from cities);
+var vv = select * from users where city_id in (select * from cities);
+var vv = select * from users where city_id in (select name from cities);
+
+}
+null pointer exception
+-------------------------------------------------------------------------
+task 11
+create aggregation function f ("dff",classname , methodname , typename , [string ])
+fucntion  sum (){
+select * from g group by f();
+}
+---------------------
+create aggregation function f ("dff",classname , methodname , typename , [string ])
+create table users (id number, string name, city_id number) type = “json” path= “C:”;
+create table cities (id number, string name) type = “json” path= “C:”;
+create table xx (id number, string name, city_id number) type = “json” path= “C:”;
+
+

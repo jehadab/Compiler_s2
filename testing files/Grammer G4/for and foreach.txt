@@ -1,0 +1,8 @@
+foreach(var dasd : i[] ){
+
+}
+
+
+for (sis = 33 ; sis > 3;i--++--){
+
+}

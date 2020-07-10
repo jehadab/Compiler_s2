@@ -1,0 +1,14 @@
+switch(k){
+case 22:
+break;
+case 'sd':
+break;
+case "ijax" :
+break ;
+case sss :
+break ;
+case x>y:
+case x>=4:
+break;
+default:
+}

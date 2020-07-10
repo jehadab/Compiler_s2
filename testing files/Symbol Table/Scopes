@@ -1,0 +1,349 @@
+func(){
+
+var x ;
+y = 5 ;
+while(z){
+var wowo = wowo2 ;
+do{
+var dodo;
+}while(wowo3 != wowo4);
+
+}
+foreach(var each1:each2){
+for (var fofo =1 ; fofo2 <4 ; fofo++){
+}
+}
+
+}
+
+
+func(){
+var x1;
+{var x2 ;
+{var x3 }{var xx2}var xx1;}
+}
+
+-----------------------------------------------------------------
+using variable undeclared (errr)
+function g (){
+var x=0;
+if(c<9)
+{
+x++;
+}
+x++;
+}
+--------------------------------
+func(){
+x++;
+if(x<9)
+{
+var x=0;
+}
+x--;
+}
+--------------------------------------
+ ---- function sum (){
+x++;
+if(x<9){
+var x =0;
+while(x<9){
+x--;
+}
+x++;
+}
+x++;
+}
+------------------------------------
+function sum (){ // we can not do declared in if
+x++;
+if(x<9)
+var x=0;
+while(true )
+x++;
+x--;
+
+}
+
+----------------------------------
+function sum (){
+x++;
+if(x<9)
+{var x=0;
+while(true )
+x++;
+x--;
+}
+}
+---------------------------------------------------
+calling function (error) // working
+function sum (){
+sum();
+}
+function div(){
+sum();
+}
+function Find(){
+help();
+}
+function help (){
+sum();
+}
+function testing (){
+help();
+}
+-------------------------------------------------
+(Multi declared variable in the same scope  )
+function sum (){
+var x   ;
+{var x;
+var x;
+}
+if(true ){
+var x;
+
+ var x;
+}
+}
+--------------------------------
+function sum (){ // working
+var x   ;
+{var x;
+var x;
+}
+
+}
+-------------------------------------
+function sum (){  // working
+var x;
+var x;
+var x;
+}
+----------------------------------------
+function sum (){ // give me error in the table name
+var x =0;
+var x = select * from s;
+
+}
+--------------------------------------
+function sum (){
+var x =0;
+var x = 9;
+
+}
+------------------------------------------------
+function sum (){ // working
+var x =0;
+var x = p;
+}
+------------------------------------
+function sum (){ // working
+var x =0;
+{
+{
+{
+{
+var x;
+}
+}
+}
+}
+}
+----------------------------
+function sum (){ // workin
+if(true )
+{
+var x;
+while(true )
+{
+var x;
+}
+}
+}
+--------------------------------------------
+
+function sum (){ // working
+if(true )
+{
+var x;
+}
+while(true )
+{
+var x ;
+}
+}
+--------------------
+
+function sum (){
+var x;
+if(true )
+{
+var x;
+}
+while(true )
+{
+var x;
+}
+}
+-----------------------------------
+
+function sum (){
+var x=0;
+if(true )
+{
+var x;
+}
+while(true )
+{
+var x;
+}
+}
+--------------------------------
+(adding function in short_cut)
+function  s (){
+var x= true;
+if(true)
+{
+x++;
+}
+x++;
+
+}
+---------------------------------
+function  s (){  //working
+var x= true;
+
+x++;
+
+}
+-----------------------------
+function  s (){
+
+
+x++;
+
+}
+----------------------------------
+function  s (){ giv me null pointer exception
+
+x=p+0;
+
+
+}
+--------------------------------------
+symantic check if //working
+function s(){
+var x=true;
+
+if(x<9)
+{
+var x =true;
+if(x==4)
+{}
+}
+}
+---------------------------
+function s(){ // workng
+var x=true;
+
+if(x<9)
+{}
+
+}
+--------------------------
+function s(){   //working
+var x=true;
+
+if(x<9)
+{}
+else if(c<9)
+{}
+
+}
+-----------------------
+function s(){ //working
+while(x<9){}
+
+}
+----------------------------------
+function s(){ // working
+var x = true ;
+while(x<9){}
+
+}
+-----------------------------
+function s(){   // working
+var x = true ;
+do {
+x=9;
+}while(c<9);
+
+}
+----------------------------------
+function s(){ //working
+var x = true ;
+do {
+x=0;
+var c;
+}while(c<9);
+
+}
+---------------------
+function s(){
+var c =0;
+var x = true ;
+do {
+x=0;
+var c;
+}while(c<9);
+
+}
+--------------------------
+switch   //working
+function s(){
+var x=true;
+switch (x+9){
+            case '1':
+
+        }
+}
+---------------- ----------
+function s(){ // working
+var u=6;
+switch (x){
+            case u<0:
+
+        }
+        print (llll);s
+        return j;
+}
+-----------------
+resting for flat function :
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number, d s  );
+create table g (   d s , j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+--------------------------------------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number, d s  );
+create table g (   j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-------------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number, d s  );
+create table g (   bbgbg s ,  d s , j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number );
+create table g (   bbgbg s ,  d s , j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-----------------------------------------------------------------
+create type s (nnnn string , m number )
+create  type address( nameuuuuu string  ,idopoi number );
+create table g (   j string , n number , m boolean ,ada address  , abcd boolean  , xyz string  ) type = "json" , path ="t"
+select h from g;
+-----------------------------------------
+testing the teacher symboles :
+symbole 12 is working fro flat function
+symbole 8 is not working we should check it
