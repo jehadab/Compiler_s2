@@ -1,6 +1,3 @@
-create aggregation function f ("dff",classname , methodname , typename , [string ])
-select * from g  group by jj ()  ;
-
 create table users (id number, string name, city_id number) type = "json" path= "C:";
 create table cities (id number, string name) type = "json" path= "C:";
 

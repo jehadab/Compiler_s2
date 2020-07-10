@@ -331,7 +331,7 @@ create aggregation function multi ("ggg",n,n,h,[string])
 function sum (){
 
 }
-create aggregation function j ("dd",classname , methodname , typename , [string ]);
+create aggregation function j ("dd",classname , methodname , typename , [string ])
 -------------------------------------------------------------------------------------------
 it give me this sample
 create table users (id number) type= "csv" path = "C:"
@@ -342,7 +342,7 @@ var cc = select name from users ;
 
 var c = select id from users where (name = "ff");
 }
-null pointer exception
+
 ---------------
 create table users (id number, string name, city_id number) type = “json” path= “C:”;
 create table cities (id number, string name) type = “json” path= “C:”;
@@ -353,7 +353,7 @@ var vv = select * from users where city_id in (select * from cities);
 var vv = select * from users where city_id in (select name from cities);
 
 }
-null pointer exception
+
 -------------------------------------------------------------------------
 task 11
 create aggregation function f ("dff",classname , methodname , typename , [string ])
