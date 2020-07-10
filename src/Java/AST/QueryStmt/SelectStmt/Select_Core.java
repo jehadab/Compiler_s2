@@ -4,6 +4,8 @@ import Java.AST.QueryStmt.Join.Join_Clause;
 import Java.AST.commn_classes_Sql.name_rule.Reslult_Cloumn;
 import Java.AST.commn_classes_Sql.name_rule.TableOrSubQuery;
 import Java.AST.expr.Expr;
+import Java.AST.expr.WhereExpr;
+import Java.AST.expr.WhereWithInForSelect;
 import Java.Visitor.AstVistor;
 
 import java.util.ArrayList;
@@ -15,7 +17,8 @@ import java.util.List;
 public class Select_Core extends select_stmt {
 private List<Reslult_Cloumn> reslult_cloumnList = new ArrayList<>();
 private List<TableOrSubQuery> tableOrSubQueryList = new ArrayList<>();
-private Expr whereExpr ;
+private WhereExpr whereExpr ;
+private WhereWithInForSelect whereWithInForSelect;
 private Expr havingExpr ;
 private List<Expr> exprList_Group ;
 private List<Expr>  exprList_Values;
@@ -49,6 +52,14 @@ private List<List_Of_Expr> list_of_exprList;
         if(havingExpr!=null){
             this.havingExpr.accept(astVisitor);
         }
+    }
+
+    public WhereWithInForSelect getWhereWithInForSelect() {
+        return whereWithInForSelect;
+    }
+
+    public void setWhereWithInForSelect(WhereWithInForSelect whereWithInForSelect) {
+        this.whereWithInForSelect = whereWithInForSelect;
     }
 
     public Expr getHavingExpr() {
@@ -107,11 +118,11 @@ private List<List_Of_Expr> list_of_exprList;
         this.tableOrSubQueryList = tableOrSubQueryList;
     }
 
-    public Expr getWhereExpr() {
+    public WhereExpr getWhereExpr() {
         return whereExpr;
     }
 
-    public void setWhereExpr(Expr whereExpr) {
+    public void setWhereExpr(WhereExpr whereExpr) {
         this.whereExpr = whereExpr;
     }
 

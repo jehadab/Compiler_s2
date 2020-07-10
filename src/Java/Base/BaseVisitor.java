@@ -230,6 +230,17 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         return drop;
     }
+boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String tableName){
+        Scope currentScope = scopesStack.peek();
+        if(currentScope.getTableMap().get(tableName).getColumnMap().containsKey(columnName)){
+            System.err.println("the column "+columnName+" is not valid"+" You can not duplicate the column name in the same table ");
+            return false;
+        }
+        return true;
+}
+
+
+
 
     @Override
     public CreateTableStmt visitCreate_table_stmt(SQLParser.Create_table_stmtContext ctx) {
@@ -241,9 +252,10 @@ public class BaseVisitor extends SQLBaseVisitor {
             createTableStmt.setTableName(visitTable_name(ctx.table_name()));
             if(!seminticCheckForCreateTable(createTableStmt.getTableName()))
                 System.out.println("------------------------------------------------------------------------------------------------");
-                String name = ctx.table_name().use_random_name().getText();
-                table.setTable_name(name);
 
+            String name = ctx.table_name().use_random_name().getText();
+            table.setTable_name(name);
+            currentScope.addTable(table.getTable_name(),table);
             if (ctx.column_def() != null) {
                 List<ColumnDef> columnDefs = new ArrayList<>();
                 Type type = new Type();
@@ -251,6 +263,10 @@ public class BaseVisitor extends SQLBaseVisitor {
                     columnDefs.add(visitColumn_def(ctx.column_def(i)));
                     Column col  =  new Column();
                     col.setColumn_name(columnDefs.get(i).getColumnName());
+                    if(seminticCheckForDuplicateColumnNameInTable(columnDefs.get(i).getColumnName(),createTableStmt.getTableName().getName()))
+                    {
+                        System.out.println("------------------------------------------------------------------------------------------------");
+                    }
                     col.setColumn_type(columnDefs.get(i).getType());
                     table.addColumnMap(columnDefs.get(i).getColumnName() , col);
                     checkDecleratedType(col.getColumn_type());
@@ -414,12 +430,25 @@ public class BaseVisitor extends SQLBaseVisitor {
         return typeName;
     }
 
+    boolean seminticCheckForDuplicateColumnNameInType( Type columntype , Type type ){
+            if(Main.symbolTable.getDeclaredTypes().get(Main.symbolTable.getDeclaredTypes().indexOf(type)).getColumns().containsValue(columntype))
+            {
+                System.err.println("the column : "+columntype+" is not valid you can not use the same column name in the same type");
+                    return false;
+            }
+        return true;
+    }
+
+
+
     @Override
-    public Create_Type visitCreate_type(SQLParser.Create_typeContext ctx) {
+    public Create_Type visitCreate_type(SQLParser.Create_typeContext ctx)
+    {
         System.out.println("visit_creat_type");
         Scope currentScope = scopesStack.peek();
         Type type = new Type();
         Create_Type create_type = new Create_Type();
+        Main.symbolTable.addType(type);
         if (ctx.use_random_name() != null) {
 //            todo check for the type name
             type.setName(ctx.use_random_name().getText());
@@ -427,7 +456,10 @@ public class BaseVisitor extends SQLBaseVisitor {
                 List<InsideCreateType> insideCreateTypes = new ArrayList<>();
                 for (int i = 0; i < ctx.inside_create_type().size(); i++) {
                     insideCreateTypes.add(visitInside_create_type(ctx.inside_create_type(i)));
-
+                    if(!seminticCheckForDuplicateColumnNameInType(type.getColumns().get(insideCreateTypes.get(i).getNameOfColumnOfType()),type))
+                    {
+                        System.out.println("-------------------------------------------------------------------------------------------------------");
+                    }
                     type.addColumns(insideCreateTypes.get(i).getNameOfColumnOfType(), insideCreateTypes.get(i).getType());
                 }
                 create_type.setType(type);
@@ -441,6 +473,7 @@ public class BaseVisitor extends SQLBaseVisitor {
 
         return create_type;
     }
+
     private boolean checkDecleratedType(Type type ){
         boolean resault = false;
         Type type1 = new Type();
@@ -701,29 +734,58 @@ public class BaseVisitor extends SQLBaseVisitor {
             }
             select_core.setTableOrSubQueryList(tableOrSubQueryList);
             if (ctx.where_expr() != null) {
-                select_core.setWhereExpr(visitExpr(ctx.where_expr().expr()));
-            }
-            if (ctx.expr() != null) {
-                List<Expr> exprs = new ArrayList<>();
-                for (int i = 0; i < ctx.expr().size(); i++) {
-                    exprs.add(visitExpr(ctx.expr(i)));
-                }
-                select_core.setExprList_Group(exprs);
-                if (ctx.having_expr() != null) {
-                    System.out.println("set having value ");
-                    select_core.setHavingExpr(visitExpr(ctx.having_expr().expr()));
-                    if(ctx.having_expr().expr().function_name() == null){
-                        System.err.println("Must set Having function group");
+                select_core.setWhereExpr(visitWhere_expr(ctx.where_expr()));
+                    if(select_core.getWhereExpr().getExpr().getLeft().getTableName()!=null ) {
+                        if (!seminticCheckForUsingTable(select_core.getWhereExpr().getExpr().getLeft().getTableName())){
+                            System.out.println("------------------------------------------------------------------------------------------------------------------");
+                        } else {
+                            if (select_core.getWhereExpr().getExpr().getLeft().getColumnName() != null) {
+                                if (!sementicCheckForExistedColumn(select_core.getWhereExpr().getExpr().getLeft().getColumnName(), select_core.getWhereExpr().getExpr().getLeft().getTableName())) {
+                                    System.out.println("------------------------------------------------------------------------------------------------------------------");
+                                }
+                            }
+                        }
+                    }
+
+                else {
+                    if(select_core.getWhereExpr().getExpr().getLeft().getColumnName()!=null ){
+                        if(!semnticCheakforExstingColumnFromTableOrSub_Qurey(select_core.getTableOrSubQueryList(),select_core.getWhereExpr().getExpr().getLeft().getColumnName())){
+                            System.out.println("------------------------------------------------------------------------------------------------------------------");
+                        }
                     }
                 }
             }
 
+           else if(ctx.where_with_in_for_select()!=null){
+                select_core.setWhereWithInForSelect(visitWhere_with_in_for_select(ctx.where_with_in_for_select()));
+                if(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName()!=null ) {
+                    if (!seminticCheckForUsingTable(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName())){
+                        System.out.println("------------------------------------------------------------------------------------------------------------------");
+                    } else {
+                        if (select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName() != null ) {
+                            if (!sementicCheckForExistedColumn(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName(), select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName())) {
+                                System.out.println("------------------------------------------------------------------------------------------------------------------");
+                            }
+                        }
+                    }
+
+                }
+
+                else {
+                    if(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName()!=null ){
+                        if(!semnticCheakforExstingColumnFromTableOrSub_Qurey(select_core.getTableOrSubQueryList(),select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName())){
+                            System.out.println("------------------------------------------------------------------------------------------------------------------");
+                        }
+                    }
+
+                }
+            }
         }
         if (ctx.result_column() != null) {
             List<Reslult_Cloumn> reslult_cloumnList = new ArrayList<>();
             for (int i = 0; i < ctx.result_column().size(); i++) {
                 reslult_cloumnList.add(visitResult_column(ctx.result_column(i)));
-                if(reslult_cloumnList.get(0).isStar()==true){
+                if(reslult_cloumnList.get(0).isStar()){
                     System.out.println(" ");
                 }
                 else if(reslult_cloumnList.get(i).getExpr().getTableName()!=null)
@@ -755,15 +817,53 @@ public class BaseVisitor extends SQLBaseVisitor {
 
             if (ctx.join_clause() != null) {
                 select_core.setJoin_clause(visitJoin_clause(ctx.join_clause()));
+
                 if (ctx.where_expr() != null) {
-                    select_core.setWhereExpr(visitExpr(ctx.where_expr().expr()));
-                }
-                if (ctx.expr() != null) {
-                    List<Expr> exprs = new ArrayList<>();
-                    for (int i = 0; i < ctx.expr().size(); i++) {
-                        exprs.add(visitExpr(ctx.expr(i)));
+                    select_core.setWhereExpr(visitWhere_expr(ctx.where_expr()));
+                    if(select_core.getWhereExpr().getExpr().getLeft().getTableName()!=null ) {
+                        if (!seminticCheckForUsingTable(select_core.getWhereExpr().getExpr().getLeft().getTableName())){
+                            System.out.println("------------------------------------------------------------------------------------------------------------------");
+                        } else {
+                            if (select_core.getWhereExpr().getExpr().getLeft().getColumnName() != null) {
+                                if (!sementicCheckForExistedColumn(select_core.getWhereExpr().getExpr().getLeft().getColumnName(), select_core.getWhereExpr().getExpr().getLeft().getTableName())) {
+                                    System.out.println("------------------------------------------------------------------------------------------------------------------");
+                                }
+                            }
+                        }
                     }
-                    select_core.setExprList_Group(exprs);
+
+                    else {
+                        if(select_core.getWhereExpr().getExpr().getLeft().getColumnName()!=null ){
+                            if(!semnticCheakforExstingColumnFromTableOrSub_Qurey(select_core.getTableOrSubQueryList(),select_core.getWhereExpr().getExpr().getLeft().getColumnName())){
+                                System.out.println("------------------------------------------------------------------------------------------------------------------");
+                            }
+                        }
+                    }
+                }
+
+                else if(ctx.where_with_in_for_select()!=null){
+                    select_core.setWhereWithInForSelect(visitWhere_with_in_for_select(ctx.where_with_in_for_select()));
+                    if(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName()!=null ) {
+                        if (!seminticCheckForUsingTable(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName())){
+                            System.out.println("------------------------------------------------------------------------------------------------------------------");
+                        } else {
+                            if (select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName() != null ) {
+                                if (!sementicCheckForExistedColumn(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName(), select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName())) {
+                                    System.out.println("------------------------------------------------------------------------------------------------------------------");
+                                }
+                            }
+                        }
+
+                    }
+
+                    else {
+                        if(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName()!=null ){
+                            if(!semnticCheakforExstingColumnFromTableOrSub_Qurey(select_core.getTableOrSubQueryList(),select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName())){
+                                System.out.println("------------------------------------------------------------------------------------------------------------------");
+                            }
+                        }
+
+                    }
                 }
             }
         } else if (ctx.list_of_expr() != null) {
@@ -784,6 +884,44 @@ public class BaseVisitor extends SQLBaseVisitor {
         return select_core;
     }
 
+
+
+    @Override public WhereWithInForSelect visitWhere_with_in_for_select(SQLParser.Where_with_in_for_selectContext ctx)
+    {
+        System.out.println("visitWhere_with_in_for_select");
+        WhereWithInForSelect whereWithInForSelect = new WhereWithInForSelect();
+        if(ctx.where_expr()!=null){
+            whereWithInForSelect.setWhereExpr(visitWhere_expr(ctx.where_expr()));
+        }
+
+        if(ctx.K_IN()!=null && ctx.select_core()!= null){
+            whereWithInForSelect.setSelect_core(visitSelect_core(ctx.select_core()));
+            semnticCheckForNumbreOfColumnReturnBySelect(whereWithInForSelect.getSelect_core().getReslult_cloumnList());
+        }
+
+        return whereWithInForSelect;
+    }
+
+    @Override public WhereExpr visitWhere_expr(SQLParser.Where_exprContext ctx)
+    {
+        WhereExpr whereExpr = new WhereExpr();
+        if(ctx.expr()!=null){
+            whereExpr.setExpr(visitExpr(ctx.expr()));
+        }
+        return whereExpr;
+    }
+
+    public boolean semnticCheckForNumbreOfColumnReturnBySelect(List<Reslult_Cloumn> reslult_cloumns){
+        if(reslult_cloumns.size() >  1 ){
+            System.err.println("you can not return more than one column with IN statment");
+            return false;
+        }
+        else if (reslult_cloumns.get(0).isStar()){
+            System.err.println("you can not use * as columns because you can not return more than one column with IN statement");
+            return  false;
+        }
+        return true;
+    }
 
     @Override
     public List_Of_Expr visitList_of_expr(SQLParser.List_of_exprContext ctx) {
@@ -871,6 +1009,8 @@ public class BaseVisitor extends SQLBaseVisitor {
                 join_clause.setJoin_opreatorList(join_opreators);
 
             }
+
+
         }
         return join_clause;
     }

@@ -430,9 +430,9 @@ column_default_value
 expr
  : literal_value
 // | BIND_PARAMETER
+ | expr commn_expr_opreator expr
  | ( ( database_name '.' )? table_name '.' )? column_name
  | unary_operator expr
- | expr commn_expr_opreator expr
  | function_name '(' ( K_DISTINCT? expr ( ',' expr )* | '*' )? ')'
  | '(' expr ')'
 // | K_CAST '(' expr K_AS type_name ')'
@@ -607,10 +607,17 @@ join_constraint
 select_core
  : K_SELECT ( K_DISTINCT | K_ALL )? result_column ( ',' result_column )*
    ( K_FROM ( table_or_subquery ( ',' table_or_subquery )* | join_clause ) )?
-   ( where_expr )?
+   (where_expr
+   |where_with_in_for_select
+   )?
    ( K_GROUP K_BY expr ( ',' expr )* (  having_expr )? )?
  | K_VALUES list_of_expr  list_of_list_of_expr
  ;
+
+ where_with_in_for_select:
+ where_expr K_IN OPEN_PAR select_core CLOSE_PAR
+ ;
+
 list_of_expr:
 '(' expr ( ',' expr )* ')'
 ;
@@ -638,6 +645,7 @@ signed_number
 literal_value
  : NUMERIC_LITERAL
  | STRING_LITERAL
+ | IDENTIFIER
  | BLOB_LITERAL
  | K_NULL
  | K_CURRENT_TIME

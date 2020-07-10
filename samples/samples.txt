@@ -1,2 +1,4 @@
-create aggregation function f ("dff",classname , methodname , typename , [string ])
-create aggregation function z ("dff",classname , methodname , typename , [string ])
+fun(){
+create table s (name string , id number) type "json" , path = "D:";
+select * from ss;
+}

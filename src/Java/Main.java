@@ -23,10 +23,7 @@ public class Main {
     public static SymbolTable symbolTable = new SymbolTable();
     public static void main(String[] args) {
         try {
-
-
-
-            File file = new File("C://Users//Dell//Desktop//Sql_compiler//samples//samples.txt");
+            File file = new File("C://Users//Dell//IdeaProjects//LOLO//samples//samples.txt");
             String fileName = file.getAbsolutePath();
 
             CharStream cs = fromFileName(fileName);
@@ -36,10 +33,6 @@ public class Main {
             ParseTree tree = parser.parse();
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
-
-
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -87,17 +80,17 @@ public class Main {
 //                }
 //                System.out.println("  ] ");
             }
-            for (Object type :symbolTable.getScopes().get(i).getTypeMap().values().toArray()){
-                System.out.println("Types: "+((Type) type).getName());
-                System.out.println("the columns in this types : ");
-                System.out.print(" [  ");
-                for (Object col :((Type) type).getColumns().values().toArray()
-                     ) {
-
-                    System.out.print(((Type) col).getName()+ " ");
-                }
-                System.out.println("  ] ");
-            }
+//            for (Object type :symbolTable.getScopes().get(i).getTypeMap().values().toArray()){
+//                System.out.println("Types: "+((Type) type).getName());
+//                System.out.println("the columns in this types : ");
+//                System.out.print(" [  ");
+//                for (Object col :((Type) type).getColumns().values().toArray()
+//                     ) {
+//
+//                    System.out.print(((Type) col).getName()+ " ");
+//                }
+//                System.out.println("  ] ");
+//            }
 
         }
     }
