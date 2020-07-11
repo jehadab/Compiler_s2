@@ -772,6 +772,9 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                             if (!sementicCheckForExistedColumn(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName(), select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName())) {
                                 System.out.println("------------------------------------------------------------------------------------------------------------------");
                             }
+                            else{
+                                test1 = true;
+                            }
                         }
                     }
 

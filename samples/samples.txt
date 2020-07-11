@@ -5,5 +5,4 @@ ff(){
 var xx = select * from users where city_id in (select id from cities);
 var vv = select * from users where city_id in (select * from cities);
 var vv = select * from users where city_id in (select name from cities);
-
 }

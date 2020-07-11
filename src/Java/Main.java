@@ -24,7 +24,7 @@ public class Main {
     public static SymbolTable symbolTable = new SymbolTable();
     public static void main(String[] args) {
         try {
-            File file = new File("C://Users//Dell//Desktop//Sql_compiler//samples//samples.txt");
+            File file = new File("C://Users//Dell//IdeaProjects//LOLO//samples//samples.txt");
             String fileName = file.getAbsolutePath();
 
             CharStream cs = fromFileName(fileName);
