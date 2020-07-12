@@ -3277,9 +3277,6 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
 
                     types.add(type);
                 }
-
-
-
             }
 
         }
