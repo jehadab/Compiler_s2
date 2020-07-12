@@ -56,6 +56,7 @@ import org.antlr.v4.runtime.*;
 import Java.AST.assignmnet.*;
 import Java.AST.instruction.Returning.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.omg.CORBA.MARSHAL;
 
 
 import javax.lang.model.type.NullType;
@@ -750,6 +751,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                                     System.out.println("------------------------------------------------------------------------------------------------------------------");
                                 }
                             }
+
                         }
                     }
 
@@ -2387,8 +2389,8 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             whileScope.setParent(scopesStack.peek());
             whileScope.setId(ctx.while_rule().K_WHILE() + "_" + ctx.while_rule().hashCode());
 
-            instructions = visitWhile_rule(ctx.while_rule());
             scopesStack.push(whileScope);
+            instructions = visitWhile_rule(ctx.while_rule());
 
             if (ctx.instructions().size() != 0) {
                 for (int i = 0; i < ctx.instructions().size(); i++) {
@@ -2408,7 +2410,6 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             foreachScope.setParent(scopesStack.peek());
             foreachScope.setId(ctx.foreach().K_FOREACH().getText() + "_" + ctx.foreach().hashCode());
 
-            instructions = visitForeach(ctx.foreach());
             scopesStack.push(foreachScope);
             instructions = visitForeach(ctx.foreach());
 
@@ -2427,8 +2428,9 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             forScope.setId(ctx.for_loop_rule().K_FOR() + "_" + ctx.for_loop_rule().hashCode());
             forScope.setParent(scopesStack.peek());
 
-            instructions = visitFor_loop_rule(ctx.for_loop_rule());
             scopesStack.push(forScope);
+            instructions = visitFor_loop_rule(ctx.for_loop_rule());
+
             for (int i = 0; i < ctx.instructions().size(); i++) {
                 instructions.getInstructions().add(visitInstructions(ctx.instructions(i)));
 
@@ -3231,6 +3233,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
     public Type getVariableType(String variableName) {
         Scope currentScope = scopesStack.peek();
         Type variableType = new Type();
+        variableType.setName("**type conflict**");
         while (currentScope.getParent() != null) {
             if (currentScope.getSymbolMap().containsKey(variableName)) {
                 return currentScope.getSymbolMap().get(variableName).getType();
@@ -3265,14 +3268,15 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
             } else if (intral_expression_value.getVariable_name() != null) {
                 if(Error_ofusing_undeclared_variabler(scopesStack.peek(),intral_expression_value.getVariable_name().getVariable_name()))
                 {
+                    Main.showSymboleTable();
                     type.setName(getVariableType(intral_expression_value.getVariable_name().getVariable_name()).getName());
+
                     if (type.getName().equals(Type.UNDEFINDED)) {
                         undefinedVar = true;
                     }
+
                     types.add(type);
                 }
-
-
             }
 
         }
@@ -3708,6 +3712,8 @@ public Flat_result FLAT(String table_name ){
     }
 
     }
+
+
 }
 
 
