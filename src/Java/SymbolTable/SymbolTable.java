@@ -14,7 +14,7 @@ public class SymbolTable {
     private ArrayList<Scope> scopes = new ArrayList();
     private ArrayList<Type> declaredTypes = new ArrayList();
     private ArrayList<function_header> functions= new ArrayList<function_header>();
-private ArrayList<AggregationFunction> agg = new ArrayList<AggregationFunction>();
+    private ArrayList<AggregationFunction> agg = new ArrayList<AggregationFunction>();
     public SymbolTable() {
     }
 

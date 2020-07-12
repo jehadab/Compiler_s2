@@ -14,9 +14,15 @@ import generated.SQLParser;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupString;
+
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
@@ -41,8 +47,11 @@ public class Main {
             e.printStackTrace();
         }
 
+        testCG();
+
 
     }
+    int x =2;
     public static void showSymboleTable(){
         System.out.println("scopes stored :"+symbolTable.getScopes().size() );
         System.out.println("_______________");
@@ -76,26 +85,7 @@ public class Main {
                     System.out.println("  ");
                 }
                 System.out.println("  ] ");
-//                System.out.println(" [  ");
-//                for(int j = 0 ; j < ((Table) table).getColumnDefListList().size();j++){
-//                    System.out.println(((Table) table).getColumnDefListList().get(j).getName()
-//                            +"  the column type : "+ ((Table) table).getColumnDefListList().get(j).getTypeName().getName());
-//                    System.out.println("  ");
-//                }
-//                System.out.println("  ] ");
             }
-//            for (Object type :symbolTable.getScopes().get(i).getTypeMap().values().toArray()){
-//                System.out.println("Types: "+((Type) type).getName());
-//                System.out.println("the columns in this types : ");
-//                System.out.print(" [  ");
-//                for (Object col :((Type) type).getColumns().values().toArray()
-//                     ) {
-//
-//                    System.out.print(((Type) col).getName()+ " ");
-//                }
-//                System.out.println("  ] ");
-//            }
-
         }
         System.out.println();
         for (Type type:symbolTable.getDeclaredTypes()
@@ -108,11 +98,64 @@ public class Main {
 //                System.out.println("column type : " + ((Column)column).getColumn_type().getName());
 
             }
-
-
-
         }
     }
 
+    public static void testCG() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+
+
+        Class classType = createClassType("className",new ArrayList<Column>(),"tablePath","tableType");
+        //runIt(classType); to use class
+
+
+
+//        Class<?> c = Class.forName("Java.AST.expr.Variable_Name");
+//        c.newInstance();
+//        System.out.println(c);
+//        System.out.println();
     }
+    public static Class<?> createClassType(String className ,
+                                       ArrayList<Column> columnArrayList,String tablePath
+                                        ,String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        className = "TestClass";
+        String  stringTable =  (
+                "a(name)  ::=<< package Java.SqlGenerated.TableClasses ;\n public class <name> {>>" +
+                "b() ::=<< }>>" +
+                        "");
+
+        STGroup stGroup = new STGroupString(stringTable);
+        ST st = stGroup.getInstanceOf("a");
+        ST st2 = stGroup.getInstanceOf("b");
+        st.add("name",className);
+
+        try {//create class and write on it with ST
+            FileWriter aWriter = new FileWriter("SqlGenerated/TableClasses/"+className+".java", false);
+           aWriter.write(st.render());
+           aWriter.write(st2.render());
+            aWriter.flush();
+            aWriter.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Class c = Class.forName("Java.SqlGenerated.TableClasses."+className);
+        c.newInstance();
+        return c;
+
+    }
+
+        public static void runIt(Class c) {
+            try {
+                Class params[] = {};
+                Object paramsObj[] = {};
+                Class thisClass = Class.forName("Java.SqlGenerated.TableClasses.testclass");
+                Object iClass = thisClass.newInstance();
+                Method thisMethod = thisClass.getDeclaredMethod("load", params);
+                thisMethod.invoke(iClass, paramsObj);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
