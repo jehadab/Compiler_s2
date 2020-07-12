@@ -1,0 +1,9 @@
+func(){
+var y = x;
+if(yy){
+var x = 9;
+var c = x + y;
+}
+return c;
+}
+

@@ -365,5 +365,25 @@ create aggregation function f ("dff",classname , methodname , typename , [string
 create table users (id number, string name, city_id number) type = “json” path= “C:”;
 create table cities (id number, string name) type = “json” path= “C:”;
 create table xx (id number, string name, city_id number) type = “json” path= “C:”;
+---------------------------------------------------------------------------------------
+create table users (name string) type= "csv" path = "C:"
 
+func (){
 
+var cc = select name from users ;
+
+var c = select id, name  from users where name = "ff";
+}
+--- we should convert it
+3 finish it
+4- they put default variable at first
+---------------------------------------------------------------------------------------------
+Func(var x ,var p = 9){
+var z = true;
+z = false;
+z = 4;
+p = false;
+}
+if this is not it will not work .....
+5- is working
+6- is working
