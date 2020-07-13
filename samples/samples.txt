@@ -1,4 +1,5 @@
-function f(){
-var x =2;
-
+create table s (name string , id number) type "json"  path = "D:";
+create table d (name string , id number) type "json"  path = "D:";
+func(){
+var x = select id from s
 }

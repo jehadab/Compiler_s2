@@ -281,8 +281,10 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 }
                 if (ctx.declare_type_table() != null) {
                     createTableStmt.setDeclareTypeTable(visitDeclare_type_table(ctx.declare_type_table()));
-                    if (ctx.COMMA() != null && ctx.declare_path_table() != null) {
+                    tableType.setExtension_of_table(createTableStmt.getDeclareTypeTable().getType());
+                    if (ctx.declare_path_table() != null) {
                         createTableStmt.setDeclarePathTable(visitDeclare_path_table(ctx.declare_path_table()));
+                        tableType.setPath_of_table(createTableStmt.getDeclarePathTable().getPath());
                     }
                 }
             } else if (ctx.select_stmt() != null) {
@@ -290,7 +292,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             }
 
         }
-
+        tableType.setTable(true);
         Main.symbolTable.getDeclaredTypes().add(tableType);
         currentScope.addTable(table.getTable_name(),table);
         table.setPath_of_table(createTableStmt.getDeclarePathTable().getPath());

@@ -23,13 +23,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
 
 public class Main {
     public static SymbolTable symbolTable = new SymbolTable();
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
         try {
             File file = new File("C://Users//Dell//IdeaProjects//LOLO//samples//samples.txt");
             String fileName = file.getAbsolutePath();
@@ -48,9 +49,10 @@ public class Main {
         }
 
         testCG();
-
-
     }
+
+
+
     int x =2;
     public static void showSymboleTable(){
         System.out.println("scopes stored :"+symbolTable.getScopes().size() );
@@ -102,20 +104,30 @@ public class Main {
     }
 
     public static void testCG() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        for (Type typ :symbolTable.getDeclaredTypes()) {
+//           the type is table and have path and typeExtension
+            if(typ.isTable()){
+               String className  = returnTableName(typ);
+               List<Column> columnList = returnTableColumn(typ);
+               String classPath = returnTablePath(typ);
+               String classExtension = returnTableExtension(typ);
+               Class classType = createClassType(className,columnList,classPath,classExtension);
+           }
+////            the type is normal type
+//           else{
+//
+//            }
+        }
 
 
-        Class classType = createClassType("className",new ArrayList<Column>(),"tablePath","tableType");
         //runIt(classType); to use class
-
-
-
 //        Class<?> c = Class.forName("Java.AST.expr.Variable_Name");
 //        c.newInstance();
 //        System.out.println(c);
 //        System.out.println();
     }
     public static Class<?> createClassType(String className ,
-                                       ArrayList<Column> columnArrayList,String tablePath
+                                           List<Column> columnList,String tablePath
                                         ,String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         className = "TestClass";
         String  stringTable =  (
@@ -129,7 +141,7 @@ public class Main {
         st.add("name",className);
 
         try {//create class and write on it with ST
-            FileWriter aWriter = new FileWriter("SqlGenerated/TableClasses/"+className+".java", false);
+            FileWriter aWriter = new FileWriter("C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//TableClasses//"+className+".java", false);
            aWriter.write(st.render());
            aWriter.write(st2.render());
             aWriter.flush();
@@ -138,7 +150,6 @@ public class Main {
             e.printStackTrace();
         }
         Class c = Class.forName("Java.SqlGenerated.TableClasses."+className);
-        c.newInstance();
         return c;
 
     }
@@ -156,6 +167,33 @@ public class Main {
                 e.printStackTrace();
             }
         }
+
+    public static String returnTableName(Type typeclass){
+        String result =  typeclass.getName();
+        return  result;
+    }
+
+    public static List<Column> returnTableColumn(Type typeclass){
+        List<Column> columnList = new ArrayList<>();
+        for (Object col:typeclass.getColumnMap().values().toArray() ) {
+            columnList.add((Column) col);
+        }
+
+
+        return columnList;
+    }
+
+    public static  String returnTablePath(Type typeclass){
+        String result =  typeclass.getPath_of_table();
+        return  result;
+    }
+
+    public static String returnTableExtension(Type typeclass){
+        String result =  typeclass.getExtension_of_table();
+        return  result;
+    }
+
+
     }
 
 
