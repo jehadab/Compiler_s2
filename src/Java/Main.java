@@ -1,13 +1,16 @@
 package Java;
 
 import Java.AST.Parse;
-//import Java.AST.visitor_java.visite_general_creating;
 import Java.Base.BaseVisitor;
 import Java.SymbolTable.*;
 
 import generated.SQLLexer;
 import generated.SQLParser;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -15,18 +18,23 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
 
 public class Main  {
     public static SymbolTable symbolTable = new SymbolTable();
-    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
         try {
             File file = new File("..//..//samples//samples.txt");
             String fileName = file.getAbsolutePath();
@@ -46,7 +54,7 @@ public class Main  {
 
 
     }
-    int x =2;
+
     public static void showSymboleTable(){
         System.out.println("scopes stored :"+symbolTable.getScopes().size() );
         System.out.println("_______________");
@@ -96,7 +104,7 @@ public class Main  {
         }
     }
 
-    public static void testCG() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public static void testCG() throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
 
         Class classType = createClassType("className",new ArrayList<Column>(),"tablePath","tableType");
@@ -111,30 +119,94 @@ public class Main  {
     }
     public static Class<?> createClassType(String className ,
                                        ArrayList<Column> columnArrayList,String tablePath
-                                        ,String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+                                        ,String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
         className = "TestClass";
-        String  stringTable =  (
-                "a(name)  ::=<< package Java.SqlGenerated.TableClasses ;\n public class <name> {>>" +
-                "b() ::=<< }>>" +
-                        "");
+        tablePath = "E:";
+        tableType = "user";
+        String packagePath = "Java.SqlGenerated.TableClasses";
+        Column column = new Column();
+        Column column1 = new Column();
+        Type type = new Type();
+        type.setName("string");
+        column.setColumn_name("name");
+        column.setColumn_type(type);
 
-        STGroup stGroup = new STGroupString(stringTable);
-        ST st = stGroup.getInstanceOf("a");
-        ST st2 = stGroup.getInstanceOf("b");
-        st.add("name",className);
+        type.setName("double");
+        column1.setColumn_name("name1");
+        column1.setColumn_type(type);
+        columnArrayList.add(column);
+        columnArrayList.add(column1);
+        String  stringTemplate =  (
+                "header(name,packagePath)  ::=<< package <packagePath> ;<\\n> import java.util.List;\n \n public class <name> {>>" +
+                "attribute(columns) ::=<<  <columns:{col |<\\n><\\t><col.column_type.name>    <col.column_name> ;}> >>" +
+                "tableAttribute(tablePath,tableType) ::=<<<\\n><\\t>String tablePath = \"<tablePath>\";<\\n>" +
+                "<\\t>String tableType = \"<tableType>\"; >> " +
+                "staticList(className)::=<<<\\n> static List\\<<className>\\> entityObject  ;<\\n> >>" +
+                "loadFunction()::= << public void load(){ System.out.println(\"hiiiii\");  " +
+                        "<\\n> } >>" +
+                "EOF()::=<<<\\n> }>>");
+
+
+        STGroup stGroup = new STGroupString(stringTemplate);
+
+        ST header = stGroup.getInstanceOf("header");
+        header.add("name",className);
+        header.add("packagePath",packagePath);
+
+        ST attribute = stGroup.getInstanceOf("attribute");
+        attribute.add("columns", columnArrayList);
+
+        ST tableAttribute = stGroup.getInstanceOf("tableAttribute");
+        tableAttribute.add("tablePath",tablePath);
+        tableAttribute.add("tableType",tableType);
+
+        ST staticList = stGroup.getInstanceOf("staticList");
+        staticList.add("className",className);
+
+        ST loadFunction = stGroup.getInstanceOf("loadFunction");
+
+        ST EOF = stGroup.getInstanceOf("EOF");
+
+
+//        ArrayList<String> s  = new ArrayList<>() ;
+//        ArrayList<String> c  = new ArrayList<>() ;
+//        for (Column col:columnArrayList
+//                ) {
+//            s.add(col.getColumn_name());
+//            c.add(col.getColumn_type().getName());
+//        }
+
+//        attribute.add("columnType",columnArrayList);
+//        attribute.add("columnName",columnArrayList);
+        Class cls =null;
 
         try {//create class and write on it with ST
-            FileWriter aWriter = new FileWriter("SqlGenerated/TableClasses/"+className+".java", false);
-           aWriter.write(st.render());
-           aWriter.write(st2.render());
-            aWriter.flush();
-            aWriter.close();
+            File classFile = new File("SqlGenerated/TableClasses/"+className+".java");
+            FileWriter fileWriter = new FileWriter(classFile ,false );
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(header.render());
+            bufferedWriter.write(attribute.render());
+            bufferedWriter.write(tableAttribute.render());
+            bufferedWriter.write(staticList.render());
+            bufferedWriter.write(loadFunction.render());
+            bufferedWriter.write(EOF.render());
+            bufferedWriter.flush();
+            bufferedWriter.close();
+            fileWriter.close();
+
+
+
+            URLClassLoader classLoader = new URLClassLoader(new URL[]{classFile.toURI().toURL()});
+
+             cls = Class.forName(packagePath+"."+className,true , classLoader);
+             Object o = cls.newInstance();
+             return cls;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Class c = Class.forName("Java.SqlGenerated.TableClasses."+className);
-        c.newInstance();
-        return c;
+
+
+        return cls;
 
     }
 
