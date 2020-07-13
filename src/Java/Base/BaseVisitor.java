@@ -56,7 +56,7 @@ import org.antlr.v4.runtime.*;
 import Java.AST.assignmnet.*;
 import Java.AST.instruction.Returning.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
-import org.omg.CORBA.MARSHAL;
+//import org.omg.CORBA.MARSHAL;
 
 
 import javax.lang.model.type.NullType;
@@ -281,8 +281,10 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 }
                 if (ctx.declare_type_table() != null) {
                     createTableStmt.setDeclareTypeTable(visitDeclare_type_table(ctx.declare_type_table()));
-                    if (ctx.COMMA() != null && ctx.declare_path_table() != null) {
+                    tableType.setExtension_of_table(createTableStmt.getDeclareTypeTable().getType());
+                    if (ctx.declare_path_table() != null) {
                         createTableStmt.setDeclarePathTable(visitDeclare_path_table(ctx.declare_path_table()));
+                        tableType.setPath_of_table(createTableStmt.getDeclarePathTable().getPath());
                     }
                 }
             } else if (ctx.select_stmt() != null) {
@@ -290,7 +292,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             }
 
         }
-
+        tableType.setTable(true);
         Main.symbolTable.getDeclaredTypes().add(tableType);
         currentScope.addTable(table.getTable_name(),table);
         table.setPath_of_table(createTableStmt.getDeclarePathTable().getPath());
@@ -747,8 +749,16 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                         } else
                          {
                             if (select_core.getWhereExpr().getExpr().getLeft().getColumnName() != null) {
-                                if (!sementicCheckForExistedColumn(select_core.getWhereExpr().getExpr().getLeft().getColumnName(), select_core.getWhereExpr().getExpr().getLeft().getTableName())) {
+                                if (!sementicCheckForExistedColumn(select_core.getWhereExpr().getExpr().getLeft().getColumnName(), select_core.getWhereExpr().getExpr().getLeft().getTableName()))
+                                {
                                     System.out.println("------------------------------------------------------------------------------------------------------------------");
+                                }else{
+                                    Type left_expr_type = findTheColumnType(select_core.getWhereExpr().getExpr().getLeft().getColumnName().getName(),
+                                            select_core.getWhereExpr().getExpr().getLeft().getTableName().getName()
+                                            );
+//                                    todo continue...... for right expr type
+//                                    var columnname = 5;
+//
                                 }
                             }
 
@@ -756,7 +766,8 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                     }
 
                 else {
-                    if(select_core.getWhereExpr().getExpr().getLeft().getColumnName()!=null ){
+                    if(select_core.getWhereExpr().getExpr().getLeft().getColumnName()!=null )
+                    {
                         if(!semnticCheakforExstingColumnFromTableOrSub_Qurey(select_core.getTableOrSubQueryList(),select_core.getWhereExpr().getExpr().getLeft().getColumnName())){
                             System.out.println("------------------------------------------------------------------------------------------------------------------");
                         }

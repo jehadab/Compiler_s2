@@ -1,9 +1,12 @@
 package Java;
 
+import Files_code_Json_csv.json_testing;
+import Java.AST.FunctionDeclaration;
 import Java.AST.Parse;
+import Java.AST.create.generalcreating;
 import Java.Base.BaseVisitor;
 import Java.SymbolTable.*;
-
+import generated.SQLBaseListener;
 import generated.SQLLexer;
 import generated.SQLParser;
 
@@ -28,6 +31,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
@@ -46,6 +50,8 @@ public class Main  {
             ParseTree tree = parser.parse();
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
+            //json_testing t = new json_testing();
+            //t.to_read_json_File();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -104,15 +110,24 @@ public class Main  {
         }
     }
 
-    public static void testCG() throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
+    public static void testCG() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        for (Type typ :symbolTable.getDeclaredTypes()) {
+//           the type is table and have path and typeExtension
+            if(typ.isTable()){
+               String className  = returnTableName(typ);
+               List<Column> columnList = returnTableColumn(typ);
+               String classPath = returnTablePath(typ);
+               String classExtension = returnTableExtension(typ);
+               Class classType = createClassType(className,columnList,classPath,classExtension);
+           }
+////            the type is normal type
+//           else{
+//
+//            }
+        }
 
-
-        Class classType = createClassType("className",new ArrayList<Column>(),"tablePath","tableType");
 
         //runIt(classType); to use class
-
-
-
 //        Class<?> c = Class.forName("Java.AST.expr.Variable_Name");
 //        c.newInstance();
 //        System.out.println(c);
@@ -233,6 +248,33 @@ public class Main  {
                 e.printStackTrace();
             }
         }
+
+    public static String returnTableName(Type typeclass){
+        String result =  typeclass.getName();
+        return  result;
+    }
+
+    public static List<Column> returnTableColumn(Type typeclass){
+        List<Column> columnList = new ArrayList<>();
+        for (Object col:typeclass.getColumnMap().values().toArray() ) {
+            columnList.add((Column) col);
+        }
+
+
+        return columnList;
+    }
+
+    public static  String returnTablePath(Type typeclass){
+        String result =  typeclass.getPath_of_table();
+        return  result;
+    }
+
+    public static String returnTableExtension(Type typeclass){
+        String result =  typeclass.getExtension_of_table();
+        return  result;
+    }
+
+
     }
 
 
