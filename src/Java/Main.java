@@ -4,29 +4,38 @@ import Files_code_Json_csv.employess;
 import Files_code_Json_csv.json_testing;
 import Java.AST.FunctionDeclaration;
 import Java.AST.Parse;
-import Java.AST.create.generalcreating;
-//import Java.AST.visitor_java.visite_general_creating;
 import Java.Base.BaseVisitor;
 import Java.SymbolTable.*;
-import generated.SQLBaseListener;
 import generated.SQLLexer;
 import generated.SQLParser;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupString;
+
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
 
-public class Main {
+public class Main  {
     public static SymbolTable symbolTable = new SymbolTable();
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
         try {
-            File file = new File("C://Users//Dell//Desktop//Sql_compiler//samples//samples.txt");
+            File file = new File("..//..//samples//samples.txt");
             String fileName = file.getAbsolutePath();
             CharStream cs = fromFileName(fileName);
             SQLLexer lexer = new SQLLexer(cs);
@@ -40,7 +49,11 @@ public class Main {
         }
 testing_json_file();
 
+        CodeGeneration.run();
+
+
     }
+
     public static void showSymboleTable(){
         System.out.println("scopes stored :"+symbolTable.getScopes().size() );
         System.out.println("_______________");
@@ -74,26 +87,7 @@ testing_json_file();
                     System.out.println("  ");
                 }
                 System.out.println("  ] ");
-//                System.out.println(" [  ");
-//                for(int j = 0 ; j < ((Table) table).getColumnDefListList().size();j++){
-//                    System.out.println(((Table) table).getColumnDefListList().get(j).getName()
-//                            +"  the column type : "+ ((Table) table).getColumnDefListList().get(j).getTypeName().getName());
-//                    System.out.println("  ");
-//                }
-//                System.out.println("  ] ");
             }
-//            for (Object type :symbolTable.getScopes().get(i).getTypeMap().values().toArray()){
-//                System.out.println("Types: "+((Type) type).getName());
-//                System.out.println("the columns in this types : ");
-//                System.out.print(" [  ");
-//                for (Object col :((Type) type).getColumns().values().toArray()
-//                     ) {
-//
-//                    System.out.print(((Type) col).getName()+ " ");
-//                }
-//                System.out.println("  ] ");
-//            }
-
         }
         System.out.println();
         for (Type type:symbolTable.getDeclaredTypes()
@@ -106,9 +100,6 @@ testing_json_file();
 //                System.out.println("column type : " + ((Column)column).getColumn_type().getName());
 
             }
-
-
-
         }
     }
     public static  void testing_json_file(){
@@ -119,4 +110,5 @@ testing_json_file();
     }
 
     }
+
 

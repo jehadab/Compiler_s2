@@ -1,9 +1,7 @@
+create table s (name String , id double) type "json"  path = "D:";
+create table d (name String , id double) type "json"  path = "D:";
+create type s (name String );
 func(){
-var y = x;
-if(yy){
-var x = 9;
-var c = x + y;
-}
-return c;
-}
 
+var x = select id from s;
+}

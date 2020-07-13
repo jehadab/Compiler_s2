@@ -345,7 +345,7 @@ column_def
           | '(' signed_number2 ')' )?
   ;
   oneOftype_name:
-  ((K_NUMBER | K_STRING | K_BOOLEAN |use_random_name))
+  ((K_DOUBLE | K_STRING | K_BOOLEAN |use_random_name))
   ;
 
 
@@ -1617,9 +1617,10 @@ K_WHILE :  W H I L E ;
 K_CONTINUE : C O N T I N U E ;
 K_JSON : J S O N ;
 K_AGGREGATION : A G G  R E G A T I O N ;
-K_STRING: S T R I N G  ;
+K_STRING: CapS T R I N G  ;
 K_BOOLEAN : B O O L E A N ;
 K_NUMBER : N U M B E R ;
+K_DOUBLE : D O U B L E ;
 K_PATH : P A T H ;
  ONE_CHAR_LETTER :
 '\'' ( ~'\'' | '\'\'' ) '\''
@@ -1699,5 +1700,5 @@ fragment W : [wW];
 fragment X : [xX];
 fragment Y : [yY];
 fragment Z : [zZ];
-//fragment CapS : [S];
+fragment CapS : [S];
 
