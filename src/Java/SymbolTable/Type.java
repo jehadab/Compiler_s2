@@ -15,8 +15,8 @@ public class Type extends Table {
     boolean isTable = false;
     private Map<String , Type> columns = new HashMap();
     private Scope scope;
-    public static final String NUMBER_CONST = "number";
-    public static final String STRING_CONST = "string";
+    public static final String NUMBER_CONST = "double";
+    public static final String STRING_CONST = "String";
     public static final String BOOLEAN_CONST = "boolean";
     public static final String UNDEFINDED = "undefined";
 

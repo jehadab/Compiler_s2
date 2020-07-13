@@ -1,5 +1,7 @@
-create table s (name string , id number) type "json"  path = "D:";
-create table d (name string , id number) type "json"  path = "D:";
+create table s (name String , id double) type "json"  path = "D:";
+create table d (name String , id double) type "json"  path = "D:";
+create type s (name String );
 func(){
-var x = select id from s
+
+var x = select id from s;
 }
