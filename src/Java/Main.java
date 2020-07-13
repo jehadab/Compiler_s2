@@ -108,6 +108,7 @@ public class Main  {
 
 
         Class classType = createClassType("className",new ArrayList<Column>(),"tablePath","tableType");
+
         //runIt(classType); to use class
 
 
@@ -120,7 +121,7 @@ public class Main  {
     public static Class<?> createClassType(String className ,
                                        ArrayList<Column> columnArrayList,String tablePath
                                         ,String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
-        className = "TestClass";
+        className = "TestClass1";
         tablePath = "E:";
         tableType = "user";
         String packagePath = "Java.SqlGenerated.TableClasses";
@@ -184,22 +185,31 @@ public class Main  {
             File classFile = new File("SqlGenerated/TableClasses/"+className+".java");
             FileWriter fileWriter = new FileWriter(classFile ,false );
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(header.render());
-            bufferedWriter.write(attribute.render());
-            bufferedWriter.write(tableAttribute.render());
-            bufferedWriter.write(staticList.render());
-            bufferedWriter.write(loadFunction.render());
-            bufferedWriter.write(EOF.render());
-            bufferedWriter.flush();
-            bufferedWriter.close();
-            fileWriter.close();
 
 
 
-            URLClassLoader classLoader = new URLClassLoader(new URL[]{classFile.toURI().toURL()});
+                bufferedWriter.write(header.render());
+                bufferedWriter.write(attribute.render());
+                bufferedWriter.write(tableAttribute.render());
+                bufferedWriter.write(staticList.render());
+                bufferedWriter.write(loadFunction.render());
+                bufferedWriter.write(EOF.render());
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                fileWriter.close();
 
-             cls = Class.forName(packagePath+"."+className,true , classLoader);
-             Object o = cls.newInstance();
+
+
+//                Process p = Runtime.getRuntime().;
+//                p.waitFor();
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            compiler.run(null, null, null, "Java.SqlGenerated.TableClasses" + "." + "TestClass1");
+
+
+            cls = Class.forName("Java.SqlGenerated.TableClasses." + "TestClass1");
+
+
+
              return cls;
         } catch (Exception e) {
             e.printStackTrace();
