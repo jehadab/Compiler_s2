@@ -50,42 +50,83 @@ public class CodeGeneration {
             String classPath = returnTablePath(typ);
             String classExtension = returnTableExtension(typ);
             createClassType(className,columnList,classPath,classExtension);
-            compileClasses(className);
-            loadClasses(className);
+            compileClasses(className,"SqlGenerated/TableClasses/");
+            loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
+
+
 //            if( == 0){
 ////                runIt(className);
 //            }
         }
         createMainClass(p.getFunctions());
+        compileClasses("SqlMain","SqlGenerated/");
+        Class compiledClass= loadClasses("SqlMain","SqlGenerated/","Java.SqlGenerated");
+        invokeMethod("SqlMain",compiledClass);
     }
     private static void createMainClass(List<FunctionDeclaration> functionDeclaration){
         String packagePath =  "Java.SqlGenerated";
-        String className = "Main";
-        String typeName = ((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0)).getWithassign().getVar_wiht_assign().getFactored().getSelect_core().getTableOrSubQueryList().get(0).getTableName().getName()+
-        "_"+((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0)).getWithassign().getFactored().getSelect_core().getReslult_cloumnList().get(0).getExpr().getColumnName().getName();
+        String className = "SqlMain";
+        String typeName = ((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0))
+                .getWithassign()
+                .getVar_wiht_assign()
+                .getVar()
+                .getFactored()
+                .getSelect_core()
+                .getTableOrSubQueryList().get(0).getTableName().getName()+
+        "_"+((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0))
+                .getWithassign()
+                .getVar_wiht_assign()
+                .getVar()
+                .getFactored()
+                .getSelect_core()
+                .getReslult_cloumnList()
+                .get(0)
+                .getExpr()
+                .getColumnName()
+                .getName();
         String varName =  ((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0)).getWithassign().getVar_wiht_assign().getVar().getVariable_with_opretor().get(0).getVariable_name();
-        System.out.println(typeName);
         String stringTemplate = (
-                "header(className,pakagePath)::=<<package <packagePath> ;<\\n>public class <className> { >>" +
-                "mainFunction()::= <<<\\t>public static void Main(){ System.out.println(\"hiiiii\");}" +
-                "addFunctions(functions ,varName , typeName)::=<< <functions:{ function|private void function.header.name()<\\{<\\n>" +
-                        "<typeName> <varName> <\\n>" +
-                        "  <\\}> }> >>" +
-                        "bodyCodeSorce(typeName,varName) ::=<<<typeName> <varName> >>" +
-                "EOF()::=<<<\\n> <\\t>}<\\n> }>>"
+                "header(className,packagePath)::=<<package <packagePath> ;<\\n>import Java.SqlGenerated.TableClasses.s_id;<\\n>public class <className> { >>" +
+                "mainFunction(functionCall)::= << <\\n><\\t>public  void Main(){ <functionCall.header.name>(); }<\\n> >>" +
+                "addFunctions(functions ,varName , typeName)::=<< <functions:{ function|private void <function.header.name>(){<\\n>" +
+                        "<typeName> <varName> = new <typeName>();<\\n>" +
+                        "<varName>.load();<\\n> " +
+                        "   }> >>" +
+                        "bodyCodeSorce(typeName,varName) ::=<< <typeName> <varName> ;>>" +
+                "EOF()::=<< <\\n> <\\t>}<\\n> }>>"
                 );
         STGroup stGroup = new STGroupString(stringTemplate);
 
         ST header = stGroup.getInstanceOf("header");
         header.add("className" ,className);
-        header.add("pakagePath" ,packagePath);
+        header.add("packagePath" ,packagePath);
 
         ST mainFunction = stGroup.getInstanceOf("mainFunction");
+        mainFunction.add("functionCall",functionDeclaration.get(0));
 
         ST addFunctions = stGroup.getInstanceOf("addFunctions");
         addFunctions.add("functions", functionDeclaration);
         addFunctions.add("varName",varName);
         addFunctions.add("typeName",typeName);
+
+        ST eof = stGroup.getInstanceOf("EOF");
+
+
+        try {
+
+            File file = new File("SqlGenerated/" + className + ".java");
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(header.render());
+            fileWriter.write(mainFunction.render());
+            fileWriter.write(addFunctions.render());
+            fileWriter.write(eof.render());
+            fileWriter.flush();
+            fileWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
 
     }
@@ -162,8 +203,8 @@ public class CodeGeneration {
         }
     }
 
-    private static void  compileClasses(String className) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
-        File sourceFile = new File("SqlGenerated/TableClasses/"+className+".java");
+    private static void  compileClasses(String className,String classPath) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+        File sourceFile = new File(classPath+className+".java");
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
         File parentDirectory = sourceFile.getParentFile();
@@ -175,23 +216,24 @@ public class CodeGeneration {
 
     }
 
-    private static void loadClasses(String className  ) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+    private static Class loadClasses(String className ,String classPath ,String relativePath) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
         try {
 
-            File sourceFile = new File("SqlGenerated/TableClasses/"+className+".java");
+            File sourceFile = new File(classPath+className+".java");
             File parentDirectory = sourceFile.getParentFile();
             URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { parentDirectory.toURI().toURL() });
-            Class<?> helloClass = classLoader.loadClass("Java.SqlGenerated.TableClasses."+className);
-            Method method = helloClass.getDeclaredMethod("load");
-            method.invoke(helloClass.newInstance());
+            Class<?> compiledClass = classLoader.loadClass(relativePath+"."+className);
+            return compiledClass;
         }
-        catch (IOException io)
-        {
+        catch (IOException io) {
             System.out.println(io);
         }
+        return null;
 
-
-
+    }
+    private static void invokeMethod(String methodName,Class cls) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+        Method method = cls.getDeclaredMethod("Main");
+        method.invoke(cls.newInstance());
     }
 
     private static String returnTableName(Type typeclass){
