@@ -1,5 +1,8 @@
 package Java;
 
+import Files_code_Json_csv.employess;
+import Files_code_Json_csv.json_testing;
+import Java.AST.FunctionDeclaration;
 import Java.AST.Parse;
 import Java.Base.BaseVisitor;
 import Java.SymbolTable.*;
@@ -34,7 +37,6 @@ public class Main  {
         try {
             File file = new File("..//..//samples//samples.txt");
             String fileName = file.getAbsolutePath();
-
             CharStream cs = fromFileName(fileName);
             SQLLexer lexer = new SQLLexer(cs);
             CommonTokenStream token = new CommonTokenStream(lexer);
@@ -42,11 +44,10 @@ public class Main  {
             ParseTree tree = parser.parse();
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
-            //json_testing t = new json_testing();
-            //t.to_read_json_File();
         } catch (IOException e) {
             e.printStackTrace();
         }
+testing_json_file();
 
         CodeGeneration.run();
 
@@ -100,6 +101,12 @@ public class Main  {
 
             }
         }
+    }
+    public static  void testing_json_file(){
+        employess ee = new employess();
+        json_testing testing = new json_testing();
+        String employ ="employess";
+        testing.get_data_from_json(ee,employ);
     }
 
     }
