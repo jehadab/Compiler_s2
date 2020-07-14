@@ -89,7 +89,7 @@ sql_stmt
 create_type:
 K_CREATE K_TYPE use_random_name
 OPEN_PAR
-inside_create_type (COMMA inside_create_type)+
+inside_create_type (COMMA inside_create_type)*
 CLOSE_PAR
 ;
 inside_create_type:

@@ -1,6 +1,7 @@
 package Files_code_Json_csv;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
@@ -59,6 +60,7 @@ public class json_testing {
             System.out.println(" the id is "+t.id);
             System.out.println(" the name  is "+t.name);
             System.out.println("the age is "+t.age);
+            JsonArray jsonElements = new JsonArray();
             T.setAge(t.age);
             T.setId(t.id);
             T.setName(t.name);
