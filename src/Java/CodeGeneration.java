@@ -49,8 +49,8 @@ public class CodeGeneration {
             String classPath = returnTablePath(typ);
             String classExtension = returnTableExtension(typ);
             createClassType(className,columnList,classPath,classExtension);
-            compileClasses(className,"SqlGenerated/TableClasses/");
-            loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
+            compileClasses(className,"C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//TableClasses//");
+            loadClasses(className,"C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//TableClasses//","Java.SqlGenerated.TableClasses");
 
 
 //            if( == 0){
@@ -58,8 +58,8 @@ public class CodeGeneration {
 //            }
         }
         createMainClass(p.getFunctions());
-        compileClasses("SqlMain","SqlGenerated/");
-        Class compiledClass= loadClasses("SqlMain","SqlGenerated/","Java.SqlGenerated");
+        compileClasses("SqlMain","C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated");
+        Class compiledClass= loadClasses("SqlMain","C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated","Java.SqlGenerated");
         invokeMethod("SqlMain",compiledClass);
     }
     private static void createMainClass(List<FunctionDeclaration> functionDeclaration){
@@ -113,7 +113,7 @@ public class CodeGeneration {
 
         try {
 
-            File file = new File("SqlGenerated/" + className + ".java");
+            File file = new File("C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//" + className + ".java");
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(header.render());
             fileWriter.write(mainFunction.render());
