@@ -1,6 +1,6 @@
-create table s (name String , id double) type "json"  path = "D:";
-create table d (name String , id double) type "json"  path = "D:";
-create type s (name String );
+create table s (name String , id double) type ="json"  path = "D:";
+create table d (name String , id double) type ="json"  path = "D:";
+create type f (name String);
 func(){
 
 var x = select id from s;

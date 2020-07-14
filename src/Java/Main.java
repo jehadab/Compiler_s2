@@ -9,31 +9,19 @@ import Java.SymbolTable.*;
 import generated.SQLLexer;
 import generated.SQLParser;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupString;
-
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
  
 public class Main  {
     public static SymbolTable symbolTable = new SymbolTable();
-    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
+    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
         try {
             File file = new File("..//..//samples//samples.txt");
             String fileName = file.getAbsolutePath();
