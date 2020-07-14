@@ -7,7 +7,16 @@ public class FunctionDeclaration extends Node {
 
     function_header header ;
     function_body  body ;
-// coposotion betwen function body because visited will visited header then function body
+
+    public function_header getHeader() {
+        return header;
+    }
+
+    public function_body getBody() {
+        return body;
+    }
+
+    // coposotion betwen function body because visited will visited header then function body
     public void setHeader(function_header header) {
         this.header = header;
     }

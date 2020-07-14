@@ -5,9 +5,7 @@ import Java.Base.BaseVisitor;
 import Java.SymbolTable.*;
 import generated.SQLLexer;
 import generated.SQLParser;
-
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -30,13 +28,13 @@ public class Main  {
             ParseTree tree = parser.parse();
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
-            //json_testing t = new json_testing();
-            //t.to_read_json_File();
+
+            CodeGeneration.run( p);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        CodeGeneration.run();
 
 
     }
