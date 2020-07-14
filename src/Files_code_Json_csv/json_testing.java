@@ -8,10 +8,9 @@ import com.google.gson.stream.JsonReader;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class json_testing {
+
     public void get_data_from_json(employess emplo, String name ){
 
         FileReader fr = null;
@@ -23,7 +22,7 @@ public class json_testing {
         }
         JsonReader reader = new JsonReader(fr);
         JsonObject testing = json.fromJson(fr, JsonObject.class);
-        JsonElement json_ele = testing.get(name);
+        JsonElement json_ele = testing.get(name );
         JsonArray j = json_ele.getAsJsonArray();
         System.out.println(j);
         for (int i=0;i<j.size();i++)
@@ -46,7 +45,7 @@ public class json_testing {
             {
                 twon t =new twon();
                 t.setHome_number(j.get(i).getAsJsonObject().get("twon").getAsJsonObject().get("home_number").getAsInt());
-                get_types( j.get(i).getAsJsonObject().get("twon").getAsJsonObject().get("street").deepCopy());
+                t.setT(get_types( j.get(i).getAsJsonObject().get("twon").getAsJsonObject().get("street").deepCopy()));
                 emplo.setC(t);
 
             }
@@ -54,16 +53,50 @@ public class json_testing {
             emplo.setAge(j.get(i).getAsJsonObject().get("age").getAsInt());
             emplo.setName(j.get(i).getAsJsonObject().get("name").toString());
 //System.out.println("for testing it "+emplo.getC().getHome_number());
-            //          System.out.println("for another testing "+emplo.getCc().getBirth());
-            //        System.out.println("for more testing "+emplo.getCc().getName());
-
+            System.out.println("id is "+emplo.getId());
+            System.out.println("name  is "+emplo.getName());
+            System.out.println("age"+emplo.getAge());
+            System.out.println(" home_number"+emplo.getC().getHome_number());
+            System.out.println("number"+emplo.getC().getT().getNumber());
+            System.out.println("building_number"+emplo.getC().getT().getB().getBuilding_number());
+            System.out.println(" person name "+emplo.getC().getT().getB().getP().getPerson_name());
+            System.out.println("Name "+emplo.getCc().getName());
+            System.out.println("Birth "+emplo.getCc().getBirth());
         }
 
 
     }
     public <T> T get_types(JsonElement object){
-        System.out.println(object.getAsJsonObject().get("number").getAsInt());
+        person p = new person();
+        building B = new building();
+        street s = new street();
+        if(object.getAsJsonObject().get("number")!=null)
+        {s.setNumber(object.getAsJsonObject().get("number").getAsInt());
+            if(object.getAsJsonObject().get("building")!=null)
+                s.setB(get_types(object.getAsJsonObject().get("building").deepCopy()));
+            return (T) s;
+        }
+        if(object.getAsJsonObject().get("building_number")!=null)
+        {
+            B.setBuilding_number(object.getAsJsonObject().get("building_number").getAsInt());
+            if(object.getAsJsonObject().get("person")!=null)
+            {
 
+                B.setP(get_types(object.getAsJsonObject().get("person").deepCopy()));
+
+            }
+
+            return (T) B;
+
+        }
+
+        if(object.getAsJsonObject().get("person_name")!=null)
+        {
+            p.setPerson_name(object.getAsJsonObject().get("person_name").getAsString());
+            return  (T)p;
+
+        }
         return null;
     }
 }
+

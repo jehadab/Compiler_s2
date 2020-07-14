@@ -103,7 +103,7 @@ public class CodeGeneration {
         Class cls =null;
 
         try {//create class and write on it with ST
-            File classFile = new File("SqlGenerated/TableClasses/"+className+".java");
+            File classFile = new File("C://Users//Dell//Desktop//Sql_compiler//src//Java//SqlGenerated//TableClasses"+className+".java");
             FileWriter fileWriter = new FileWriter(classFile  );
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
@@ -127,7 +127,7 @@ public class CodeGeneration {
     }
 
     public static void compileIt(String className) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
-        File sourceFile = new File("SqlGenerated/TableClasses/"+className+".java");
+        File sourceFile = new File("C://Users//Dell//Desktop//Sql_compiler//src//Java//SqlGenerated//TableClasses"+className+".java");
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
         File parentDirectory = sourceFile.getParentFile();
@@ -145,7 +145,7 @@ public class CodeGeneration {
 
     public static void runIt(String className  ) {
         try {
-            URLClassLoader classLoader = new URLClassLoader(new URL[]{new File("C:/Users/Jehad/IdeaProjects/Compailer_S2/src/Java/SqlGenerated/TableClasses/"+ className+".class").toURI().toURL()},                Main.class.getClassLoader()
+            URLClassLoader classLoader = new URLClassLoader(new URL[]{new File("C://Users//Dell//Desktop//Sql_compiler//src//Java//SqlGenerated//TableClasses"+ className+".class").toURI().toURL()},                Main.class.getClassLoader()
             );
 
             Class thisClass = Class.forName("Java.SqlGenerated.TableClasses."+ className,true,classLoader );
