@@ -57,10 +57,10 @@ public class CodeGeneration {
 ////                runIt(className);
 //            }
         }
-        createMainClass(p.getFunctions());
-        compileClasses("SqlMain","C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated");
-        Class compiledClass= loadClasses("SqlMain","C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated","Java.SqlGenerated");
-        invokeMethod("SqlMain",compiledClass);
+//        createMainClass(p.getFunctions());
+//        compileClasses("SqlMain","C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated");
+//        Class compiledClass= loadClasses("SqlMain","C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated","Java.SqlGenerated");
+//        invokeMethod("SqlMain",compiledClass);
     }
     private static void createMainClass(List<FunctionDeclaration> functionDeclaration){
         String packagePath =  "Java.SqlGenerated";
@@ -136,7 +136,16 @@ public class CodeGeneration {
         String packagePath = "Java.SqlGenerated.TableClasses";
 
         String  stringTemplate =  (
-                "header(name,packagePath)  ::=<< package <packagePath> ;<\\n> import java.util.List; <\\n> public class <name> {>>" +
+                "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
+                        "import java.util.List; <\\n>" +
+                        "import com.google.gson.Gson; <\\n>" +
+                        "import com.google.gson.JsonArray; <\\n>" +
+                        "import com.google.gson.JsonElement; <\\n>" +
+                        "import com.google.gson.JsonObject; <\\n>" +
+                        "import com.google.gson.stream.JsonReader; <\\n>" +
+                        "import java.io.FileNotFoundException; <\\n>" +
+                        "import java.io.FileReader; <\\n>" +
+                        " public class <name> {>>" +
                         "attribute(columns) ::=<<  <columns:{col |<\\n><\\t><col.column_type.name>    <col.column_name> ;}> >>" +
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
