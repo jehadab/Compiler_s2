@@ -30,7 +30,7 @@ import java.util.List;
 
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
-
+ 
 public class Main  {
     public static SymbolTable symbolTable = new SymbolTable();
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
