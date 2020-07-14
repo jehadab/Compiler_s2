@@ -2,6 +2,7 @@ package Java;
 
 import Java.SymbolTable.Column;
 import Java.SymbolTable.Type;
+import com.sun.xml.internal.fastinfoset.util.CharArray;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -11,30 +12,48 @@ import javax.tools.ToolProvider;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
+import java.util.Arrays;
+
+import javax.tools.ToolProvider;
+
 
 /**
  * Created by Jehad on 7/13/2020.
  */
 public class CodeGeneration {
-    public static void run() throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
+    public static void run() throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
         for (Type typ :Main.symbolTable.getDeclaredTypes()) {
 //           the type is table and have path and typeExtension
-            if(typ.isTable()){
-
-                String className  = returnTableName(typ);
-                ArrayList<Column> columnList = returnTableColumn(typ);
-                String classPath = returnTablePath(typ);
-                String classExtension = returnTableExtension(typ);
-                Class classType = createClassType(className,columnList,classPath,classExtension);
+            String typeName = typ.getName();
+            if(typeName.indexOf("_") != -1){
+                typeName.split("_");
             }
+
+
+            String className  = returnTableName(typ);
+            ArrayList<Column> columnList = returnTableColumn(typ);
+            String classPath = returnTablePath(typ);
+            String classExtension = returnTableExtension(typ);
+             createClassType(className,columnList,classPath,classExtension);
+            compileIt(className);
+//            if( == 0){
+////                runIt(className);
+//            }
         }
     }
-    public static Class<?> createClassType(String className ,
+    public static void createClassType(String className ,
                                            List<Column> columnArrayList, String tablePath
             , String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
@@ -43,13 +62,12 @@ public class CodeGeneration {
         String  stringTemplate =  (
                 "header(name,packagePath)  ::=<< package <packagePath> ;<\\n> import java.util.List;\n \n public class <name> {>>" +
                         "attribute(columns) ::=<<  <columns:{col |<\\n><\\t><col.column_type.name>    <col.column_name> ;}> >>" +
-                        "tableAttribute(tablePath,tableType) ::=<<<\\n><\\t>String tablePath = <tablePath>;<\\n>" +
-                        "<\\t>String tableType = <tableType>; >> " +
-                        "staticList(className)::=<<<\\n> static List\\<<className>\\> entityObject  ;<\\n> >>" +
-                        "loadFunction()::= << public void load(){ System.out.println(\"hiiiii\");  " +
+                        "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
+                        "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
+                        "staticList(className)::=<<<\\n><\\t>static List\\<<className>\\> entityObject  ;<\\n> >>" +
+                        "loadFunction()::= <<<\\t>public void load(){ System.out.println(\"hiiiii\");  " +
                         "<\\n> } >>" +
                         "EOF()::=<<<\\n> }>>");
-
 
         STGroup stGroup = new STGroupString(stringTemplate);
 
@@ -86,7 +104,7 @@ public class CodeGeneration {
 
         try {//create class and write on it with ST
             File classFile = new File("SqlGenerated/TableClasses/"+className+".java");
-            FileWriter fileWriter = new FileWriter(classFile ,false );
+            FileWriter fileWriter = new FileWriter(classFile  );
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
 
@@ -97,38 +115,43 @@ public class CodeGeneration {
             bufferedWriter.write(staticList.render());
             bufferedWriter.write(loadFunction.render());
             bufferedWriter.write(EOF.render());
-            bufferedWriter.flush();
             bufferedWriter.close();
             fileWriter.close();
 
-
-
 //                Process p = Runtime.getRuntime().;
 //                p.waitFor();
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            compiler.run(null, null, null, "Java.SqlGenerated.TableClasses" + "." + className);
-            cls = Class.forName("Java.SqlGenerated.TableClasses." + className);
 
-
-
-            return cls;
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    public static void compileIt(String className) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+        File sourceFile = new File("SqlGenerated/TableClasses/"+className+".java");
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+        File parentDirectory = sourceFile.getParentFile();
+        fileManager.setLocation(StandardLocation.CLASS_OUTPUT, Arrays.asList(parentDirectory));
+        Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(Arrays.asList(sourceFile));
+        compiler.getTask(null, fileManager, null, null, null, compilationUnits).call();
+        fileManager.close();
 
-        return cls;
+        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[] { parentDirectory.toURI().toURL() });
+        Class<?> helloClass = classLoader.loadClass("Java.SqlGenerated.TableClasses."+className);
+        Method method = helloClass.getDeclaredMethod("load");
+        method.invoke(helloClass.newInstance());
 
     }
 
-    public static void runIt(Class c) {
+    public static void runIt(String className  ) {
         try {
-            Class params[] = {};
-            Object paramsObj[] = {};
-            Class thisClass = Class.forName("Java.SqlGenerated.TableClasses.testclass");
+            URLClassLoader classLoader = new URLClassLoader(new URL[]{new File("C:/Users/Jehad/IdeaProjects/Compailer_S2/src/Java/SqlGenerated/TableClasses/"+ className+".class").toURI().toURL()},                Main.class.getClassLoader()
+            );
+
+            Class thisClass = Class.forName("Java.SqlGenerated.TableClasses."+ className,true,classLoader );
             Object iClass = thisClass.newInstance();
-            Method thisMethod = thisClass.getDeclaredMethod("load", params);
-            thisMethod.invoke(iClass, paramsObj);
+            Method thisMethod = thisClass.getDeclaredMethod("load");
+            thisMethod.invoke(iClass);
         }
         catch (Exception e) {
             e.printStackTrace();
