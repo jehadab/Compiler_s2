@@ -6,17 +6,23 @@
       "name":"keko",
       "age":"21",
       "twon":{
-    "home_number":"99999",
-    "street":{
-    "number":"9"
-  }
-  },
-    "city":[
-    {
-      "Name":"ii",
-      "Birth":"666"
+        "home_number":"99999",
+        "street":{
+          "number":"9",
+          "building": {
+            "building_number":"99999",
+            "person":{
+              "person_name":"ABCD"
+            }
+          }
+        }
+      },
+      "city":[
+        {
+          "Name":"ii",
+          "Birth":"666"
+        }
+      ]
     }
-  ]
-  }
   ]
 }

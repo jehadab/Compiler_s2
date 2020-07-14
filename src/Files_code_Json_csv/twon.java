@@ -17,6 +17,14 @@ boolean complixty=true;
         return complixty;
     }
 
+    public street getT() {
+        return t;
+    }
+
+    public void setT(street t) {
+        this.t = t;
+    }
+
     public void setComplixty(boolean complixty) {
         this.complixty = complixty;
     }
