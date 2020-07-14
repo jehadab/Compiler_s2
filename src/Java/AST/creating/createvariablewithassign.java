@@ -34,7 +34,7 @@ public class createvariablewithassign extends gneralcreating {
         return json_wiht_assign;
     }
 
-    public createvariablewithassign getVar_wiht_assign() {
+    public create_variable_withassign getVar_wiht_assign() {
         return var_wiht_assign;
     }
 
