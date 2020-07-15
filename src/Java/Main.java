@@ -28,8 +28,8 @@ public class Main  {
             ParseTree tree = parser.parse();
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
-
-            CodeGeneration.run( p);
+            CodeGeneration codeGeneration = new CodeGeneration();
+                    codeGeneration.run( p);
 
         } catch (IOException e) {
             e.printStackTrace();
