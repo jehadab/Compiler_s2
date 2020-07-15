@@ -16,7 +16,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.File;
 import java.io.IOException;
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
-
+ 
 public class Main  {
     public static SymbolTable symbolTable = new SymbolTable();
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
