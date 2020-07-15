@@ -5,14 +5,14 @@
       "id":"1",
       "name":"keko",
       "age":"21",
-      "twon":{
-        "home_number":"99999",
-        "street":{
-          "number":"9",
+      "twon": {
+        "home_number": "99999",
+        "street": {
+          "number": "9",
           "building": {
-            "building_number":"99999",
-            "person":{
-              "person_name":"ABCD"
+            "building_number": "99999",
+            "person": {
+              "person_name": "ABCD"
             }
           }
         }
@@ -20,9 +20,23 @@
       "city":[
         {
           "Name":"ii",
-          "Birth":"666"
+          "Birth":"666",
+          "street":{
+            "number":"9"
+          },
+          "city": [
+            {
+              "Name": "inside_nested_one",
+              "city": [{"Name": "inside_nested_one"}]
+            }
+          ]
         }
       ]
+    },
+    {
+      "id": "2",
+      "name": "Narjess"
+
     }
   ]
 }
