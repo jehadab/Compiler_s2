@@ -22,7 +22,7 @@ public class json_testing {
         }
         JsonReader reader = new JsonReader(fr);
         JsonObject testing = json.fromJson(fr, JsonObject.class);
-        JsonElement json_ele = testing.get(name );
+        JsonElement json_ele = testing.get(name);
         JsonArray j = json_ele.getAsJsonArray();
         System.out.println(j);
         for (int i=0;i<j.size();i++)

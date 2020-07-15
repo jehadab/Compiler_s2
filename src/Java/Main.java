@@ -19,7 +19,7 @@ import static org.antlr.v4.runtime.CharStreams.fromFileName;
 
 public class Main  {
     public static SymbolTable symbolTable = new SymbolTable();
-    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
+    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException { ;
         try {
             File file = new File("C://Users//Dell//IdeaProjects//LOLO//samples//samples.txt");
             String fileName = file.getAbsolutePath();

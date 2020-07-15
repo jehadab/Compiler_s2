@@ -48,11 +48,12 @@ public class CodeGeneration {
             ArrayList<Column> columnList = returnTableColumn(typ);
             String classPath = returnTablePath(typ);
             String classExtension = returnTableExtension(typ);
-            createClassType(className,columnList,classPath,classExtension);
-            compileClasses(className,"C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//TableClasses//");
-            loadClasses(className,"C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//TableClasses//","Java.SqlGenerated.TableClasses");
+            if(typ.isTable()){
+                createClassType(className,columnList,classPath,classExtension);
+                compileClasses(className,"C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//TableClasses//");
+                loadClasses(className,"C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//TableClasses//","Java.SqlGenerated.TableClasses");
 
-
+            }
 //            if( == 0){
 ////                runIt(className);
 //            }
@@ -138,6 +139,7 @@ public class CodeGeneration {
         String  stringTemplate =  (
                 "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
                         "import java.util.List; <\\n>" +
+                        "import java.util.ArrayList; <\\n>" +
                         "import com.google.gson.Gson; <\\n>" +
                         "import com.google.gson.JsonArray; <\\n>" +
                         "import com.google.gson.JsonElement; <\\n>" +
@@ -150,7 +152,24 @@ public class CodeGeneration {
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
                         "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
-                        "loadFunction()::= <<<\\t>public void load(){ System.out.println(\"hiiiii\");<\\n><\\t>}>>  " +
+                        "loadFunction()::= <<<\\t>public void load(){<\\n><\\t>System.out.println(\"hiiiii\");<\\n><\\t>}>>" +
+                        "readJsonFile(className)::= <<<\\n><\\t>" +
+                        "public List\\<<className>\\> readJsonFile(){<\\n><\\t>" +
+                        "List\\<<className>\\> result = new ArrayList\\<>();<\\n><\\t>" +
+                        "FileReader fr = null;" +
+                        "Gson json = new Gson();<\\n><\\t>" +
+                        "try {<\\n><\\t>" +
+                        "fr=new FileReader(tablePath);" +
+                        "<\\n><\\t>}" +
+                        "catch(FileNotFoundException e) {<\\n><\\t>" +
+                        "e.printStackTrace();}<\\n><\\t>" +
+                        "JsonReader reader = new JsonReader(fr);<\\n><\\t>" +
+                        "JsonObject testing = json.fromJson(fr, JsonObject.class);<\\n><\\t>" +
+                        "JsonElement json_ele = testing.get(\"<className>\");<\\n><\\t>" +
+                        "JsonArray j = json_ele.getAsJsonArray();<\\n><\\t>" +
+                        "" +
+                        "return result;" +
+                        "<\\n><\\t>}>>" +
                         "EOF()::=<<<\\n> }>>");
 
         STGroup stGroup = new STGroupString(stringTemplate);
@@ -171,6 +190,9 @@ public class CodeGeneration {
         staticList.add("tablePath",tablePath);
 
         ST loadFunction = stGroup.getInstanceOf("loadFunction");
+
+        ST readJsonFile = stGroup.getInstanceOf("readJsonFile");
+        readJsonFile.add("className",className);
 
         ST EOF = stGroup.getInstanceOf("EOF");
 
@@ -199,6 +221,7 @@ public class CodeGeneration {
             bufferedWriter.write(tableAttribute.render());
             bufferedWriter.write(staticList.render());
             bufferedWriter.write(loadFunction.render());
+            bufferedWriter.write(readJsonFile.render());
             bufferedWriter.write(EOF.render());
             bufferedWriter.close();
             fileWriter.close();
