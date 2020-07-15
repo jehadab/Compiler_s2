@@ -14,7 +14,7 @@ public class json_testing {
         FileReader fr = null;
         Gson json = new Gson();
         try {
-            fr = new FileReader("C://Users//Dell//Desktop//Sql_compiler//src//Files_code_Json_csv//json_fle.json");
+            fr=new FileReader("C://Users//Dell//Desktop//Sql_compiler//src//Files_code_Json_csv//json_fle.json");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

@@ -29,14 +29,11 @@ import Java.AST.instruction.Returning.returnes_rule;
 import Java.AST.instruction.all_the_non_functional_instructions.One_line_if;
 import Java.Main;
 import Java.SymbolTable.*;
-//import com.sun.org.apache.xml.internal.utils.StringComparable;
 import generated.SQLBaseVisitor;
 import generated.SQLParser;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
-
 import Java.AST.assignmnet.Variable_with_opretor;
 import Java.AST.creating.createwihtoutassign;
 import Java.AST.creating.creatingvariabelwithoutassing;
@@ -56,9 +53,6 @@ import org.antlr.v4.runtime.*;
 import Java.AST.assignmnet.*;
 import Java.AST.instruction.Returning.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
-//import org.omg.CORBA.MARSHAL;
-
-
 import javax.lang.model.type.NullType;
 import java.util.*;
 

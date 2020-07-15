@@ -7,7 +7,6 @@ import Java.Base.BaseVisitor;
 import Java.SymbolTable.*;
 import generated.SQLLexer;
 import generated.SQLParser;
-
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import org.antlr.v4.runtime.CharStream;
@@ -16,12 +15,12 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.File;
 import java.io.IOException;
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
- 
+
 public class Main  {
     public static SymbolTable symbolTable = new SymbolTable();
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
         try {
-            File file = new File("C://Users//Dell//Desktop//Sql_compiler//samples//samples.txt");
+            File file = new File("C://Users//Dell//IdeaProjects//LOLO//samples//samples.txt");
             String fileName = file.getAbsolutePath();
             CharStream cs = fromFileName(fileName);
             SQLLexer lexer = new SQLLexer(cs);
@@ -30,12 +29,14 @@ public class Main  {
             ParseTree tree = parser.parse();
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
+
+            CodeGeneration.run( p);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-testing_json_file();
+            testing_json_file();
 
-     //   CodeGeneration.run();
 
 
     }
