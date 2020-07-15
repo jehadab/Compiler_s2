@@ -13,6 +13,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.invoke.StringConcatFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -135,45 +136,9 @@ public class CodeGeneration {
             , String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
         String packagePath = "Java.SqlGenerated.TableClasses";
-
-        String  stringTemplate =  (
-                "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
-                        "import java.util.List; <\\n>" +
-                        "import java.util.ArrayList; <\\n>" +
-                        "import com.google.gson.Gson; <\\n>" +
-                        "import com.google.gson.JsonArray; <\\n>" +
-                        "import com.google.gson.JsonElement; <\\n>" +
-                        "import com.google.gson.JsonObject; <\\n>" +
-                        "import com.google.gson.stream.JsonReader; <\\n>" +
-                        "import java.io.FileNotFoundException; <\\n>" +
-                        "import java.io.FileReader; <\\n>" +
-                        " public class <name> {>>" +
-                        "attribute(columns) ::=<<  <columns:{col |<\\n><\\t><col.column_type.name>    <col.column_name> ;}> >>" +
-                        "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
-                        "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
-                        "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
-                        "loadFunction()::= <<<\\t>public void load(){<\\n><\\t>System.out.println(\"hiiiii\");<\\n><\\t>}>>" +
-                        "readJsonFile(className)::= <<<\\n><\\t>" +
-                        "public List\\<<className>\\> readJsonFile(){<\\n><\\t>" +
-                        "List\\<<className>\\> result = new ArrayList\\<>();<\\n><\\t>" +
-                        "FileReader fr = null;" +
-                        "Gson json = new Gson();<\\n><\\t>" +
-                        "try {<\\n><\\t>" +
-                        "fr=new FileReader(tablePath);" +
-                        "<\\n><\\t>}" +
-                        "catch(FileNotFoundException e) {<\\n><\\t>" +
-                        "e.printStackTrace();}<\\n><\\t>" +
-                        "JsonReader reader = new JsonReader(fr);<\\n><\\t>" +
-                        "JsonObject testing = json.fromJson(fr, JsonObject.class);<\\n><\\t>" +
-                        "JsonElement json_ele = testing.get(\"<className>\");<\\n><\\t>" +
-                        "JsonArray j = json_ele.getAsJsonArray();<\\n><\\t>" +
-                        "" +
-                        "return result;" +
-                        "<\\n><\\t>}>>" +
-                        "EOF()::=<<<\\n> }>>");
+        String stringTemplate = StringForCreateCurrentType();
 
         STGroup stGroup = new STGroupString(stringTemplate);
-
         ST header = stGroup.getInstanceOf("header");
         header.add("name",className);
         header.add("packagePath",packagePath);
@@ -193,35 +158,27 @@ public class CodeGeneration {
 
         ST readJsonFile = stGroup.getInstanceOf("readJsonFile");
         readJsonFile.add("className",className);
+//
+        ST returnSpecificType = stGroup.getInstanceOf("returnSpecificType");
+//
+        ST returnListOfColumn = stGroup.getInstanceOf("returnListOfColumn");
 
         ST EOF = stGroup.getInstanceOf("EOF");
 
-
-//        ArrayList<String> s  = new ArrayList<>() ;
-//        ArrayList<String> c  = new ArrayList<>() ;
-//        for (Column col:columnArrayList
-//                ) {
-//            s.add(col.getColumn_name());
-//            c.add(col.getColumn_type().getName());
-//        }
-
-//        attribute.add("columnType",columnArrayList);
-//        attribute.add("columnName",columnArrayList);
         Class cls =null;
 
         try {//create class and write on it with ST
             File classFile = new File("C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//TableClasses//"+className+".java");
             FileWriter fileWriter = new FileWriter(classFile  );
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-
-
             bufferedWriter.write(header.render());
             bufferedWriter.write(attribute.render());
             bufferedWriter.write(tableAttribute.render());
             bufferedWriter.write(staticList.render());
             bufferedWriter.write(loadFunction.render());
             bufferedWriter.write(readJsonFile.render());
+            bufferedWriter.write(returnSpecificType.render());
+            bufferedWriter.write(returnListOfColumn.render());
             bufferedWriter.write(EOF.render());
             bufferedWriter.close();
             fileWriter.close();
@@ -295,7 +252,80 @@ public class CodeGeneration {
         String result =  typeclass.getExtension_of_table();
         return  result;
     }
+public static String StringForCreateCurrentType(){
+    String  stringTemplate =  (
+            "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
+                    "import java.util.List; <\\n>" +
+                    "import Java.SymbolTable.Column;<\\n>" +
+                    "import Java.SymbolTable.Type; <\\n>" +
+                    "import Java.Main; <\\n>" +
+                    "import java.util.ArrayList; <\\n>" +
+                    "import com.google.gson.Gson; <\\n>" +
+                    "import com.google.gson.JsonArray; <\\n>" +
+                    "import com.google.gson.JsonElement; <\\n>" +
+                    "import com.google.gson.JsonObject; <\\n>" +
+                    "import com.google.gson.stream.JsonReader; <\\n>" +
+                    "import java.io.FileNotFoundException; <\\n>" +
+                    "import java.io.FileReader; <\\n>" +
+                    " public class <name> {>>" +
+                    "attribute(columns) ::=<<  <columns:{col |<\\n><\\t><col.column_type.name>    <col.column_name> ;}> >>" +
+                    "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
+                    "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
+                    "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
+                    "loadFunction()::= <<<\\t>public void load()" +
+                    "{<\\n><\\t>" +
+                    "System.out.println(\"hiiiii\");" +
+                    "<\\n><\\t>}>>" +
 
+                    "readJsonFile(className)::= <<<\\n><\\t>" +
+                    "public List\\<<className>\\> readJsonFile(){<\\n><\\t>" +
+                    "List\\<<className>\\> result = new ArrayList\\<>();<\\n><\\t>" +
+                    "FileReader fr = null;" +
+                    "Gson json = new Gson();<\\n><\\t>" +
+                    "try {<\\n><\\t>" +
+                    "fr=new FileReader(tablePath);" +
+                    "<\\n><\\t>}" +
+                    "catch(FileNotFoundException e) {<\\n><\\t>" +
+                    "e.printStackTrace();}<\\n><\\t>" +
+                    "JsonReader reader = new JsonReader(fr);<\\n><\\t>" +
+                    "JsonObject testing = json.fromJson(fr, JsonObject.class);<\\n><\\t>" +
+                    "JsonElement json_ele = testing.get(\"<className>\");<\\n><\\t>" +
+                    "JsonArray j = json_ele.getAsJsonArray();<\\n><\\t>" +
+                    "Type type = returnSpecificType(\"<className>\");<\\n><\\t>" +
+                    "List\\<Column> columnList = new ArrayList\\<>();<\\n><\\t>" +
+                    "columnList = returnListOfColumn(type);<\\n><\\t>" +
+                    "return result;<\\n><\\t>" +
+                    "}>>" +
+                    "returnSpecificType()::= << <\\n><\\t>" +
+                    "public Type returnSpecificType(String typeName)<\\n><\\t>" +
+                    "{<\\n><\\t>" +
+                    "for(Type typ :Main.symbolTable.getDeclaredTypes())<\\n><\\t>" +
+                    "{<\\n><\\t>" +
+                    "if(typ.getName() == typeName)<\\n><\\t>" +
+                    "{<\\n><\\t>" +
+                    "return typ;<\\n><\\t>" +
+                    "}<\\n><\\t>" +
+                    "}<\\n><\\t>" +
+                    "return null;<\\n><\\t>" +
+                    "}>>" +
+
+                    "returnListOfColumn()::= << <\\n><\\t>" +
+                    "public List\\<Column>  returnListOfColumn(Type type)<\\n><\\t>" +
+                    "{<\\n><\\t>" +
+                    "List\\<Column> columnList = new ArrayList\\<>();<\\n><\\t>" +
+                    "for(Object col:type.getColumns().keySet().toArray())<\\n><\\t>" +
+                    "{<\\n><\\t>" +
+                    "Column column = new Column();<\\n><\\t>" +
+                    "column.setColumn_name(col.toString());<\\n><\\t>" +
+                    "column.setColumn_type(type.getColumns().get(col.toString()));<\\n><\\t>" +
+                    "columnList.add(column);<\\n><\\t>" +
+                    "}<\\n><\\t>" +
+                    "return columnList;<\\n><\\t>" +
+                    "}>>"+
+
+                    "EOF()::=<<<\\n> }>>");
+    return  stringTemplate;
+}
 
 }
 

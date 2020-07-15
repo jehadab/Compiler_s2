@@ -1,5 +1,8 @@
  package Java.SqlGenerated.TableClasses; 
 import java.util.List; 
+import Java.SymbolTable.Column;
+import Java.SymbolTable.Type; 
+import Java.Main; 
 import java.util.ArrayList; 
 import com.google.gson.Gson; 
 import com.google.gson.JsonArray; 
@@ -28,6 +31,32 @@ import java.io.FileReader;
 	JsonObject testing = json.fromJson(fr, JsonObject.class);
 	JsonElement json_ele = testing.get("d");
 	JsonArray j = json_ele.getAsJsonArray();
+	Type type = returnSpecificType("d");
+	List<Column> columnList = new ArrayList<>();
+	columnList = returnListOfColumn(type);
 	return result;
+	}
+	public Type returnSpecificType(String typeName)
+	{
+	for(Type typ :Main.symbolTable.getDeclaredTypes())
+	{
+	if(typ.getName() == typeName)
+	{
+	return typ;
+	}
+	}
+	return null;
+	}
+	public List<Column>  returnListOfColumn(Type type)
+	{
+	List<Column> columnList = new ArrayList<>();
+	for(Object col:type.getColumns().keySet().toArray())
+	{
+	Column column = new Column();
+	column.setColumn_name(col.toString());
+	column.setColumn_type(type.getColumns().get(col.toString()));
+	columnList.add(column);
+	}
+	return columnList;
 	}
  }
