@@ -1,5 +1,6 @@
 package Java;
 
+import Files_code_Json_csv.employess;
 import Java.SymbolTable.Scope;
 import Java.AST.FunctionDeclaration;
 import Java.SymbolTable.Column;
@@ -151,6 +152,10 @@ public class CodeGeneration {
 
             }
         }
+
+
+
+
 //           ((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0))
 //                .getWithassign()
 //                .getVar_wiht_assign()
@@ -389,9 +394,77 @@ public class CodeGeneration {
         return null;
 
     }
+public void where_function (Parse p){
+        String left_side="";
+        String righ_side="";
+        String operator ="";
+        String select_value_we_have="";
+    ArrayList<employess> e =  new ArrayList<employess>();
+    for(int i=0;i<4;i++)
+    {
+        employess temp = new employess();
+        temp.setId(i);
+        temp.setName("testing1"+i);
+        temp.setAge(i);
+        e.add(temp);
+    }
+    if(p.getFunctions().get(0).getBody().getInstructions() != null) {//make sure there is instructions
+        for (Object obj : p.getFunctions().get(0).getBody().getInstructions()
+        ) {
+            if (obj instanceof gneralcreating)//what is to cast
+            {
+                gneralcreating generalcreate = (gneralcreating) obj;
+                if (generalcreate.getWithassign() != null)//create with assign
+                {
+                    if (generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)//assign var
+                    {
 
+                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored() != null) {//is it factored select ?
+                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core() != null) {
+                                 select_value_we_have=generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getReslult_cloumnList().get(0).getExpr().getColumnName().getName();
+                                if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr() != null) {
+                                    if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft() != null) {
+                                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName() != null) {
+                                            left_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName().getName();
+                                        }
+                                    }
+                                    if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp() != null) {
+                                        operator = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp();
+                                    }
+                                    if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight() != null) {
+                                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName() != null) {
+                                            righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName().getName();
+                                        }
+                                    }
+                                    get_where_final_result(left_side,righ_side,operator,select_value_we_have,e);
+                                }
 
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    }
+    public void get_where_final_result (String select_column , String left_side, String right_side, String operator, ArrayList<employess> datalist){
+        get_where_result(right_side,left_side,operator,datalist);
+        // we will fill the arraylist result in final arraylist according what we will selet
+    }
+    public void get_where_result(String left_side, String right_side, String operator,ArrayList<employess> datalist){
+     if(operator=="=")
+     {
+         //getvalue of left side // get value of right side according to value we should use '=' oerator and store result in arraylist
+         //taking some rest .........
+     }
+    }
 }
+
+
+
+
+
+
 
 
 

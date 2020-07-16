@@ -6,6 +6,7 @@ import Files_code_Json_csv.json_testing;
 import Java.AST.Parse;
 import Java.Base.BaseVisitor;
 import Java.JarFiles.Sum;
+import Java.SqlGenerated.TableClasses.SqlMain;
 import Java.SymbolTable.*;
 import generated.SQLLexer;
 import generated.SQLParser;
@@ -38,13 +39,18 @@ public class Main  {
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
             CodeGeneration codeGeneration = new CodeGeneration();
-            codeGeneration.run( p);
+           // codeGeneration.run( p);
+            //SqlMain q = new SqlMain(); // put them because the code generation is not working
+            //q.Main(); // put them because the code generation is not working
+            codeGeneration.where_function(p);
+
+
 
         } catch (IOException e) {
             e.printStackTrace();
         }
         Runtime.getRuntime().exec("java -cp Sql_Compiler.jar Java.JarFiles.Sum");
-        testing_json_file();
+       // testing_json_file();
 
 
 

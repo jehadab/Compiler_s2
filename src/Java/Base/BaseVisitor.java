@@ -757,6 +757,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
 //                                    var columnname = 5;
 //
                                 }
+
                             }
 
                         }
@@ -1373,6 +1374,8 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         else if(ctx.OPEN_PAR() != null && ctx.expr()!= null){
             expr = visitExpr(ctx.expr(0));
         }
+        if(ctx.commn_expr_opreator()!=null)
+            expr.setOp(ctx.commn_expr_opreator().getText());
 
         return expr;
     }

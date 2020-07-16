@@ -17,6 +17,15 @@ private Literal_Value literal_value;
 private DataBaseName dataBaseName;
 private TableName tableName;
 private ColumnName columnName;
+private  String  op;
+
+    public String getOp() {
+        return op;
+    }
+
+    public void setOp(String op) {
+        this.op = op;
+    }
 
     public String getFunction_name() {
         return Function_name;

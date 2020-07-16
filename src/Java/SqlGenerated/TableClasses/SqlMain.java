@@ -6,8 +6,10 @@ package Java.SqlGenerated.TableClasses;
   private void func(){
   s_id x = new s_id();
   x.load();
+  x.where_fucntion();
    d_name y = new d_name();
-  y.load();
+ // y.load();
         
  	}
+
  }
