@@ -317,7 +317,7 @@ public class CodeGeneration {
 
     private Class loadClasses(String className ,String classPath ,String relativePath) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
 
-            File f = new File("C:\\Users\\Jehad\\IdeaProjects\\Compailer_S2\\src\\Java\\SqlGenerated\\TableClasses\\Java\\SqlGenerated\\TableClasses\\"+className);
+            File f = new File("C://Users//Dell//Desktop//Sql_compiler//src//Java//SqlGenerated//TableClasses"+className);
             File sourceFile = new File(classPath+className+".java");
             File parentDirectory = f.getParentFile();
             URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{sourceFile.toURI().toURL()});
