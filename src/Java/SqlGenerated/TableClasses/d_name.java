@@ -1,7 +1,7 @@
  package Java.SqlGenerated.TableClasses ;
  import java.util.List; 
- public class s_id {
-  	double    id ;  
+ public class d_name {
+  	s    name ;  
  	public void load(){ System.out.println("hiiiii");
 	}
  }

@@ -889,7 +889,8 @@ any_name
  | STRING_LITERAL
  //| '(' any_name ')'
  ;
-create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION  use_random_name  OPEN_PAR IDENTIFIER
+create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION  use_random_name  OPEN_PAR
+                                                                               IDENTIFIER
                                                                                COMMA
                                                                                use_random_name
                                                                                COMMA

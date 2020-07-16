@@ -57,7 +57,8 @@ import javax.lang.model.type.NullType;
 import java.util.*;
 
 public class BaseVisitor extends SQLBaseVisitor {
-    Stack<Scope> scopesStack = new Stack<>();
+    private Stack<Scope> scopesStack = new Stack<>();
+    private int functionNameCounter = 0;
 
     public Parse visitParse(SQLParser.ParseContext ctx) {
         System.out.println("visitParse");
@@ -92,14 +93,16 @@ public class BaseVisitor extends SQLBaseVisitor {
             else if(ctx.children.get(i) instanceof SQLParser.FuntionContext){
                 System.out.println("visiting function ");
                 System.out.println(" size of the function " + ctx.funtion().size());
-
+                FunctionDeclaration function = new FunctionDeclaration();
                 Scope functionScope = new Scope();
-                functionScope.setId(((SQLParser.FuntionContext)(ctx.children.get(i))).function_header().use_random_name().getText() + "_" + (((SQLParser.FuntionContext)(ctx.children.get(i))).hashCode()));
+                functionScope.setId(((SQLParser.FuntionContext)(ctx.children.get(i))).function_header().use_random_name().getText() + "_" + (functionNameCounter));
+                functionNameCounter++;
                 functionScope.setParent(scopesStack.peek());
 
                 scopesStack.push(functionScope);
 
-                p.getFunctions().add(visitFuntion((SQLParser.FuntionContext)ctx.children.get(i)));
+                function = visitFuntion((SQLParser.FuntionContext)ctx.children.get(i));
+                p.getFunctions().add(function);
 
                 Main.symbolTable.addScope(scopesStack.pop());
 
@@ -3532,14 +3535,40 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                             Iterator<Column> columns = table.getColumnMap().values().iterator();
                             while (columns.hasNext())
                             {
-                                typeName =  typeName.concat("_"+columns.next().getColumn_name()) ;
-
+                                Column col = columns.next();
+                                typeName =  typeName.concat("_"+col.getColumn_name()) ;
+                                type.addColumns(col.getColumn_name(),col.getColumn_type());
                             }
                         }
                     }
                     else {
                         typeName = typeName.concat("_"+ selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getColumnName().getName());
-                    }
+
+                            Scope currentScope = scopesStack.peek();
+                            boolean found = false;
+                            while (currentScope != null)
+                            {
+                                found = currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(j).getTableName().getName());
+                                if(found)
+                                {
+                                    break;
+                                }
+                                currentScope = currentScope.getParent();
+                            }
+                            if(found) {
+                                Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(j).getTableName().getName());
+                                String colName = selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getColumnName().getName();
+
+                                if(table.getColumnMap().containsKey(colName)){
+                                    Column col =  table.getColumnMap().get(colName);
+                                    type.addColumns(colName,col.getColumn_type());
+                                }
+                            }
+
+
+                        selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getColumnName().getName();
+
+                }
                 }
             }
         }
