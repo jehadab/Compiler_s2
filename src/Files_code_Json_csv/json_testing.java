@@ -140,3 +140,23 @@ public class json_testing {
         return (T) c;
     }
 }
+
+
+
+//for (int i= 0; i<columnList.size();i++){
+//        if(j.get(i).getAsJsonObject().get(columnList.get(i).getColumn_name())!=null){
+//        if(columnList.get(i).getColumn_type().getName()!=Type.NUMBER_CONST){
+////			s.setId(j.get(i).getAsJsonObject().get("id").getAsInt());
+//        }
+//        else if(columnList.get(i).getColumn_type().getName()!=Type.BOOLEAN_CONST){
+//
+//        }
+//        else if(columnList.get(i).getColumn_type().getName()!=Type.STRING_CONST){
+//
+//        }
+//        else{
+//
+//        }
+//        }
+//
+//        }

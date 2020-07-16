@@ -158,10 +158,16 @@ public class CodeGeneration {
 
         ST readJsonFile = stGroup.getInstanceOf("readJsonFile");
         readJsonFile.add("className",className);
-//
+
         ST returnSpecificType = stGroup.getInstanceOf("returnSpecificType");
-//
+
         ST returnListOfColumn = stGroup.getInstanceOf("returnListOfColumn");
+
+        ST setterAttribute = stGroup.getInstanceOf("setterAttribute");
+        setterAttribute.add("columns",columnArrayList);
+
+        ST getterAttribute = stGroup.getInstanceOf("getterAttribute");
+        getterAttribute.add("columns",columnArrayList);
 
         ST EOF = stGroup.getInstanceOf("EOF");
 
@@ -173,6 +179,8 @@ public class CodeGeneration {
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(header.render());
             bufferedWriter.write(attribute.render());
+            bufferedWriter.write(setterAttribute.render());
+            bufferedWriter.write(getterAttribute.render());
             bufferedWriter.write(tableAttribute.render());
             bufferedWriter.write(staticList.render());
             bufferedWriter.write(loadFunction.render());
@@ -267,15 +275,35 @@ public static String StringForCreateCurrentType(){
                     "import com.google.gson.stream.JsonReader; <\\n>" +
                     "import java.io.FileNotFoundException; <\\n>" +
                     "import java.io.FileReader; <\\n>" +
+
                     " public class <name> {>>" +
                     "attribute(columns) ::=<<  <columns:{col |<\\n><\\t><col.column_type.name>    <col.column_name> ;}> >>" +
+
+                    "setterAttribute(columns) ::=<< " +
+                    "<columns:{col |<\\n><\\t> public void set<col.column_name>(<col.column_type.name> value){<\\n><\\t>" +
+                    "this.<col.column_name>  = value ; <\\n><\\t>" +
+                    "\\}" +
+                    " } > >>" +
+
+                    "<\\n><\\t>" +
+
+                    "getterAttribute(columns) ::=<< " +
+                    "<columns:{col |<\\n><\\t> public <col.column_type.name> get<col.column_name>(){<\\n><\\t>" +
+                    "return <col.column_name> ;   <\\n><\\t>" +
+                    "\\}" +
+                    " } > >>"+
+
                     "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
+
                     "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
+
                     "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
+
                     "loadFunction()::= <<<\\t>public void load()" +
                     "{<\\n><\\t>" +
                     "System.out.println(\"hiiiii\");" +
-                    "<\\n><\\t>}>>" +
+                    "<\\n><\\t>" +
+                    "}>>" +
 
                     "readJsonFile(className)::= <<<\\n><\\t>" +
                     "public List\\<<className>\\> readJsonFile(){<\\n><\\t>" +
@@ -296,6 +324,7 @@ public static String StringForCreateCurrentType(){
                     "columnList = returnListOfColumn(type);<\\n><\\t>" +
                     "return result;<\\n><\\t>" +
                     "}>>" +
+
                     "returnSpecificType()::= << <\\n><\\t>" +
                     "public Type returnSpecificType(String typeName)<\\n><\\t>" +
                     "{<\\n><\\t>" +

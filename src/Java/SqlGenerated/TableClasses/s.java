@@ -13,7 +13,19 @@ import java.io.FileNotFoundException;
 import java.io.FileReader; 
  public class s {
   	String    name ;
-  	double    id ;   
+  	double    id ; 
+ 	 public void setname(String value){
+ 	this.name  = value ; 
+ 	} 
+ 	 public void setid(double value){
+ 	this.id  = value ; 
+ 	}  
+ 	 public String getname(){
+ 	return name ;   
+ 	} 
+ 	 public double getid(){
+ 	return id ;   
+ 	}    
  	String tablePath = "D:";
 	String tableType = "json"; 
  	static List<s> entityObject  ;
