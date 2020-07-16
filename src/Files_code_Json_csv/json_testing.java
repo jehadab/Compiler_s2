@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 public class json_testing {
-    public void get_data_from_json(employess emplo,String name ) {
+    public void get_data_from_json(employess emplo,String name ,String path ) {
 
         FileReader fr = null;
         Gson json = new Gson();

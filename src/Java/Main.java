@@ -1,5 +1,6 @@
 package Java;
 
+import Files_code_Json_csv.csv_testing;
 import Files_code_Json_csv.employess;
 import Files_code_Json_csv.json_testing;
 import Java.AST.Parse;
@@ -89,11 +90,13 @@ public class Main  {
             }
         }
     }
-    public static  void testing_json_file(){
+    public static  void testing_json_file() throws IOException {
         employess ee = new employess();
         json_testing testing = new json_testing();
         String employ ="employess";
-        testing.get_data_from_json(ee,employ);
+        testing.get_data_from_json(ee,employ,"C://Users//Dell//Desktop//Sql_compiler//src//Files_code_Json_csv//json_fle.json");
+        csv_testing c= new csv_testing();
+        c.get_data_from_csv("C://Users//Dell//Desktop//Sql_compiler//src//Files_code_Json_csv//csv_testing.csv","employess");
     }
 
     }
