@@ -2,6 +2,7 @@ package Java;
 
 import Java.AST.Parse;
 import Java.Base.BaseVisitor;
+import Java.JarFiles.Sum;
 import Java.SymbolTable.*;
 import generated.SQLLexer;
 import generated.SQLParser;
@@ -12,13 +13,19 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
+
 
 public class Main  {
     public static SymbolTable symbolTable = new SymbolTable();
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
         try {
-            File file = new File("..//..//samples//samples.txt");
+            File file = new File("samples/samples.txt");
             String fileName = file.getAbsolutePath();
 
             CharStream cs = fromFileName(fileName);
@@ -29,13 +36,12 @@ public class Main  {
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
             CodeGeneration codeGeneration = new CodeGeneration();
-                    codeGeneration.run( p);
+            codeGeneration.run( p);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
+        Runtime.getRuntime().exec("java -cp Sql_Compiler.jar Java.JarFiles.Sum");
 
     }
 

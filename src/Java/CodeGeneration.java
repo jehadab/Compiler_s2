@@ -42,9 +42,11 @@ import java.nio.file.FileSystem;
 /**
  * Created by Jehad on 7/13/2020.
  */
+
 public class CodeGeneration {
-    public synchronized void run(Parse p ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
-        boolean compiled = false;
+
+        private volatile boolean compiled = false;
+    public  void run(Parse p ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
         for (Type typ :Main.symbolTable.getDeclaredTypes()) {
 //           the type is table and have path and typeExtension
 //            String typeName = typ.getName();
@@ -73,23 +75,29 @@ public class CodeGeneration {
                 String classPath = returnTablePath(typ);
                 String classExtension = returnTableExtension(typ);
                 createClassType(className,columnList,classPath,classExtension);
-//                compileClasses(className,"SqlGenerated/TableClasses/");
+                compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
                 //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
 
 
 
 //            if( == 0){
 ////                runIt(className);
-//            }
+//            }A
+        }
+        if(compiled){
+            compiled= false;
+            createMainClass(p.getFunctions());
+            compiled = compileClasses("SqlMain","src/Java/SqlGenerated/TableClasses/");
+            if(compiled){
+                Class compiledClass= loadClasses("SqlMain","src/Java/SqlGenerated/TableClasses/","src.Java.SqlGenerated.TableClasses");
+                invokeMethod("Main",compiledClass);
+            }
         }
 
-            createMainClass(p.getFunctions());
-//            compileClasses("SqlMain","SqlGenerated/TableClasses/");
-            Class compiledClass= loadClasses("SqlMain","SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
-            invokeMethod("Main",compiledClass);
 
     }
     private  void createMainClass(List<FunctionDeclaration> functionDeclaration){
+
         String packagePath =  "Java.SqlGenerated.TableClasses";
         String className = "SqlMain";
 //        System.out.println(functionDeclaration.get(0).getHeader().getName().hashCode());
@@ -125,13 +133,13 @@ public class CodeGeneration {
                     if(obj instanceof gneralcreating)//what is to cast
                     {
                         gneralcreating generalcreate =(gneralcreating) obj;
-                        if(generalcreate.getWithassign() !=null)
+                        if(generalcreate.getWithassign() !=null)//create with assign
                         {
-                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)
+                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)//assign var
                             {
                                 NameAndType nameAndTypeobj = new NameAndType();
                                 nameAndTypeobj.varName = generalcreate.getWithassign().getVar_wiht_assign().getVar().getVariable_with_opretor().get(0).getVariable_name();
-                                if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored()!= null){
+                                if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored()!= null){//is it factored select ?
                                     Type type = getVariableType(nameAndTypeobj.varName,functionDeclaration.get(0).getHeader().getName()+"_0");
                                     nameAndTypeobj.typeName =  type.getName();
                                     nameAndTypes.add(nameAndTypeobj);
@@ -184,7 +192,7 @@ public class CodeGeneration {
 
         try {
 
-            File file = new File("SqlGenerated/TableClasses/" + className + ".java");
+            File   file = new File("src/Java/SqlGenerated/TableClasses/" + className + ".java");
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(header.render());
             fileWriter.write(mainFunction.render());
@@ -252,7 +260,7 @@ public class CodeGeneration {
         Class cls =null;
 
         try {//create class and write on it with ST
-            File classFile = new File("SqlGenerated/TableClasses/"+className+".java");
+            File classFile = new File("src/Java/SqlGenerated/TableClasses/"+className+".java");
             FileWriter fileWriter = new FileWriter(classFile  );
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
@@ -277,8 +285,8 @@ public class CodeGeneration {
         boolean compiled = false;
         File sourceFile = new File(classPath+className+".java");
         String destenation = "";
-        File out = new File("out/production/Sql_Compiler/Java/SqlGenerated/TableClasses");
-        System.out.println(out.getAbsolutePath());
+        //File out = new File("out/production/Sql_Compiler/Java/SqlGenerated/TableClasses");
+//        System.out.println(out.getAbsolutePath());
 
 
 
@@ -303,12 +311,10 @@ public class CodeGeneration {
             File f = new File("C:\\Users\\Jehad\\IdeaProjects\\Compailer_S2\\src\\Java\\SqlGenerated\\TableClasses\\Java\\SqlGenerated\\TableClasses\\"+className);
             File sourceFile = new File(classPath+className+".java");
             File parentDirectory = f.getParentFile();
-            URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{f.toURI().toURL()});
+            URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{sourceFile.toURI().toURL()});
 //            ClassLoader.getSystemClassLoader().loadClass(relativePath+"."+className);
 //            Class<?> compiledClass1 =ClassLoader.getSystemClassLoader().loadClass(className+className);
-
 //            URLClassLoader classLoader =new URLClassLoader(new URL[] {parentDirectory.toURI().toURL() });
-
             Class<?> compiledClass = Class.forName("Java.SqlGenerated.TableClasses.SqlMain",true,urlClassLoader);
             compiledClass.newInstance();
             return compiledClass;
