@@ -21,7 +21,7 @@ public class Main  {
     public static SymbolTable symbolTable = new SymbolTable();
     public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
         try {
-            File file = new File("C://Users//Dell//IdeaProjects//LOLO//samples//samples.txt");
+            File file = new File("samples/samples.txt");
             String fileName = file.getAbsolutePath();
             CharStream cs = fromFileName(fileName);
             SQLLexer lexer = new SQLLexer(cs);

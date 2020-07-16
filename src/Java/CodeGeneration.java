@@ -29,9 +29,9 @@ import Java.AST.Parse;
 import Java.AST.instruction.instructions;
 import Java.AST.creating.createvariablewithassign;
 import Java.AST.creating.gneralcreating;
-
+import org.stringtemplate.v4.STGroupString;
 import javax.tools.ToolProvider;
-
+import org.stringtemplate.v4.STGroup;
 
 /**
  * Created by Jehad on 7/13/2020.
@@ -153,7 +153,7 @@ public class CodeGeneration {
                         "loadFunction()::= <<<\\t>public void load(){ System.out.println(\"hiiiii\");<\\n><\\t>}>>  " +
                         "EOF()::=<<<\\n> }>>");
 
-        STGroup stGroup = new STGroupString(stringTemplate);
+        STGroup    stGroup = new STGroupString(stringTemplate);
 
         ST header = stGroup.getInstanceOf("header");
         header.add("name",className);
