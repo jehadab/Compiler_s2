@@ -1,7 +1,6 @@
-create table s (name String , id double) type ="json"  path = "D:";
-create table d (name s , id double) type ="json"  path = "D:";
-create type f (name String);
-func(){
-var x = select id from s;
-var y = select name from d;
+create aggregation function sum ("C:/Users/Jehad/IdeaProjects/Compailer_S2/src/Java/JarFiles/Run_jar/Sql_Compiler.jar",Sum,sumNumber,double,[number])
+Create table students(id double , name String , mark double) type="json"  path="E:/compiler/students.json";
+Func(){
+var x = select sum(id) from students;
+Print(x);
 }

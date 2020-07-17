@@ -56,6 +56,8 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import javax.lang.model.type.NullType;
 import java.util.*;
 
+import static Java.Main.symbolTable;
+
 public class BaseVisitor extends SQLBaseVisitor {
     private Stack<Scope> scopesStack = new Stack<>();
     private int functionNameCounter = 0;
@@ -70,24 +72,27 @@ public class BaseVisitor extends SQLBaseVisitor {
         for (int i = 0; i < ctx.funtion().size() ; i++) {
             function_header header = new function_header();
             header.setName((ctx.funtion().get(i).function_header().use_random_name().getText()));
-            Main.symbolTable.add_functions(header);
+            symbolTable.add_functions(header);
         }
        // System.out.println("aggregation function size"+ctx.create_aggregation_function().size());
         for(int i=0;i<ctx.create_aggregation_function().size();i++)
         {
             AggregationFunction agg_function = new AggregationFunction();
             agg_function.setAggregationFunctionName(ctx.create_aggregation_function().get(i).use_random_name(0).getText());
-            Main.symbolTable.getAgg().add(agg_function);
+
         }
-        System.out.println("list size of aggregation function "+Main.symbolTable.getAgg().size());
+        System.out.println("list size of aggregation function "+ symbolTable.getAgg().size());
         for (int i = 0; i <ctx.children.size(); i++) {
 
             if(ctx.children.get(i) instanceof SQLParser.Create_aggregation_functionContext){
-                p.getAg().add(visitCreate_aggregation_function( ((SQLParser.Create_aggregation_functionContext)ctx.children.get(i))));
+                AggregationFunction agg_function = visitCreate_aggregation_function( ((SQLParser.Create_aggregation_functionContext)ctx.children.get(i)));
+                p.getAg().add(agg_function);
+                symbolTable.getAgg().add(agg_function);
             }
             else if(ctx.children.get(i) instanceof SQLParser.Sql_stmt_listContext){
                 for (int j = 0; j < ((SQLParser.Sql_stmt_listContext) ctx.children.get(i)).sql_stmt().size(); j++) {
                     p.getSqlStmts().add(visitSql_stmt(((SQLParser.Sql_stmt_listContext) ctx.children.get(i)).sql_stmt().get(j)));
+
                 }
             }
             else if(ctx.children.get(i) instanceof SQLParser.FuntionContext){
@@ -104,7 +109,7 @@ public class BaseVisitor extends SQLBaseVisitor {
                 function = visitFuntion((SQLParser.FuntionContext)ctx.children.get(i));
                 p.getFunctions().add(function);
 
-                Main.symbolTable.addScope(scopesStack.pop());
+                symbolTable.addScope(scopesStack.pop());
 
             }
         }
@@ -113,7 +118,7 @@ public class BaseVisitor extends SQLBaseVisitor {
         //System.out.println("the aggreation funtion we have in the parse  "+p.getAg().size());
         p.setLine(ctx.getStart().getLine()); //get line number
         p.setCol(ctx.getStart().getCharPositionInLine()); // get col number
-        Main.symbolTable.addScope(scopesStack.pop());
+        symbolTable.addScope(scopesStack.pop());
         Main.showSymboleTable();
         return p;
     }
@@ -290,7 +295,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
 
         }
         tableType.setTable(true);
-        Main.symbolTable.getDeclaredTypes().add(tableType);
+        symbolTable.getDeclaredTypes().add(tableType);
         currentScope.addTable(table.getTable_name(),table);
         table.setPath_of_table(createTableStmt.getDeclarePathTable().getPath());
         table.setExtension_of_table(createTableStmt.getDeclareTypeTable().getType());
@@ -435,7 +440,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
     }
 
     boolean seminticCheckForDuplicateColumnNameInType( Type columntype , Type type ){
-            if(Main.symbolTable.getDeclaredTypes().get(Main.symbolTable.getDeclaredTypes().indexOf(type)).getColumns().containsValue(columntype))
+            if(symbolTable.getDeclaredTypes().get(symbolTable.getDeclaredTypes().indexOf(type)).getColumns().containsValue(columntype))
             {
                 System.err.println("the column : "+columntype+" is not valid you can not use the same column name in the same type");
                     return false;
@@ -452,7 +457,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         Scope currentScope = scopesStack.peek();
         Type type = new Type();
         Create_Type create_type = new Create_Type();
-        Main.symbolTable.addType(type);
+        symbolTable.addType(type);
         if (ctx.use_random_name() != null) {
 //            todo check for the type name
             type.setName(ctx.use_random_name().getText());
@@ -471,7 +476,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             create_type.setName("Create_Type");
         }
         currentScope.addType(type.getName(), type);
-        Main.symbolTable.addType(type);
+        symbolTable.addType(type);
         Main.showSymboleTable();
         checkDecleratedType(create_type.getType());
 
@@ -503,7 +508,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                         }else if(name.equals(Type.STRING_CONST)){
                             resault = true ;
                         }else{
-                                for (Type subtype :Main.symbolTable.getDeclaredTypes()) {
+                                for (Type subtype : symbolTable.getDeclaredTypes()) {
                                     if(subtype.getName().equals(((Type) colType).getName())){
                                         found = true;
                                        break;
@@ -520,7 +525,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 }
             }else{
                 boolean found = false;
-                for (Type subtype :Main.symbolTable.getDeclaredTypes()) {
+                for (Type subtype : symbolTable.getDeclaredTypes()) {
                     if(subtype.getName().equals(((Type) type).getName())){
                         resault = true;
                         found=true;
@@ -1482,10 +1487,11 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 while (!currentScope.getTableMap().containsKey(tableOrSubQueryList.get(i).getTableName().getName())){
                     currentScope = currentScope.getParent();
                 }
-                if(currentScope.getTableMap().get(tableOrSubQueryList.get(i).getTableName().getName()).getColumnMap().containsKey(columnName.getName()))
-                {
-                    return true ;
-                }
+//                if(currentScope.getTableMap().get(tableOrSubQueryList.get(i).getTableName().getName()).getColumnMap().containsKey(columnName.getName()))
+//                {
+//                    return true ;
+//                }
+                return true;
             }
 
             currentScope = scopesStack.peek();
@@ -1735,7 +1741,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             Type type = new Type();
             if(Error_in_Multiple_Declarations(variable_with_assign.getVar().getVariable_with_opretor().get(0).getVariable_name())){
                 type = getSelectType(variable_with_assign.getVar().getFactored());
-                Main.symbolTable.getDeclaredTypes().add(type);
+                symbolTable.getDeclaredTypes().add(type);
             }
                 createdSymbol.setType(type);
 
@@ -2383,7 +2389,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 sub_function_body.addNode(visitSql_stmt_list((SQLParser.Sql_stmt_listContext) ctx.children.get(i)));
             }
         }
-        Main.symbolTable.addScope(scopesStack.pop());
+        symbolTable.addScope(scopesStack.pop());
 
         return sub_function_body;
     }
@@ -2410,7 +2416,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             if (ctx.exiting_loops() != null) {
                 visitExiting_loops(ctx.exiting_loops());
             }
-            Main.symbolTable.addScope(scopesStack.pop());
+            symbolTable.addScope(scopesStack.pop());
 
         } else if (ctx.foreach() != null) {
 
@@ -2429,7 +2435,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 visitExiting_loops(ctx.exiting_loops());
 
             }
-            Main.symbolTable.addScope(scopesStack.pop());
+            symbolTable.addScope(scopesStack.pop());
         } else if (ctx.for_loop_rule() != null) {
 
             Scope forScope = new Scope();
@@ -2446,7 +2452,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             if (ctx.exiting_loops() != null) {
                 visitExiting_loops(ctx.exiting_loops());
             }
-            Main.symbolTable.addScope(scopesStack.pop());
+            symbolTable.addScope(scopesStack.pop());
 
         }
 
@@ -2554,7 +2560,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 ins.setLoop(e);
             }
 
-            Main.symbolTable.addScope(scopesStack.pop());
+            symbolTable.addScope(scopesStack.pop());
 
 
             if (ctx.else_if_rule() != null) {
@@ -2585,7 +2591,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                         ins.setLoop(e);
 
                     }
-                    Main.symbolTable.addScope(scopesStack.pop());
+                    symbolTable.addScope(scopesStack.pop());
                 }
 
             }
@@ -2615,7 +2621,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                     e.setR(r);
                     ins.setLoop(e);
                 }
-                Main.symbolTable.addScope(scopesStack.pop());
+                symbolTable.addScope(scopesStack.pop());
 
             }
         }
@@ -2692,7 +2698,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             ins.setLoop(visitExiting_loops(ctx.exiting_loops()));
 
         }
-        Main.symbolTable.addScope(scopesStack.pop());
+        symbolTable.addScope(scopesStack.pop());
 
 
         return ins;
@@ -2841,7 +2847,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                    Type selectType = getSelectType(ins.getVar().getFactored());
                    compareTwoTypes(type,selectType);
                    if(type.getName() != null)
-                   Main.symbolTable.getDeclaredTypes().add(selectType);
+                   symbolTable.getDeclaredTypes().add(selectType);
                }
             }
         } else if (ctx.assign_array() != null) {
@@ -2922,10 +2928,22 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         if (ctx.use_random_name() != null) {
             A.setAggregationFunctionName(visitUse_random_name(ctx.use_random_name(0)));
         }
-        //A.setJat_path(ctx.IDENTIFIER().toString());
+        A.setJar_path(ctx.IDENTIFIER().toString());
         A.setClassName(ctx.use_random_name(1).getText());
         A.setMethodName(ctx.use_random_name(2).getText());
-        A.setReturnType(ctx.use_random_name(3).getText());// here sgould we viste retur  type
+        if(ctx.use_random_name(3) != null)
+            A.setReturnType(ctx.use_random_name(3).getText());// here sgould we viste retur  type
+        else if(ctx.K_NUMBER() != null){
+            A.setReturnType(ctx.K_NUMBER().getSymbol().getText());
+        }else if(ctx.K_BOOLEAN() != null){
+            A.setReturnType(ctx.K_BOOLEAN().getSymbol().getText());
+
+        }else if(ctx.K_STRING() != null){
+            A.setReturnType(ctx.K_STRING().getSymbol().getText());
+        }else if(ctx.K_DOUBLE() != null){
+            A.setReturnType(ctx.K_DOUBLE().getSymbol().getText());
+        }
+//        System.err.println("sssssssssssssss "+A.getReturnType());
         if (ctx.parames().size() != 0) {
             System.out.println("the size of parametars " + ctx.use_random_name().size());
             for (int i = 0; i < ctx.parames().size(); i++) {
@@ -3065,7 +3083,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             ins.setDeafult(visitDefult(ctx.defult()));
         }
 
-        Main.symbolTable.addScope(scopesStack.pop());
+        symbolTable.addScope(scopesStack.pop());
 
         return ins;
     }
@@ -3141,9 +3159,9 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
     }
 
     public boolean Error_UNdeclared_Function(String function_name) {
-        for (int i = 0; i < Main.symbolTable.getFunctions().size(); i++) {
+        for (int i = 0; i < symbolTable.getFunctions().size(); i++) {
 
-            if (Main.symbolTable.getFunctions().get(i).getName().equals(function_name)) {
+            if (symbolTable.getFunctions().get(i).getName().equals(function_name)) {
                 return true;
             }
         }
@@ -3153,9 +3171,9 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         return false;
     }
     public boolean Error_UNdeclared_aggregation_Function(String function_name) {
-        for (int i = 0; i < Main.symbolTable.getAgg().size(); i++) {
+        for (int i = 0; i < symbolTable.getAgg().size(); i++) {
 
-            if (Main.symbolTable.getAgg().get(i).getAggregationFunctionName().equals(function_name)) {
+            if (symbolTable.getAgg().get(i).getAggregationFunctionName().equals(function_name)) {
                 return true;
             }
 
@@ -3521,9 +3539,16 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                     if(selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).isStar()){
                         Scope currentScope = scopesStack.peek();
                         boolean found = false;
+                        int indexOfTable = 0;
                         while (currentScope != null)
                         {
-                            found = currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(j).getTableName().getName());
+                            for (int k = 0; k <selectFactoredStmt.getSelect_core().getTableOrSubQueryList().size() ; k++) {
+                                if(currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(k).getTableName().getName())){
+                                    found = true;
+                                    indexOfTable = k ;
+                                    break;
+                                }
+                            }
                             if(found)
                             {
                                 break;
@@ -3531,7 +3556,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                             currentScope = currentScope.getParent();
                         }
                         if(found){
-                            Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(j).getTableName().getName());
+                            Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(indexOfTable).getTableName().getName());
                             Iterator<Column> columns = table.getColumnMap().values().iterator();
                             while (columns.hasNext())
                             {
@@ -3541,14 +3566,35 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                             }
                         }
                     }
+                    else if(selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getFunction_name() != null){
+                        typeName = typeName.concat("$"+ selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getFunction_name());
+                        String aggFuncName= selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getFunction_name();
+                        AggregationFunction aggregationFunction = new AggregationFunction();
+                        for (int k = 0; k <Main.symbolTable.getAgg().size() ; k++) {
+                            if(Main.symbolTable.getAgg().get(k).getAggregationFunctionName().equals(aggFuncName)){
+                                aggregationFunction = Main.symbolTable.getAgg().get(k);
+                                break;
+                            }
+                        }
+                        type.addColumns(aggFuncName,aggregationFunction);
+                    }
                     else {
                         typeName = typeName.concat("_"+ selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getColumnName().getName());
 
                             Scope currentScope = scopesStack.peek();
                             boolean found = false;
+                            int indexOfTable = 0;
                             while (currentScope != null)
                             {
-                                found = currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(j).getTableName().getName());
+                                for (int k = 0; k <selectFactoredStmt.getSelect_core().getTableOrSubQueryList().size() ; k++) {
+                                    if(currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(k).getTableName().getName())){
+                                        found = true;
+                                        indexOfTable = k ;
+                                        break;
+                                    }
+
+                                }
+
                                 if(found)
                                 {
                                     break;
@@ -3556,7 +3602,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                                 currentScope = currentScope.getParent();
                             }
                             if(found) {
-                                Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(j).getTableName().getName());
+                                Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getTableOrSubQueryList().get(indexOfTable).getTableName().getName());
                                 String colName = selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getColumnName().getName();
 
                                 if(table.getColumnMap().containsKey(colName)){
@@ -3564,11 +3610,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                                     type.addColumns(colName,col.getColumn_type());
                                 }
                             }
-
-
-                        selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getColumnName().getName();
-
-                }
+                        }
                 }
             }
         }
@@ -3677,10 +3719,10 @@ public Flat_result FLAT(String table_name ){
         ArrayList<Type> col = new ArrayList<Type>();
         Iterator itr = col.iterator();
         Map<String, Type> maps = new HashMap();
-            for (int i = 0; i < Main.symbolTable.getDeclaredTypes().size(); i++) {
-                if (Main.symbolTable.getDeclaredTypes().get(i).getName().equals(p.getName())) {
-                    itr = Main.symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
-                    maps = Main.symbolTable.getDeclaredTypes().get(i).getColumns();
+            for (int i = 0; i < symbolTable.getDeclaredTypes().size(); i++) {
+                if (symbolTable.getDeclaredTypes().get(i).getName().equals(p.getName())) {
+                    itr = symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
+                    maps = symbolTable.getDeclaredTypes().get(i).getColumns();
                     while (itr.hasNext()) {
                         Type types = (Type) itr.next();
                             if (types.getName().equals(Type.STRING_CONST) || types.getName().equals(Type.BOOLEAN_CONST) || types.getName().equals(Type.NUMBER_CONST)) {
@@ -3707,9 +3749,9 @@ public Flat_result FLAT(String table_name ){
     boolean complix=false ;
         ArrayList<Type> col = new ArrayList<Type>();
         Iterator itr = col.iterator();
-        for (int i = 0; i < Main.symbolTable.getDeclaredTypes().size(); i++) {
-            if (Main.symbolTable.getDeclaredTypes().get(i).getName().equals(t.getName())) {
-                itr = Main.symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
+        for (int i = 0; i < symbolTable.getDeclaredTypes().size(); i++) {
+            if (symbolTable.getDeclaredTypes().get(i).getName().equals(t.getName())) {
+                itr = symbolTable.getDeclaredTypes().get(i).getColumns().values().iterator();
                 while (itr.hasNext()) {
                     Type types = (Type) itr.next();
                     if (!types.getName().equals(Type.STRING_CONST) &&! types.getName().equals(Type.BOOLEAN_CONST) && !types.getName().equals(Type.NUMBER_CONST)) {

@@ -15,12 +15,12 @@ public class AggregationFunction extends Type {
     protected String returnType;
     private ArrayList<parametes> params = new ArrayList();
 
-    public String getJat_path() {
+    public String getJar_path() {
         return jar_path;
     }
 
-    public void setJat_path(String jat_path) {
-        this.jar_path = jat_path;
+    public void setJar_path(String jar_path) {
+        this.jar_path = jar_path;
     }
 
     public AggregationFunction() {

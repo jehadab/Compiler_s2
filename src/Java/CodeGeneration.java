@@ -1,5 +1,6 @@
 package Java;
 
+import Java.SymbolTable.AggregationFunction;
 import Java.SymbolTable.Scope;
 import Java.AST.FunctionDeclaration;
 import Java.SymbolTable.Column;
@@ -49,7 +50,7 @@ public class CodeGeneration {
     public  void run(Parse p ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
         for (Type typ :Main.symbolTable.getDeclaredTypes()) {
 //           the type is table and have path and typeExtension
-//            String typeName = typ.getName();
+            String typeName = typ.getName();
 //            if(typeName.contains("_")){
 //                if(typeName.contains("+")){
 //
@@ -67,9 +68,15 @@ public class CodeGeneration {
 //                    ArrayList<Column> columnList = returnTableColumn(typ);
 //                    String classPath = returnTablePath(typ);
 //                    String classExtension = returnTableExtension(typ);
+//
+//                    createClassType(className,columnList,classPath,classExtension);
+//                    compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
 //                }
 //            }
+            if(typeName.contains("0")){
 
+            }
+             {
                 String className  = returnTableName(typ);
                 ArrayList<Column> columnList = returnTableColumn(typ);
                 String classPath = returnTablePath(typ);
@@ -77,6 +84,9 @@ public class CodeGeneration {
                 createClassType(className,columnList,classPath,classExtension);
                 compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
                 //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
+
+            }
+
 
 
 
@@ -161,10 +171,10 @@ public class CodeGeneration {
 
 
         String stringTemplate = (
-                "header(className,packagePath,imports)::=<<package <packagePath>;<addImports(imports)> <\\n> public class <className> { >>" +
+                "header(className,packagePath,imports)::=<<package <packagePath>;<addImports(imports)> <\\n> "+importJarLoader()+" public class <className> { >>" +
                 "addImports(imports)::=<< <imports:{import |<\\n>import Java.SqlGenerated.TableClasses.<import.typeName>; }> >>" +
-                "mainFunction(functionCall)::= << <\\n><\\t>public  void Main(){ <functionCall.header.name>(); }<\\n> >>" +
-                "addFunctions(functions , nameAndType)::=<< <functions:{ function|private void <function.header.name>(){<\\n>" +
+                "mainFunction(functionCall)::= << <\\n><\\t>public  void Main() "+throwException()+" { <functionCall.header.name>(); }<\\n> >>" +
+                "addFunctions(functions , nameAndType)::=<< <functions:{ function|private void <function.header.name>()"+throwException()+"{<\\n>" +
                         "<bodyCodeSorce(nameAndType)>" +
                         "   }> >>" +
                         "bodyCodeSorce(nameAndType) ::=<< <nameAndType:{namesTypes | <namesTypes.typeName> <namesTypes.varName> = new <namesTypes.typeName>();<\\n>" +
@@ -215,24 +225,40 @@ public class CodeGeneration {
                                            List<Column> columnArrayList, String tablePath
             , String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
+        ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
+        ArrayList<Column> columns = new ArrayList<>();
+        for (Column col:columnArrayList
+             ) {
+//            System.err.println("sssssssssssssssssssssssssssss "+col.getColumn_name());
+            if(col.getColumn_type() instanceof AggregationFunction)
+            {
+                aggregationFunctionArrayList.add((AggregationFunction) col.getColumn_type());
+                System.err.println("sssssssssssssssssssssssssssss "+((AggregationFunction)col.getColumn_type()).getJar_path());
+//                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
+
+            }
+            else {
+                columns.add(col);
+            }
+        }
+
         String packagePath = "Java.SqlGenerated.TableClasses";
         String  stringTemplate =  (
-                "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
-                        "import java.util.List; <\\n>" +
-                        "import com.google.gson.Gson; <\\n>" +
-                        "import com.google.gson.JsonArray; <\\n>" +
-                        "import com.google.gson.JsonElement; <\\n>" +
-                        "import com.google.gson.JsonObject; <\\n>" +
-                        "import com.google.gson.stream.JsonReader; <\\n>" +
-                        "import java.io.FileNotFoundException; <\\n>" +
-                        "import java.io.FileReader; <\\n>" +
+                "header(name,packagePath)  ::=<< package <packagePath>; <\\n> "
+                        +importJarLoader()+
                         " public class <name> {>>" +
                         "attribute(columns) ::=<<  <columns:{col |<\\n><\\t><col.column_type.name>    <col.column_name> ;}> >>" +
+                        "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> $<aggFun.AggregationFunctionName> ; }>  >>" +
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
                         "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
-                        "loadFunction()::= <<<\\t>public void load(){ System.out.println(\"hiiiii\");<\\n><\\t>}>>  " +
+                        "loadFunction(aggList)::= << <\\t>public void load() <if(aggList)> "+throwException()+" <endif> {<if(aggList)> <aggList:{aggCall | <aggCall.AggregationFunctionName>(); }> <endif> System.out.println(\"hiiiii\");<\\n><\\t>} " +
+                        "<if(aggList)> <loadAggFuncs(aggList)>  <endif>   >>  " +
+                        "loadAggFuncs(aggList) ::= << <aggList :{ agg|<\\n><\\t> public void <agg.AggregationFunctionName>() "+throwException()+" " +
+                        "{ "+loadAggClassToSelect()+"  \\} }> >> " +
                         "EOF()::=<<<\\n> }>>");
+
+
 
         STGroup stGroup = new STGroupString(stringTemplate);
 
@@ -241,7 +267,10 @@ public class CodeGeneration {
         header.add("packagePath",packagePath);
 
         ST attribute = stGroup.getInstanceOf("attribute");
-        attribute.add("columns",columnArrayList );
+        attribute.add("columns",columns );
+
+        ST aggFunc = stGroup.getInstanceOf("aggFunctions");
+        aggFunc.add("aggList",aggregationFunctionArrayList);
 
         ST tableAttribute = stGroup.getInstanceOf("tableAttribute");
         tableAttribute.add("tablePath",tablePath);
@@ -252,6 +281,7 @@ public class CodeGeneration {
         staticList.add("tablePath",tablePath);
 
         ST loadFunction = stGroup.getInstanceOf("loadFunction");
+        loadFunction.add("aggList",aggregationFunctionArrayList);
 
         ST EOF = stGroup.getInstanceOf("EOF");
 
@@ -275,6 +305,7 @@ public class CodeGeneration {
 
             bufferedWriter.write(header.render());
             bufferedWriter.write(attribute.render());
+            bufferedWriter.write(aggFunc.render());
             bufferedWriter.write(tableAttribute.render());
             bufferedWriter.write(staticList.render());
             bufferedWriter.write(loadFunction.render());
@@ -389,9 +420,58 @@ public class CodeGeneration {
         return null;
 
     }
+    private String loadAggClassToSelect(){
+        String stringTEmplate =(
+                " <\\t><\\n>String JarPath = <agg.jar_path>;<\\n>" +
+                "<\\t>String JarName = \"<agg.AggregationFunctionName>.jar\";<\\n>" +
+                "<\\t>String ClassName = \"<agg.ClassName>\";<\\n>" +
+                "<\\t>String MethodName = \"<agg.MethodName>\";<\\n>" +
+                "<\\t>ArrayList\\<Double> myNumbers = new ArrayList\\<>(Arrays.asList(1.0, 2.0, 3.0, 12.0));<\\n>" +
+                "<\\t>URLClassLoader myClassLoader = new URLClassLoader(" +
+                "<\\t>new URL[]{new File(JarPath ).toURI().toURL()\\},Main.class.getClassLoader()); <\\n>" +
+                "<\\t>Class myClass = Class.forName(ClassName, true, myClassLoader);<\\n>" +
+                "<\\t>Method mySingeltonGetterMethod = myClass.getMethod(\"get\" + ClassName,null);<\\n>" +
+                "<\\t>Object myObject = mySingeltonGetterMethod.invoke(null);<\\n>" +
+                "<\\t>Object myValue = myObject.getClass().getMethod(MethodName, List.class).invoke(myObject, myNumbers);<\\n>" +
+                "<\\t>System.out.println(myValue);<\\n>"
 
+        );
+
+
+
+        return stringTEmplate;
+
+    }
+    private String importJarLoader()
+    {
+        String stringTEmplate = ("import java.util.List; <\\n>" +
+                " import Java.Main;<\\n>" +
+                "import com.google.gson.Gson; <\\n>" +
+                "import com.google.gson.JsonArray; <\\n>" +
+                "import com.google.gson.JsonElement; <\\n>" +
+                "import com.google.gson.JsonObject; <\\n>" +
+                "import com.google.gson.stream.JsonReader; <\\n>" +
+                "import java.io.FileNotFoundException; <\\n>" +
+                "import java.io.FileReader; <\\n>" +
+                "import java.io.File;\n" +
+                "import java.lang.reflect.InvocationTargetException;\n" +
+                "import java.lang.reflect.Method;\n" +
+                "import java.net.MalformedURLException;\n" +
+                "import java.net.URL;\n" +
+                "import java.net.URLClassLoader;\n" +
+                "import java.util.ArrayList;\n" +
+                "import java.util.Arrays;\n" +
+                "import java.util.List;\n" );
+        return stringTEmplate;
+    }
+    private String throwException(){
+        String stringTemplate = ("throws ClassNotFoundException, NoSuchMethodException" +
+                ", InvocationTargetException, IllegalAccessException, MalformedURLException");
+        return stringTemplate;
+    }
 
 }
+
 
 
 
