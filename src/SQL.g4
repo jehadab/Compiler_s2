@@ -889,13 +889,14 @@ any_name
  | STRING_LITERAL
  //| '(' any_name ')'
  ;
-create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION  use_random_name  OPEN_PAR IDENTIFIER
+create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION  use_random_name  OPEN_PAR
+                                                                               IDENTIFIER
                                                                                COMMA
                                                                                use_random_name
                                                                                COMMA
                                                                                use_random_name
                                                                                COMMA
-                                                                               use_random_name
+                                                                               (use_random_name | K_NUMBER | K_BOOLEAN | K_STRING | K_DOUBLE)
                                                                                COMMA
                                                                                OPEN_SQER_BAR (parames? (COMMA parames)*)  CLOSE_SQER_PAR CLOSE_PAR
   //jar_pathe
@@ -1616,7 +1617,7 @@ K_WITHOUT : W I T H O U T;
 K_WHILE :  W H I L E ;
 K_CONTINUE : C O N T I N U E ;
 K_JSON : J S O N ;
-K_AGGREGATION : A G G  R E G A T I O N ;
+K_AGGREGATION : A G G R E G A T I O N ;
 K_STRING: CapS T R I N G  ;
 K_BOOLEAN : B O O L E A N ;
 K_NUMBER : N U M B E R ;

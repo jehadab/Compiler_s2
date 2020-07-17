@@ -9,12 +9,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 public class json_testing {
-    public void get_data_from_json(employess emplo,String name ) {
+    public void get_data_from_json(employess emplo,String name ,String path ) {
 
         FileReader fr = null;
         Gson json = new Gson();
         try {
-            fr=new FileReader("C://Users//Dell//IdeaProjects//LOLO//src//Files_code_Json_csv//json_fle.json");
+            fr=new FileReader("src/Files_code_Json_csv/json_fle.json");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -114,7 +114,6 @@ public class json_testing {
         return null;
     }
 
-
     public <T> T get_table(JsonArray array) {
 
         city c = new city();
@@ -141,21 +140,3 @@ public class json_testing {
         return (T) c;
     }
 }
-
-
-
-//for (int i= 0; i<columnList.size();i++){
-//if(columnList.get(i).getColumn_type().getName()!=Type.NUMBER_CONST) {
-//        setid(j.get(i).getAsJsonObject().get(columnList.get(i).getColumn_name()).getAsDouble());
-//        }
-//        else if(columnList.get(i).getColumn_type().getName()!=Type.BOOLEAN_CONST) {
-////		setid(j.get(i).getAsJsonObject().get(columnList.get(i).getColumn_name()).getAsBoolean());
-//        }
-//        else if(columnList.get(i).getColumn_type().getName()!=Type.STRING_CONST) {
-//        setname(j.get(i).getAsJsonObject().get(columnList.get(i).getColumn_name()).getAsString());
-//        }
-//        else {
-//
-//        }
-//
-//        }
