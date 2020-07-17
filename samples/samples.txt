@@ -1,5 +1,4 @@
-create table s (name String , id double) type ="json"  path = "D:";
-create table d (name String , id double) type ="json"  path = "D:";
+create table s (name String , id double ,die boolean) type ="json"  path = "D:";
 create type f (name String);
 func(){
 var x = select id from s;

@@ -114,6 +114,7 @@ public class json_testing {
         return null;
     }
 
+
     public <T> T get_table(JsonArray array) {
 
         city c = new city();
@@ -144,19 +145,17 @@ public class json_testing {
 
 
 //for (int i= 0; i<columnList.size();i++){
-//        if(j.get(i).getAsJsonObject().get(columnList.get(i).getColumn_name())!=null){
-//        if(columnList.get(i).getColumn_type().getName()!=Type.NUMBER_CONST){
-////			s.setId(j.get(i).getAsJsonObject().get("id").getAsInt());
+//if(columnList.get(i).getColumn_type().getName()!=Type.NUMBER_CONST) {
+//        setid(j.get(i).getAsJsonObject().get(columnList.get(i).getColumn_name()).getAsDouble());
 //        }
-//        else if(columnList.get(i).getColumn_type().getName()!=Type.BOOLEAN_CONST){
+//        else if(columnList.get(i).getColumn_type().getName()!=Type.BOOLEAN_CONST) {
+////		setid(j.get(i).getAsJsonObject().get(columnList.get(i).getColumn_name()).getAsBoolean());
+//        }
+//        else if(columnList.get(i).getColumn_type().getName()!=Type.STRING_CONST) {
+//        setname(j.get(i).getAsJsonObject().get(columnList.get(i).getColumn_name()).getAsString());
+//        }
+//        else {
 //
-//        }
-//        else if(columnList.get(i).getColumn_type().getName()!=Type.STRING_CONST){
-//
-//        }
-//        else{
-//
-//        }
 //        }
 //
 //        }

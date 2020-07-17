@@ -3,6 +3,33 @@ package Java.SymbolTable;
 public class Column {
     private String column_name;
     private Type column_type;
+    private String TypeNumber ;
+    private String TypeString ;
+    private String Typeboolean;
+
+    public String getTypeNumber() {
+        return TypeNumber;
+    }
+
+    public void setTypeNumber(String typeNumber) {
+        TypeNumber = typeNumber;
+    }
+
+    public String getTypeString() {
+        return TypeString;
+    }
+
+    public void setTypeString(String typeString) {
+        TypeString = typeString;
+    }
+
+    public String getTypeboolean() {
+        return Typeboolean;
+    }
+
+    public void setTypeboolean(String typeboolean) {
+        Typeboolean = typeboolean;
+    }
 
     public String getColumn_name() {
         return column_name;

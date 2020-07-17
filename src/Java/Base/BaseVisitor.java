@@ -262,6 +262,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                         System.out.println("------------------------------------------------------------------------------------------------");
                     }
                     col.setColumn_type(columnDefs.get(i).getType());
+                    System.out.println();
                     table.addColumnMap(columnDefs.get(i).getColumnName() , col);
                     tableType.addColumns(columnDefs.get(i).getColumnName(),col.getColumn_type());
                     checkDecleratedType(col.getColumn_type());

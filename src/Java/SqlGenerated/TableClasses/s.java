@@ -12,14 +12,21 @@ import com.google.gson.stream.JsonReader;
 import java.io.FileNotFoundException; 
 import java.io.FileReader; 
  public class s {
+  	boolean    die ;
   	String    name ;
   	double    id ; 
+ 	 public void setdie(boolean value){
+ 	this.die  = value ; 
+ 	} 
  	 public void setname(String value){
  	this.name  = value ; 
  	} 
  	 public void setid(double value){
  	this.id  = value ; 
  	}  
+ 	 public boolean getdie(){
+ 	return die ;   
+ 	} 
  	 public String getname(){
  	return name ;   
  	} 
@@ -29,10 +36,16 @@ import java.io.FileReader;
  	String tablePath = "D:";
 	String tableType = "json"; 
  	static List<s> entityObject  ;
- 	public void load(){
-	System.out.println("hiiiii");
+  	public void load(){
+	if(tableType == "json")
+	{
+	entityObject = readJsonFile();
 	}
-	public List<s> readJsonFile(){
+	else 
+	{
+	}
+	}
+	 public List<s> readJsonFile(){
 	List<s> result = new ArrayList<>();
 	FileReader fr = null;Gson json = new Gson();
 	try {
@@ -43,32 +56,21 @@ import java.io.FileReader;
 	JsonObject testing = json.fromJson(fr, JsonObject.class);
 	JsonElement json_ele = testing.get("s");
 	JsonArray j = json_ele.getAsJsonArray();
-	Type type = returnSpecificType("s");
-	List<Column> columnList = new ArrayList<>();
-	columnList = returnListOfColumn(type);
+	for (int i = 0 ; i < j.size() ; i++ ) {
+	s tableName = new s();
+	if(j.get(i).getAsJsonObject().get("die") != null);
+	{
+	tableName.setdie(j.get(i).getAsJsonObject().get("die").getAsBoolean());
+	}
+	 if(j.get(i).getAsJsonObject().get("name") != null);
+	{
+	tableName.setname(j.get(i).getAsJsonObject().get("name").getAsString());
+	}
+	 if(j.get(i).getAsJsonObject().get("id") != null);
+	{
+	tableName.setid(j.get(i).getAsJsonObject().get("id").getAsDouble());
+	}
+	 result.add(tableName);
+	}
 	return result;
-	}
-	public Type returnSpecificType(String typeName)
-	{
-	for(Type typ :Main.symbolTable.getDeclaredTypes())
-	{
-	if(typ.getName() == typeName)
-	{
-	return typ;
-	}
-	}
-	return null;
-	}
-	public List<Column>  returnListOfColumn(Type type)
-	{
-	List<Column> columnList = new ArrayList<>();
-	for(Object col:type.getColumns().keySet().toArray())
-	{
-	Column column = new Column();
-	column.setColumn_name(col.toString());
-	column.setColumn_type(type.getColumns().get(col.toString()));
-	columnList.add(column);
-	}
-	return columnList;
-	}
- }
+	 } }
