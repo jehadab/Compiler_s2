@@ -49,12 +49,10 @@ public class CodeGeneration {
             ArrayList<Column> columnList = returnTableColumn(typ);
             String classPath = returnTablePath(typ);
             String classExtension = returnTableExtension(typ);
-            if(typ.isTable()){
+
                 createClassType(className,columnList,classPath,classExtension);
                 compileClasses(className,"C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//TableClasses//");
                 loadClasses(className,"C://Users//Dell//IdeaProjects//LOLO//src//Java//SqlGenerated//TableClasses//","Java.SqlGenerated.TableClasses");
-
-            }
 //            if( == 0){
 ////                runIt(className);
 //            }
@@ -155,10 +153,12 @@ public class CodeGeneration {
         staticList.add("tablePath",tablePath);
 
         ST loadFunction = stGroup.getInstanceOf("loadFunction");
+        loadFunction.add("tablePath",tablePath);
 
         ST readJsonFile = stGroup.getInstanceOf("readJsonFile");
         readJsonFile.add("className",className);
         readJsonFile.add("columns",columnArrayList);
+        readJsonFile.add("tablePath",tablePath);
 
 //        ST returnSpecificType = stGroup.getInstanceOf("returnSpecificType");
 //
@@ -314,9 +314,11 @@ String ss="true" ;
 
                     "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
 
-                    "loadFunction()::=<< " +
+
+                    "loadFunction(tablePath)::=<< " +
                     "<\\t>public void load()" +
                     "{<\\n><\\t>" +
+                    "<if(tablePath)>" +
                     "if(tableType == \"json\")<\\n><\\t>" +
                     "{<\\n><\\t>" +
                     "entityObject = readJsonFile();" +
@@ -325,10 +327,12 @@ String ss="true" ;
                     "else <\\n><\\t>" +
                     "{<\\n><\\t>" +
                     "}<\\n><\\t>" +
+                    "<endif>"+
                     "}>>" +
 
-                    "readJsonFile(className,columns)::=<<" +
+                    "readJsonFile(className,columns,tablePath)::=<<" +
                     "<\\n><\\t> public List\\<<className>\\> readJsonFile(){<\\n><\\t>" +
+                    "<if(tablePath)>" +
                     "List\\<<className>\\> result = new ArrayList\\<>();<\\n><\\t>" +
                     "FileReader fr = null;" +
                     "Gson json = new Gson();<\\n><\\t>" +
@@ -365,9 +369,14 @@ String ss="true" ;
                     " }>" +
                     "result.add(tableName);<\\n><\\t>" +
                     "}<\\n><\\t>" +
-
                     "return result;" +
+                    "<else>"+
+                    "return null;<\\n><\\t>"+
+                    "<endelse>"+
+                    "<endif>"+
+
                     "<\\n><\\t> }>>" +
+
                     "EOF()::=<< }>>");
     return  stringTemplate;
 }
