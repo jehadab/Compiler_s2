@@ -252,7 +252,7 @@ public class CodeGeneration {
                         "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
                         "loadFunction(aggList)::= << <\\t>public static void load() <if(aggList)> "+throwException()+" <endif> {<if(aggList)> <aggList:{aggCall | <aggCall.AggregationFunctionName>(); }> <endif> System.out.println(\"hiiiii\");<\\n><\\t>} " +
                         "<if(aggList)> <loadAggFuncs(aggList)>  <endif>   >>  " +
-                        "loadAggFuncs(aggList) ::= << <aggList :{ agg|<\\n><\\t> public static void <agg.AggregationFunctionName>() "+throwException()+" " +
+                        "loadAggFuncs(aggList) ::= << <aggList :{ agg|<\\n><\\t><if(agg.jar_path)> hi<endif> public static void <agg.AggregationFunctionName>() "+throwException()+" " +
                         "{ "+loadAggClassToSelect()+"  \\} }> >> " +
                         "EOF()::=<<<\\n> }>>");
 
@@ -427,7 +427,7 @@ public class CodeGeneration {
                 "<\\t>ArrayList\\<Double> myNumbers = new ArrayList\\<>(Arrays.asList(1.0, 2.0, 3.0, 12.0));<\\n>" +
                 "<\\t>URLClassLoader myClassLoader = new URLClassLoader(" +
                 "<\\t>new URL[]{new File(JarPath ).toURI().toURL()\\},Main.class.getClassLoader()); <\\n>" +
-                "<\\t>Class myClass = Class.forName(ClassName, true, myClassLoader);<\\n>" +
+                "<\\t>Class\\<?> myClass = Class.forName(ClassName, true, myClassLoader);<\\n>" +
                 "<\\t>Method mySingeltonGetterMethod = myClass.getMethod(\"get\" + ClassName,null);<\\n>" +
                 "<\\t>Object myObject = mySingeltonGetterMethod.invoke(null);<\\n>" +
                 "<\\t>Object myValue = myObject.getClass().getDeclaredMethod(MethodName, List.class).invoke(myObject, myNumbers);<\\n>" +
