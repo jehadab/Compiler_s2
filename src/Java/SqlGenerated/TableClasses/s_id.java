@@ -7,7 +7,7 @@
  import java.util.List;
  public class s_id {
   	double    id ;
-  	ArrayList<employess> e =  new ArrayList<employess>();
+  	/*ArrayList<employess> e =  new ArrayList<employess>();
   	public void put_damy_data(){
   	    for(int i=0;i<4;i++)
         {
@@ -17,12 +17,12 @@
             temp.setAge(i);
             e.add(temp);
         }
-    }
+    }*/
  	public void load(){ System.out.println("hiiiii");
 	}
-	public void where_fucntion (){
+	/*public void where_fucntion (){
         put_damy_data();
 
 
-    }
+    }*/
  }

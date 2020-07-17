@@ -6,7 +6,7 @@ import Files_code_Json_csv.json_testing;
 import Java.AST.Parse;
 import Java.Base.BaseVisitor;
 import Java.JarFiles.Sum;
-import Java.SqlGenerated.TableClasses.SqlMain;
+//import Java.SqlGenerated.TableClasses.SqlMain;
 import Java.SymbolTable.*;
 import generated.SQLLexer;
 import generated.SQLParser;
@@ -42,7 +42,6 @@ public class Main  {
             ParseTree tree = parser.parse();
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
-
             CodeGeneration codeGeneration = new CodeGeneration();
             codeGeneration.run( p);
             codeGeneration.where_function(p);
