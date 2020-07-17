@@ -46,7 +46,7 @@ import java.nio.file.FileSystem;
 
 public class CodeGeneration {
 
-        private volatile boolean compiled = false;
+//        private volatile boolean compiled = false;
     public  void run(Parse p ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
         for (Type typ :Main.symbolTable.getDeclaredTypes()) {
 //           the type is table and have path and typeExtension
@@ -82,7 +82,7 @@ public class CodeGeneration {
                 String classPath = returnTablePath(typ);
                 String classExtension = returnTableExtension(typ);
                 createClassType(className,columnList,classPath,classExtension);
-                compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
+                //compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
                 //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
 
             }
@@ -94,21 +94,19 @@ public class CodeGeneration {
 ////                runIt(className);
 //            }A
         }
-        if(compiled){
-            compiled= false;
             createMainClass(p.getFunctions());
-            compiled = compileClasses("SqlMain","src/Java/SqlGenerated/TableClasses/");
-            if(compiled){
-                Class compiledClass= loadClasses("SqlMain","src/Java/SqlGenerated/TableClasses/","src.Java.SqlGenerated.TableClasses");
-                invokeMethod("Main",compiledClass);
-            }
-        }
+            // compileClasses("SqlMain","src/Java/SqlGenerated/TableClasses/");
+//            if(compiled){
+//                Class compiledClass= loadClasses("SqlMain","src/Java/SqlGenerated/TableClasses/","src.Java.SqlGenerated.TableClasses");
+//                invokeMethod("Main",compiledClass);
+//            }
+//        }
 
 
     }
     private  void createMainClass(List<FunctionDeclaration> functionDeclaration){
 
-        String packagePath =  "Java.SqlGenerated.TableClasses";
+        String packagePath =  "Java";
         String className = "SqlMain";
 //        System.out.println(functionDeclaration.get(0).getHeader().getName().hashCode());
 //        String typeName = ((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0))
@@ -173,8 +171,8 @@ public class CodeGeneration {
         String stringTemplate = (
                 "header(className,packagePath,imports)::=<<package <packagePath>;<addImports(imports)> <\\n> "+importJarLoader()+" public class <className> { >>" +
                 "addImports(imports)::=<< <imports:{import |<\\n>import Java.SqlGenerated.TableClasses.<import.typeName>; }> >>" +
-                "mainFunction(functionCall)::= << <\\n><\\t>public  void Main() "+throwException()+" { <functionCall.header.name>(); }<\\n> >>" +
-                "addFunctions(functions , nameAndType)::=<< <functions:{ function|private void <function.header.name>()"+throwException()+"{<\\n>" +
+                "mainFunction(functionCall)::= << <\\n><\\t>public static void main(String[] args) "+throwException()+" { <functionCall.header.name>(); }<\\n> >>" +
+                "addFunctions(functions , nameAndType)::=<< <functions:{ function|private static void <function.header.name>()"+throwException()+"{<\\n>" +
                         "<bodyCodeSorce(nameAndType)>" +
                         "   }> >>" +
                         "bodyCodeSorce(nameAndType) ::=<< <nameAndType:{namesTypes | <namesTypes.typeName> <namesTypes.varName> = new <namesTypes.typeName>();<\\n>" +
@@ -202,7 +200,7 @@ public class CodeGeneration {
 
         try {
 
-            File   file = new File("src/Java/SqlGenerated/TableClasses/" + className + ".java");
+            File   file = new File("src/Java/" + className + ".java");
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(header.render());
             fileWriter.write(mainFunction.render());
@@ -233,7 +231,7 @@ public class CodeGeneration {
             if(col.getColumn_type() instanceof AggregationFunction)
             {
                 aggregationFunctionArrayList.add((AggregationFunction) col.getColumn_type());
-                System.err.println("sssssssssssssssssssssssssssss "+((AggregationFunction)col.getColumn_type()).getJar_path());
+//                System.err.println("sssssssssssssssssssssssssssss "+((AggregationFunction)col.getColumn_type()).getJar_path());
 //                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
 
             }
@@ -252,9 +250,9 @@ public class CodeGeneration {
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
                         "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
-                        "loadFunction(aggList)::= << <\\t>public void load() <if(aggList)> "+throwException()+" <endif> {<if(aggList)> <aggList:{aggCall | <aggCall.AggregationFunctionName>(); }> <endif> System.out.println(\"hiiiii\");<\\n><\\t>} " +
+                        "loadFunction(aggList)::= << <\\t>public static void load() <if(aggList)> "+throwException()+" <endif> {<if(aggList)> <aggList:{aggCall | <aggCall.AggregationFunctionName>(); }> <endif> System.out.println(\"hiiiii\");<\\n><\\t>} " +
                         "<if(aggList)> <loadAggFuncs(aggList)>  <endif>   >>  " +
-                        "loadAggFuncs(aggList) ::= << <aggList :{ agg|<\\n><\\t> public void <agg.AggregationFunctionName>() "+throwException()+" " +
+                        "loadAggFuncs(aggList) ::= << <aggList :{ agg|<\\n><\\t> public static void <agg.AggregationFunctionName>() "+throwException()+" " +
                         "{ "+loadAggClassToSelect()+"  \\} }> >> " +
                         "EOF()::=<<<\\n> }>>");
 
@@ -432,7 +430,7 @@ public class CodeGeneration {
                 "<\\t>Class myClass = Class.forName(ClassName, true, myClassLoader);<\\n>" +
                 "<\\t>Method mySingeltonGetterMethod = myClass.getMethod(\"get\" + ClassName,null);<\\n>" +
                 "<\\t>Object myObject = mySingeltonGetterMethod.invoke(null);<\\n>" +
-                "<\\t>Object myValue = myObject.getClass().getMethod(MethodName, List.class).invoke(myObject, myNumbers);<\\n>" +
+                "<\\t>Object myValue = myObject.getClass().getDeclaredMethod(MethodName, List.class).invoke(myObject, myNumbers);<\\n>" +
                 "<\\t>System.out.println(myValue);<\\n>"
 
         );

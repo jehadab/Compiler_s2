@@ -10,16 +10,16 @@ import Java.SymbolTable.*;
 import generated.SQLLexer;
 import generated.SQLParser;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
 
@@ -41,8 +41,18 @@ public class Main  {
             CodeGeneration codeGeneration = new CodeGeneration();
             codeGeneration.run( p);
 
+//            try {
+//                double count = (double) Max(new ArrayList<>(Arrays.asList(1, 2, 3)));
+//                System.out.println("Count is: " + count);
+//            } catch (Exception e) {
+//
+//            }
+
+
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 //        Runtime.getRuntime().exec("java -cp Sum.jar Java.JarFiles.Sum");
@@ -108,6 +118,20 @@ public class Main  {
         testing.get_data_from_json(ee,employ,"src/Files_code_Json_csv/json_fle.json");
         csv_testing c= new csv_testing();
         c.get_data_from_csv("src/Files_code_Json_csv/csv_testing.csv","employess");
+    }
+    public static Object Max(ArrayList<?> values) throws Exception {
+        String JarPath = "src/AggregationFunctions.jar";
+        String ClassName = "CommonAggregations";
+        String MethodName = "Count";
+        URLClassLoader myClassLoader = new URLClassLoader(new URL[]{new File(JarPath).toURI().toURL()}, Main.class.getClassLoader());
+        Class<?> myClass = Class.forName(ClassName, true, myClassLoader);
+        Method mySingeltonGetterMethod = myClass.getMethod("get" + ClassName, null);
+        Object myObject = mySingeltonGetterMethod.invoke(null);
+        // for(Method m : myClass.getDeclaredMethods())
+        // System.out.println (m);
+
+        return myObject.getClass().getDeclaredMethod(MethodName, List.class).invoke(myObject, values);
+
     }
 
     }

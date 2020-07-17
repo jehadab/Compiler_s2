@@ -5,7 +5,7 @@ import java.util.List;
  * Created by Jehad on 7/16/2020.
  */
 
-public final class Sum {
+public class Sum {
     public double sumNumber(List<Double> numbers){
 
         return numbers.

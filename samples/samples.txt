@@ -1,4 +1,4 @@
-create aggregation function sum ("C:/Users/Jehad/IdeaProjects/Compailer_S2/src/Java/JarFiles/Run_jar/Sql_Compiler.jar",Sum,sumNumber,double,[number])
+create aggregation function sum ("src/AggregationFunctions.jar",CommonAggregations,SUM,double,[number])
 Create table students(id double , name String , mark double) type="json"  path="E:/compiler/students.json";
 Func(){
 var x = select sum(id) from students;
