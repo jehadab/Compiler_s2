@@ -405,7 +405,7 @@ public void where_function (Parse p){
     {
         employess temp = new employess();
         temp.setId(i);
-        temp.setName("testing1"+i);
+        temp.setName("testing  "+i);
         //temp.setAge(i);
         e.add(temp);
     }
@@ -469,10 +469,12 @@ public void where_function (Parse p){
         System.out.println("the select column "+select_column);
         if(select_column.equals("name"))
         {
+            if(temp_list.size()!=0)
             for(int i=0;i<temp_list.size();i++)
             {
                 result_list.add(temp_list.get(i).getName());
             }
+            else System.out.println(" no result value we a have ");
         }
        for(int i=0;i<result_list.size();i++)
        {
@@ -480,15 +482,16 @@ public void where_function (Parse p){
        }
     }
     public ArrayList<employess> get_where_result( String right_side, String left_side, String operator,ArrayList<employess> datalist){
+        //know what the right real type
+        //symbole map column name --> type
+        //if type double // convert string ->double
+        // if type boolean ///convert strign -> boolean
+        // print_the_list(datalist);
+        int temp_righ_value=Integer.valueOf(right_side);
+        ArrayList<employess> temp_list = new ArrayList<employess>();
      if(operator.equals("="))
      {
-         //know what the right real type
-         //symbole map column name --> type
-         //if type double // convert string ->double
-         // if type boolean ///convert strign -> boolean
-         // print_the_list(datalist);
-         int temp_righ_value=Integer.valueOf(right_side);
-         ArrayList<employess> temp_list = new ArrayList<employess>();
+
       if(left_side.equals("id"))
       {
           for(int i=0;i<datalist.size();i++)
@@ -504,9 +507,89 @@ public void where_function (Parse p){
           }
 
       }
+
 return temp_list;
      }
-return datalist;
+     if(operator.equals("!="))
+     {
+         for(int i=0;i<datalist.size();i++)
+         {
+             // System.out.println("int he arraylist we have "+datalist.get(i).getId());
+             if(datalist.get(i).getId()!=temp_righ_value)
+             {
+                 //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                 temp_list.add(datalist.get(i));
+
+             }
+
+         }
+         return temp_list;
+     }
+     if(operator.equals("<"))
+     {
+         for(int i=0;i<datalist.size();i++)
+         {
+             // System.out.println("int he arraylist we have "+datalist.get(i).getId());
+             if(datalist.get(i).getId()<temp_righ_value)
+             {
+                 //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                 temp_list.add(datalist.get(i));
+
+             }
+
+         }
+        // System.out.println(" size of temp_list "+temp_list.size());
+         return temp_list;
+     }
+        if(operator.equals(">"))
+        {
+
+            for(int i=0;i<datalist.size();i++)
+            {
+                // System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                if(datalist.get(i).getId()>temp_righ_value)
+                {
+                    //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                    temp_list.add(datalist.get(i));
+
+                }
+
+            }
+           // System.out.println(" size of temp_list "+temp_list.size());
+            return temp_list;
+        }
+        if(operator.equals("<="))
+        {
+            for(int i=0;i<datalist.size();i++)
+            {
+                // System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                if(datalist.get(i).getId()<=temp_righ_value)
+                {
+                    //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                    temp_list.add(datalist.get(i));
+
+                }
+
+            }
+            return temp_list;
+        }
+        if(operator.equals(">="))
+        {
+            for(int i=0;i<datalist.size();i++)
+            {
+                // System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                if(datalist.get(i).getId()>=temp_righ_value)
+                {
+                    //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                    temp_list.add(datalist.get(i));
+
+                }
+
+            }
+            return temp_list;
+        }
+
+return null;
     }
     public void print_the_list(ArrayList<employess> t){
         for(int i=0;i<t.size();i++)
