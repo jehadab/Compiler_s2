@@ -1,5 +1,6 @@
 package Java;
 
+import Java.SymbolTable.AggregationFunction;
 import Files_code_Json_csv.employess;
 import Java.SymbolTable.Scope;
 import Java.AST.FunctionDeclaration;
@@ -46,9 +47,10 @@ import java.nio.file.FileSystem;
 
 public class CodeGeneration {
 
-        private volatile boolean compiled = false;
-    public  void run(Parse p ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
-        for (Type typ :Main.symbolTable.getDeclaredTypes()) {
+    private volatile boolean compiled = false;
+
+    public void run(Parse p) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
+        for (Type typ : Main.symbolTable.getDeclaredTypes()) {
 //           the type is table and have path and typeExtension
 //            String typeName = typ.getName();
 //            if(typeName.contains("_")){
@@ -71,35 +73,35 @@ public class CodeGeneration {
 //                }
 //            }
 
-                String className  = returnTableName(typ);
-                ArrayList<Column> columnList = returnTableColumn(typ);
-                String classPath = returnTablePath(typ);
-                String classExtension = returnTableExtension(typ);
-                createClassType(className,columnList,classPath,classExtension);
-                compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
-                //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
-
+            String className = returnTableName(typ);
+            ArrayList<Column> columnList = returnTableColumn(typ);
+            String classPath = returnTablePath(typ);
+            String classExtension = returnTableExtension(typ);
+            createClassType(className, columnList, classPath, classExtension);
+            compiled = compileClasses(className, "src/Java/SqlGenerated/TableClasses/");
+            //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
 
 
 //            if( == 0){
 ////                runIt(className);
 //            }A
         }
-        if(compiled){
-            compiled= false;
+        if (compiled) {
+            compiled = false;
             createMainClass(p.getFunctions());
-            compiled = compileClasses("SqlMain","src/Java/SqlGenerated/TableClasses/");
-            if(compiled){
-                Class compiledClass= loadClasses("SqlMain","src/Java/SqlGenerated/TableClasses/","src.Java.SqlGenerated.TableClasses");
-                invokeMethod("Main",compiledClass);
+            compiled = compileClasses("SqlMain", "src/Java/SqlGenerated/TableClasses/");
+            if (compiled) {
+                Class compiledClass = loadClasses("SqlMain", "src/Java/SqlGenerated/TableClasses/", "src.Java.SqlGenerated.TableClasses");
+                invokeMethod("Main", compiledClass);
             }
         }
 
 
     }
-    private  void createMainClass(List<FunctionDeclaration> functionDeclaration){
 
-        String packagePath =  "Java.SqlGenerated.TableClasses";
+    private void createMainClass(List<FunctionDeclaration> functionDeclaration) {
+
+        String packagePath = "Java.SqlGenerated.TableClasses";
         String className = "SqlMain";
 //        System.out.println(functionDeclaration.get(0).getHeader().getName().hashCode());
 //        String typeName = ((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0))
@@ -123,26 +125,26 @@ public class CodeGeneration {
 
         class NameAndType {
             public String varName;
-            public String typeName ;
+            public String typeName;
         }
         ArrayList<NameAndType> nameAndTypes = new ArrayList<>();
 
-        if(functionDeclaration.get(0) != null ){//make sure there is function
-            if(functionDeclaration.get(0).getBody().getInstructions() != null){//make sure there is instructions
-                for (Object obj:functionDeclaration.get(0).getBody().getInstructions()
-                     ) {
-                    if(obj instanceof gneralcreating)//what is to cast
+        if (functionDeclaration.get(0) != null) {//make sure there is function
+            if (functionDeclaration.get(0).getBody().getInstructions() != null) {//make sure there is instructions
+                for (Object obj : functionDeclaration.get(0).getBody().getInstructions()
+                ) {
+                    if (obj instanceof gneralcreating)//what is to cast
                     {
-                        gneralcreating generalcreate =(gneralcreating) obj;
-                        if(generalcreate.getWithassign() !=null)//create with assign
+                        gneralcreating generalcreate = (gneralcreating) obj;
+                        if (generalcreate.getWithassign() != null)//create with assign
                         {
-                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)//assign var
+                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)//assign var
                             {
                                 NameAndType nameAndTypeobj = new NameAndType();
                                 nameAndTypeobj.varName = generalcreate.getWithassign().getVar_wiht_assign().getVar().getVariable_with_opretor().get(0).getVariable_name();
-                                if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored()!= null){//is it factored select ?
-                                    Type type = getVariableType(nameAndTypeobj.varName,functionDeclaration.get(0).getHeader().getName()+"_0");
-                                    nameAndTypeobj.typeName =  type.getName();
+                                if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored() != null) {//is it factored select ?
+                                    Type type = getVariableType(nameAndTypeobj.varName, functionDeclaration.get(0).getHeader().getName() + "_0");
+                                    nameAndTypeobj.typeName = type.getName();
                                     nameAndTypes.add(nameAndTypeobj);
                                 }
                             }
@@ -152,8 +154,6 @@ public class CodeGeneration {
 
             }
         }
-
-
 
 
 //           ((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0))
@@ -167,37 +167,37 @@ public class CodeGeneration {
 
         String stringTemplate = (
                 "header(className,packagePath,imports)::=<<package <packagePath>;<addImports(imports)> <\\n> public class <className> { >>" +
-                "addImports(imports)::=<< <imports:{import |<\\n>import Java.SqlGenerated.TableClasses.<import.typeName>; }> >>" +
-                "mainFunction(functionCall)::= << <\\n><\\t>public  void Main(){ <functionCall.header.name>(); }<\\n> >>" +
-                "addFunctions(functions , nameAndType)::=<< <functions:{ function|private void <function.header.name>(){<\\n>" +
+                        "addImports(imports)::=<< <imports:{import |<\\n>import Java.SqlGenerated.TableClasses.<import.typeName>; }> >>" +
+                        "mainFunction(functionCall)::= << <\\n><\\t>public  void Main(){ <functionCall.header.name>(); }<\\n> >>" +
+                        "addFunctions(functions , nameAndType)::=<< <functions:{ function|private void <function.header.name>(){<\\n>" +
                         "<bodyCodeSorce(nameAndType)>" +
                         "   }> >>" +
                         "bodyCodeSorce(nameAndType) ::=<< <nameAndType:{namesTypes | <namesTypes.typeName> <namesTypes.varName> = new <namesTypes.typeName>();<\\n>" +
                         "<namesTypes.varName>.load();<\\n> }> >>" +
-                "EOF()::=<< <\\n> <\\t>}<\\n> }>>"
-                );
+                        "EOF()::=<< <\\n> <\\t>}<\\n> }>>"
+        );
         STGroup stGroup = new STGroupString(stringTemplate);
 
         ST header = stGroup.getInstanceOf("header");
-        header.add("className" ,className);
-        header.add("packagePath" ,packagePath);
+        header.add("className", className);
+        header.add("packagePath", packagePath);
         Set<NameAndType> set = new HashSet<>(nameAndTypes);
-        header.add("imports" ,set);
+        header.add("imports", set);
 
         ST mainFunction = stGroup.getInstanceOf("mainFunction");
-        mainFunction.add("functionCall",functionDeclaration.get(0));
+        mainFunction.add("functionCall", functionDeclaration.get(0));
 
 
         ST addFunctions = stGroup.getInstanceOf("addFunctions");
         addFunctions.add("functions", functionDeclaration);
-        addFunctions.add("nameAndType",nameAndTypes);
+        addFunctions.add("nameAndType", nameAndTypes);
 
         ST eof = stGroup.getInstanceOf("EOF");
 
 
         try {
 
-            File   file = new File("src/Java/SqlGenerated/TableClasses/" + className + ".java");
+            File file = new File("src/Java/SqlGenerated/TableClasses/" + className + ".java");
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(header.render());
             fileWriter.write(mainFunction.render());
@@ -214,14 +214,14 @@ public class CodeGeneration {
         }
 
 
-
     }
-    private  void createClassType(String className ,
-                                           List<Column> columnArrayList, String tablePath
+
+    private void createClassType(String className,
+                                 List<Column> columnArrayList, String tablePath
             , String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
         String packagePath = "Java.SqlGenerated.TableClasses";
-        String  stringTemplate =  (
+        String stringTemplate = (
                 "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
                         "import java.util.List; <\\n>" +
                         "import com.google.gson.Gson; <\\n>" +
@@ -242,19 +242,19 @@ public class CodeGeneration {
         STGroup stGroup = new STGroupString(stringTemplate);
 
         ST header = stGroup.getInstanceOf("header");
-        header.add("name",className);
-        header.add("packagePath",packagePath);
+        header.add("name", className);
+        header.add("packagePath", packagePath);
 
         ST attribute = stGroup.getInstanceOf("attribute");
-        attribute.add("columns",columnArrayList );
+        attribute.add("columns", columnArrayList);
 
         ST tableAttribute = stGroup.getInstanceOf("tableAttribute");
-        tableAttribute.add("tablePath",tablePath);
-        tableAttribute.add("tableType",tableType);
+        tableAttribute.add("tablePath", tablePath);
+        tableAttribute.add("tableType", tableType);
 
         ST staticList = stGroup.getInstanceOf("staticList");
-        staticList.add("className",className);
-        staticList.add("tablePath",tablePath);
+        staticList.add("className", className);
+        staticList.add("tablePath", tablePath);
 
         ST loadFunction = stGroup.getInstanceOf("loadFunction");
 
@@ -271,11 +271,11 @@ public class CodeGeneration {
 
 //        attribute.add("columnType",columnArrayList);
 //        attribute.add("columnName",columnArrayList);
-        Class cls =null;
+        Class cls = null;
 
         try {//create class and write on it with ST
-            File classFile = new File("src/Java/SqlGenerated/TableClasses/"+className+".java");
-            FileWriter fileWriter = new FileWriter(classFile  );
+            File classFile = new File("src/Java/SqlGenerated/TableClasses/" + className + ".java");
+            FileWriter fileWriter = new FileWriter(classFile);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
             bufferedWriter.write(header.render());
@@ -295,13 +295,12 @@ public class CodeGeneration {
         }
     }
 
-    private  boolean  compileClasses(String className,String classPath) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+    private boolean compileClasses(String className, String classPath) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
         boolean compiled = false;
-        File sourceFile = new File(classPath+className+".java");
+        File sourceFile = new File(classPath + className + ".java");
         String destenation = "";
         //File out = new File("out/production/Sql_Compiler/Java/SqlGenerated/TableClasses");
 //        System.out.println(out.getAbsolutePath());
-
 
 
 //        System.out.println(path.getParent().getParent());
@@ -320,36 +319,36 @@ public class CodeGeneration {
         return compiled;
     }
 
-    private Class loadClasses(String className ,String classPath ,String relativePath) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+    private Class loadClasses(String className, String classPath, String relativePath) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
 
-            File f = new File("C://Users//Dell//Desktop//Sql_compiler//src//Java//SqlGenerated//TableClasses"+className);
-            File sourceFile = new File(classPath+className+".java");
-            File parentDirectory = f.getParentFile();
-            URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{sourceFile.toURI().toURL()});
+        File f = new File("C:\\Users\\Jehad\\IdeaProjects\\Compailer_S2\\src\\Java\\SqlGenerated\\TableClasses\\Java\\SqlGenerated\\TableClasses\\" + className);
+        File sourceFile = new File(classPath + className + ".java");
+        File parentDirectory = f.getParentFile();
+        URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{sourceFile.toURI().toURL()});
 //            ClassLoader.getSystemClassLoader().loadClass(relativePath+"."+className);
 //            Class<?> compiledClass1 =ClassLoader.getSystemClassLoader().loadClass(className+className);
 //            URLClassLoader classLoader =new URLClassLoader(new URL[] {parentDirectory.toURI().toURL() });
-            Class<?> compiledClass = Class.forName("Java.SqlGenerated.TableClasses.SqlMain",true,urlClassLoader);
-            compiledClass.newInstance();
-            return compiledClass;
+        Class<?> compiledClass = Class.forName("Java.SqlGenerated.TableClasses.SqlMain", true, urlClassLoader);
+        compiledClass.newInstance();
+        return compiledClass;
 //            Class<?> compiledClass = Class.forName(relativePath+"."+className,true , classLoader);
 
 
-
     }
-    private  void invokeMethod(String methodName,Class cls) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+
+    private void invokeMethod(String methodName, Class cls) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
         Method method = cls.getDeclaredMethod(methodName);
         method.invoke(cls.newInstance());
     }
 
-    private  String returnTableName(Type typeclass){
-        String result =  typeclass.getName();
-        return  result;
+    private String returnTableName(Type typeclass) {
+        String result = typeclass.getName();
+        return result;
     }
 
-    private  ArrayList<Column> returnTableColumn(Type typeclass){
+    private ArrayList<Column> returnTableColumn(Type typeclass) {
         ArrayList<Column> columnList = new ArrayList<>();
-        for (Object col:typeclass.getColumns().keySet().toArray() ) {
+        for (Object col : typeclass.getColumns().keySet().toArray()) {
 
             Column column = new Column();
             column.setColumn_name(col.toString());
@@ -361,21 +360,21 @@ public class CodeGeneration {
         return columnList;
     }
 
-    private   String returnTablePath(Type typeclass){
-        String result =  typeclass.getPath_of_table();
-        return  result;
+    private String returnTablePath(Type typeclass) {
+        String result = typeclass.getPath_of_table();
+        return result;
     }
 
-    private  String returnTableExtension(Type typeclass){
-        String result =  typeclass.getExtension_of_table();
-        return  result;
+    private String returnTableExtension(Type typeclass) {
+        String result = typeclass.getExtension_of_table();
+        return result;
     }
-    private  Type getVariableType(String variableName,String scopeName) {
-        Scope currentScope ;
-        for (Scope scope:Main.symbolTable.getScopes()
-             ) {
-            if(scope.getId().equals(scopeName))
-            {
+
+    private Type getVariableType(String variableName, String scopeName) {
+        Scope currentScope;
+        for (Scope scope : Main.symbolTable.getScopes()
+        ) {
+            if (scope.getId().equals(scopeName)) {
                 currentScope = scope;
                 Type variableType = new Type();
                 variableType.setName("**type conflict**");
@@ -394,67 +393,88 @@ public class CodeGeneration {
         return null;
 
     }
-public void where_function (Parse p){
-   // System.out.println(" we are here........................... ");
-        String left_side="";
-        String righ_side="";
-        String operator ="";
-        String select_value_we_have="";
-    ArrayList<employess> e =  new ArrayList<employess>();
-    for(int i=0;i<4;i++)
-    {
-        employess temp = new employess();
-        temp.setId(i);
-        temp.setName("testing  "+i);
-        //temp.setAge(i);
-        e.add(temp);
+
+    private String loadAggClassToSelect() {
+        String stringTEmplate = (
+                " <\\t><\\n>String JarPath = <agg.jar_path>;<\\n>" +
+                        "<\\t>String JarName = \"<agg.AggregationFunctionName>.jar\";<\\n>" +
+                        "<\\t>String ClassName = \"<agg.ClassName>\";<\\n>" +
+                        "<\\t>String MethodName = \"<agg.MethodName>\";<\\n>" +
+                        "<\\t>ArrayList\\<Double> myNumbers = new ArrayList\\<>(Arrays.asList(1.0, 2.0, 3.0, 12.0));<\\n>" +
+                        "<\\t>URLClassLoader myClassLoader = new URLClassLoader(" +
+                        "<\\t>new URL[]{new File(JarPath ).toURI().toURL()\\},Main.class.getClassLoader()); <\\n>" +
+                        "<\\t>Class myClass = Class.forName(ClassName, true, myClassLoader);<\\n>" +
+                        "<\\t>Method mySingeltonGetterMethod = myClass.getMethod(\"get\" + ClassName,null);<\\n>" +
+                        "<\\t>Object myObject = mySingeltonGetterMethod.invoke(null);<\\n>" +
+                        "<\\t>Object myValue = myObject.getClass().getDeclaredMethod(MethodName, List.class).invoke(myObject, myNumbers);<\\n>" +
+                        "<\\t>System.out.println(myValue);<\\n>"
+
+        );
+
+
+        return stringTEmplate;
     }
-    System.out.println(" the data we have ");
-    for(int i=0;i<4;i++)
-    {
-        System.out.println(" the id will be"+e.get(i).getId());
-        System.out.println(" the name will be"+e.get(i).getName());
-    }
-   // System.out.println(" the size of list after creatign it "+e.size());
-    if(p.getFunctions().get(0).getBody().getInstructions() != null) {//make sure there is instructions
-        for (Object obj : p.getFunctions().get(0).getBody().getInstructions()
-        ) {
-            if (obj instanceof gneralcreating)//what is to cast
-            {
-                gneralcreating generalcreate = (gneralcreating) obj;
-                if (generalcreate.getWithassign() != null)//create with assign
+
+    public void where_function(Parse p) {
+        // System.out.println(" we are here........................... ");
+        String left_side = "";
+        String righ_side = "";
+        String operator = "";
+        String select_value_we_have = "";
+        ArrayList<employess> e = new ArrayList<employess>();
+        for (int i = 0; i < 4; i++) {
+            employess temp = new employess();
+            temp.setId(i);
+            temp.setName("testing  " + i);
+            //temp.setAge(i);
+            e.add(temp);
+        }
+        System.out.println(" the data we have ");
+        for (int i = 0; i < 4; i++) {
+            System.out.println(" the id will be" + e.get(i).getId());
+            System.out.println(" the name will be" + e.get(i).getName());
+        }
+        // System.out.println(" the size of list after creatign it "+e.size());
+        if (p.getFunctions().get(0).getBody().getInstructions() != null) {//make sure there is instructions
+            for (Object obj : p.getFunctions().get(0).getBody().getInstructions()
+            ) {
+                if (obj instanceof gneralcreating)//what is to cast
                 {
-                    if (generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)//assign var
+                    gneralcreating generalcreate = (gneralcreating) obj;
+                    if (generalcreate.getWithassign() != null)//create with assign
                     {
+                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)//assign var
+                        {
 
-                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored() != null) {//is it factored select ?
-                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core() != null) {
-                                 select_value_we_have=generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getReslult_cloumnList().get(0).getExpr().getColumnName().getName();
-                                if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr() != null) {
-                                    if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft() != null) {
-                                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName() != null) {
-                                            left_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName().getName();
-                                          //  System.out.println(" the left side will -----"+left_side);
+                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored() != null) {//is it factored select ?
+                                if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core() != null) {
+                                    select_value_we_have = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getReslult_cloumnList().get(0).getExpr().getColumnName().getName();
+                                    if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr() != null) {
+                                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft() != null) {
+                                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName() != null) {
+                                                left_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName().getName();
+                                                //  System.out.println(" the left side will -----"+left_side);
+                                            }
                                         }
-                                    }
-                                    if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp() != null) {
-                                        operator = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp();
-                                        //System.out.println("the operatore is ---"+operator);
-                                    }
-                                    if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight() != null) {
-                                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName() != null) {
-                                            righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName().getName();
-
+                                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp() != null) {
+                                            operator = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp();
+                                            //System.out.println("the operatore is ---"+operator);
                                         }
-                                        if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value()!=null){
-                                            righ_side=generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value().getReturnType().toString();
+                                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight() != null) {
+                                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName() != null) {
+                                                righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName().getName();
 
+                                            }
+                                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value() != null) {
+                                                righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value().getReturnType().toString();
+
+                                            }
                                         }
+
+                                        get_where_final_result(left_side, righ_side, operator, select_value_we_have, e);
                                     }
 
-                                    get_where_final_result(left_side,righ_side,operator,select_value_we_have,e);
                                 }
-
                             }
                         }
                     }
@@ -462,109 +482,52 @@ public void where_function (Parse p){
             }
         }
     }
-    }
-    public void get_where_final_result (String left_side ,  String right_side, String operator,String select_column, ArrayList<employess> datalist){
-        ArrayList<employess> temp_list = get_where_result(right_side,left_side,operator,datalist);
-        ArrayList<String> result_list= new  ArrayList<String>();
-        System.out.println("the select column "+select_column);
-        if(select_column.equals("name"))
-        {
-            if(temp_list.size()!=0)
-            for(int i=0;i<temp_list.size();i++)
-            {
-                result_list.add(temp_list.get(i).getName());
-            }
+
+    public void get_where_final_result(String left_side, String right_side, String operator, String select_column, ArrayList<employess> datalist) {
+        ArrayList<employess> temp_list = get_where_result(right_side, left_side, operator, datalist);
+        ArrayList<String> result_list = new ArrayList<String>();
+        System.out.println("the select column " + select_column);
+        if (select_column.equals("name")) {
+            if (temp_list.size() != 0)
+                for (int i = 0; i < temp_list.size(); i++) {
+                    result_list.add(temp_list.get(i).getName());
+                }
             else System.out.println(" no result value we a have ");
         }
-       for(int i=0;i<result_list.size();i++)
-       {
-           System.out.println(" the query result will be "+result_list.get(i));
-       }
+        for (int i = 0; i < result_list.size(); i++) {
+            System.out.println(" the query result will be " + result_list.get(i));
+        }
     }
-    public ArrayList<employess> get_where_result( String right_side, String left_side, String operator,ArrayList<employess> datalist){
+
+    public ArrayList<employess> get_where_result(String right_side, String left_side, String operator, ArrayList<employess> datalist) {
         //know what the right real type
         //symbole map column name --> type
         //if type double // convert string ->double
         // if type boolean ///convert strign -> boolean
         // print_the_list(datalist);
-        int temp_righ_value=Integer.valueOf(right_side);
+        int temp_righ_value = Integer.valueOf(right_side);
         ArrayList<employess> temp_list = new ArrayList<employess>();
-     if(operator.equals("="))
-     {
+        if (operator.equals("=")) {
 
-      if(left_side.equals("id"))
-      {
-          for(int i=0;i<datalist.size();i++)
-          {
-             // System.out.println("int he arraylist we have "+datalist.get(i).getId());
-            if(datalist.get(i).getId()==temp_righ_value)
-            {
-                //System.out.println("int he arraylist we have "+datalist.get(i).getId());
-              temp_list.add(datalist.get(i));
+            if (left_side.equals("id")) {
+                for (int i = 0; i < datalist.size(); i++) {
+                    // System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                    if (datalist.get(i).getId() == temp_righ_value) {
+                        //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                        temp_list.add(datalist.get(i));
 
-            }
-
-          }
-
-      }
-
-return temp_list;
-     }
-     if(operator.equals("!="))
-     {
-         for(int i=0;i<datalist.size();i++)
-         {
-             // System.out.println("int he arraylist we have "+datalist.get(i).getId());
-             if(datalist.get(i).getId()!=temp_righ_value)
-             {
-                 //System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                 temp_list.add(datalist.get(i));
-
-             }
-
-         }
-         return temp_list;
-     }
-     if(operator.equals("<"))
-     {
-         for(int i=0;i<datalist.size();i++)
-         {
-             // System.out.println("int he arraylist we have "+datalist.get(i).getId());
-             if(datalist.get(i).getId()<temp_righ_value)
-             {
-                 //System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                 temp_list.add(datalist.get(i));
-
-             }
-
-         }
-        // System.out.println(" size of temp_list "+temp_list.size());
-         return temp_list;
-     }
-        if(operator.equals(">"))
-        {
-
-            for(int i=0;i<datalist.size();i++)
-            {
-                // System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                if(datalist.get(i).getId()>temp_righ_value)
-                {
-                    //System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                    temp_list.add(datalist.get(i));
+                    }
 
                 }
 
             }
-           // System.out.println(" size of temp_list "+temp_list.size());
+
             return temp_list;
         }
-        if(operator.equals("<="))
-        {
-            for(int i=0;i<datalist.size();i++)
-            {
+        if (operator.equals("!=")) {
+            for (int i = 0; i < datalist.size(); i++) {
                 // System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                if(datalist.get(i).getId()<=temp_righ_value)
-                {
+                if (datalist.get(i).getId() != temp_righ_value) {
                     //System.out.println("int he arraylist we have "+datalist.get(i).getId());
                     temp_list.add(datalist.get(i));
 
@@ -573,13 +536,49 @@ return temp_list;
             }
             return temp_list;
         }
-        if(operator.equals(">="))
-        {
-            for(int i=0;i<datalist.size();i++)
-            {
+        if (operator.equals("<")) {
+            for (int i = 0; i < datalist.size(); i++) {
                 // System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                if(datalist.get(i).getId()>=temp_righ_value)
-                {
+                if (datalist.get(i).getId() < temp_righ_value) {
+                    //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                    temp_list.add(datalist.get(i));
+
+                }
+
+            }
+            // System.out.println(" size of temp_list "+temp_list.size());
+            return temp_list;
+        }
+        if (operator.equals(">")) {
+
+            for (int i = 0; i < datalist.size(); i++) {
+                // System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                if (datalist.get(i).getId() > temp_righ_value) {
+                    //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                    temp_list.add(datalist.get(i));
+
+                }
+
+            }
+            // System.out.println(" size of temp_list "+temp_list.size());
+            return temp_list;
+        }
+        if (operator.equals("<=")) {
+            for (int i = 0; i < datalist.size(); i++) {
+                // System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                if (datalist.get(i).getId() <= temp_righ_value) {
+                    //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                    temp_list.add(datalist.get(i));
+
+                }
+
+            }
+            return temp_list;
+        }
+        if (operator.equals(">=")) {
+            for (int i = 0; i < datalist.size(); i++) {
+                // System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                if (datalist.get(i).getId() >= temp_righ_value) {
                     //System.out.println("int he arraylist we have "+datalist.get(i).getId());
                     temp_list.add(datalist.get(i));
 
@@ -589,18 +588,43 @@ return temp_list;
             return temp_list;
         }
 
-return null;
+        return null;
     }
-    public void print_the_list(ArrayList<employess> t){
-        for(int i=0;i<t.size();i++)
-        {
+
+    public void print_the_list(ArrayList<employess> t) {
+        for (int i = 0; i < t.size(); i++) {
             System.out.println(t.get(i).getId());
         }
     }
+
+    private String importJarLoader() {
+        String stringTEmplate = ("import java.util.List; <\\n>" +
+                " import Java.Main;<\\n>" +
+                "import com.google.gson.Gson; <\\n>" +
+                "import com.google.gson.JsonArray; <\\n>" +
+                "import com.google.gson.JsonElement; <\\n>" +
+                "import com.google.gson.JsonObject; <\\n>" +
+                "import com.google.gson.stream.JsonReader; <\\n>" +
+                "import java.io.FileNotFoundException; <\\n>" +
+                "import java.io.FileReader; <\\n>" +
+                "import java.io.File;\n" +
+                "import java.lang.reflect.InvocationTargetException;\n" +
+                "import java.lang.reflect.Method;\n" +
+                "import java.net.MalformedURLException;\n" +
+                "import java.net.URL;\n" +
+                "import java.net.URLClassLoader;\n" +
+                "import java.util.ArrayList;\n" +
+                "import java.util.Arrays;\n" +
+                "import java.util.List;\n");
+        return stringTEmplate;
+    }
+
+    private String throwException() {
+        String stringTemplate = ("throws ClassNotFoundException, NoSuchMethodException" +
+                ", InvocationTargetException, IllegalAccessException, MalformedURLException");
+        return stringTemplate;
+    }
 }
-
-
-
 
 
 

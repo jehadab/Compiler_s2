@@ -5,4 +5,3 @@ func(){
 var x = select name  from s where id    >= 6;
 var y = select name from d;
 }
-testing it....
