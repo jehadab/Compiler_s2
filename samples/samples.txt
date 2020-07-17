@@ -2,7 +2,7 @@ create table s (name String , id double) type ="json"  path = "D:";
 create table d (name s , id double) type ="json"  path = "D:";
 create type f (name String);
 func(){
-var x = select id from s where id=1;
+var x = select name  from s where id=1;
 var y = select name from d;
 }
 testing it....

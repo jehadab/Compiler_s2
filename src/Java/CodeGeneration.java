@@ -395,6 +395,7 @@ public class CodeGeneration {
 
     }
 public void where_function (Parse p){
+   // System.out.println(" we are here........................... ");
         String left_side="";
         String righ_side="";
         String operator ="";
@@ -405,9 +406,16 @@ public void where_function (Parse p){
         employess temp = new employess();
         temp.setId(i);
         temp.setName("testing1"+i);
-        temp.setAge(i);
+        //temp.setAge(i);
         e.add(temp);
     }
+    System.out.println(" the data we have ");
+    for(int i=0;i<4;i++)
+    {
+        System.out.println(" the id will be"+e.get(i).getId());
+        System.out.println(" the name will be"+e.get(i).getName());
+    }
+   // System.out.println(" the size of list after creatign it "+e.size());
     if(p.getFunctions().get(0).getBody().getInstructions() != null) {//make sure there is instructions
         for (Object obj : p.getFunctions().get(0).getBody().getInstructions()
         ) {
@@ -426,16 +434,24 @@ public void where_function (Parse p){
                                     if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft() != null) {
                                         if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName() != null) {
                                             left_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName().getName();
+                                          //  System.out.println(" the left side will -----"+left_side);
                                         }
                                     }
                                     if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp() != null) {
                                         operator = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp();
+                                        //System.out.println("the operatore is ---"+operator);
                                     }
                                     if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight() != null) {
                                         if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName() != null) {
                                             righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName().getName();
+
+                                        }
+                                        if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value()!=null){
+                                            righ_side=generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value().getReturnType().toString();
+
                                         }
                                     }
+
                                     get_where_final_result(left_side,righ_side,operator,select_value_we_have,e);
                                 }
 
@@ -447,16 +463,56 @@ public void where_function (Parse p){
         }
     }
     }
-    public void get_where_final_result (String select_column , String left_side, String right_side, String operator, ArrayList<employess> datalist){
-        get_where_result(right_side,left_side,operator,datalist);
-        // we will fill the arraylist result in final arraylist according what we will selet
+    public void get_where_final_result (String left_side ,  String right_side, String operator,String select_column, ArrayList<employess> datalist){
+        ArrayList<employess> temp_list = get_where_result(right_side,left_side,operator,datalist);
+        ArrayList<String> result_list= new  ArrayList<String>();
+        System.out.println("the select column "+select_column);
+        if(select_column.equals("name"))
+        {
+            for(int i=0;i<temp_list.size();i++)
+            {
+                result_list.add(temp_list.get(i).getName());
+            }
+        }
+       for(int i=0;i<result_list.size();i++)
+       {
+           System.out.println(" the query result will be "+result_list.get(i));
+       }
     }
-    public void get_where_result(String left_side, String right_side, String operator,ArrayList<employess> datalist){
-     if(operator=="=")
+    public ArrayList<employess> get_where_result( String right_side, String left_side, String operator,ArrayList<employess> datalist){
+     if(operator.equals("="))
      {
-         //getvalue of left side // get value of right side according to value we should use '=' oerator and store result in arraylist
-         //taking some rest .........
+         //know what the right real type
+         //symbole map column name --> type
+         //if type double // convert string ->double
+         // if type boolean ///convert strign -> boolean
+         // print_the_list(datalist);
+         int temp_righ_value=Integer.valueOf(right_side);
+         ArrayList<employess> temp_list = new ArrayList<employess>();
+      if(left_side.equals("id"))
+      {
+          for(int i=0;i<datalist.size();i++)
+          {
+             // System.out.println("int he arraylist we have "+datalist.get(i).getId());
+            if(datalist.get(i).getId()==temp_righ_value)
+            {
+                //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+              temp_list.add(datalist.get(i));
+
+            }
+
+          }
+
+      }
+return temp_list;
      }
+return datalist;
+    }
+    public void print_the_list(ArrayList<employess> t){
+        for(int i=0;i<t.size();i++)
+        {
+            System.out.println(t.get(i).getId());
+        }
     }
 }
 
