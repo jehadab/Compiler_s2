@@ -3,9 +3,9 @@ package Java.SymbolTable;
 public class Column {
     private String column_name;
     private Type column_type;
-    private String TypeNumber ;
+    private String TypeNumber  ;
     private String TypeString ;
-    private String Typeboolean;
+    private String Typeboolean ;
 
     public String getTypeNumber() {
         return TypeNumber;

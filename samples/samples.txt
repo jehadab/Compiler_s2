@@ -1,6 +1,9 @@
 create aggregation function sum ("src/AggregationFunctions.jar",CommonAggregations,SUM,double,[number])
 Create table students(id double , name String , mark double) type="json"  path="E:/compiler/students.json";
+create type si (col1 String , col2 double);
 Func(){
 var x = select sum(id) from students;
-Print(x);
+var y = select sum(id),mark from  students;
+var z = select mark from  students;
+
 }
