@@ -20,8 +20,8 @@ import java.util.List;
 import Java.SymbolTable.Column;
 import Java.SymbolTable.Type; 
  public class si {
-  	double    col2 ;
-  	String    col1 ;   
+  	public double    col2 ;
+  	public String    col1 ;   
  	 public void setcol2(double value){
  	this.col2  = value ; 
  	} 
@@ -39,5 +39,6 @@ import Java.SymbolTable.Type;
   
 	 public List<si> readJsonFile(){
 	return null;
+	
 	 }
  }

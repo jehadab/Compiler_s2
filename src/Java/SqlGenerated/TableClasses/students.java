@@ -41,13 +41,15 @@ import Java.SymbolTable.Type;
  	 public double getmark(){
  	return mark ;   
  	}    
- 	String tablePath = "E:/compiler/students.json";
+ 	String tablePath = "src/Colors.json";
 	String tableType = "json"; 
- 	static List<students> entityObject  ;
+ 	static List<students> entityObject   ;
+
  	public void load()  { 
 	if(tableType == "json")
 	{
 	entityObject = readJsonFile();
+
 	}
 	else 
 	{

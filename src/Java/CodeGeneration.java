@@ -14,7 +14,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.invoke.StringConcatFactory;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -43,7 +43,7 @@ import java.nio.file.FileSystem;
  */
 
 public class CodeGeneration {
-
+    Parse parse ;
 //        private volatile boolean compiled = false;
     public  void run(Parse p ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
         for (Type typ :Main.symbolTable.getDeclaredTypes()) {
@@ -71,19 +71,30 @@ public class CodeGeneration {
 //                    compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
 //                }
 //            }
-            if(typeName.contains("0")){
+            this.parse = p ;
 
+            if(p.getFunctions().get(0) != null ){//make sure there is function
+                if(p.getFunctions().get(0).getBody().getInstructions() != null){//make sure there is instructions
+                    for (Object obj:p.getFunctions().get(0).getBody().getInstructions()
+                            ) {
+                        if(obj instanceof gneralcreating)//what is to cast
+                        {
+                            gneralcreating generalcreate =(gneralcreating) obj;
+                            String className  = returnTableName(typ);
+                            ArrayList<Column> columnList = returnTableColumn(typ);
+                            String classPath = returnTablePath(typ);
+                            String classExtension = returnTableExtension(typ);
+                            createClassType(className,columnList,classPath,classExtension,generalcreate);
+
+                        }
+                    }
+                }
             }
-             {
-                String className  = returnTableName(typ);
-                ArrayList<Column> columnList = returnTableColumn(typ);
-                String classPath = returnTablePath(typ);
-                String classExtension = returnTableExtension(typ);
-                createClassType(className,columnList,classPath,classExtension);
+
                 //compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
                 //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
 
-            }
+
 
 
 
@@ -131,6 +142,7 @@ public class CodeGeneration {
             public String typeName ;
         }
         ArrayList<NameAndType> nameAndTypes = new ArrayList<>();
+        ArrayList<String> tablesCaller = new ArrayList<>();
 
         if(functionDeclaration.get(0) != null ){//make sure there is function
             if(functionDeclaration.get(0).getBody().getInstructions() != null){//make sure there is instructions
@@ -154,9 +166,19 @@ public class CodeGeneration {
                         }
                     }
                 }
-
             }
         }
+        for (Type type :Main.symbolTable.getDeclaredTypes()
+             ) {
+            if(type.getName().contains("_") || type.getName().contains("$"))
+                continue;
+            else  {
+                if(type.isTable())
+                    tablesCaller.add(type.getName());
+            }
+
+        }
+
 //           ((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0))
 //                .getWithassign()
 //                .getVar_wiht_assign()
@@ -167,13 +189,15 @@ public class CodeGeneration {
 
 
         String stringTemplate = (
-                "header(className,packagePath,imports)::=<<package <packagePath>;<addImports(imports)> <\\n> "+importJarLoader()+" public class <className> { >>" +
-                "addImports(imports)::=<< <imports:{import |<\\n>import Java.SqlGenerated.TableClasses.<import.typeName>; }> >>" +
-                "mainFunction(functionCall)::= << <\\n><\\t>public static void main(String[] args) "+throwException()+" { <functionCall.header.name>(); }<\\n> >>" +
+                "header(className,packagePath,imports,createTables)::=<<package <packagePath>;<addImports(imports,createTables)> <\\n> "+importJarLoader()+" public class <className> { >>" +
+                "addImports(imports,createTables)::=<< <imports:{import |<\\n>import Java.SqlGenerated.TableClasses.<import.typeName>; }>" +
+                        "<createTables:{  createTable| import Java.SqlGenerated.TableClasses.<createTable>; }> >>" +
+                "mainFunction(functionCall,createTables)::= << <\\n><\\t>public static void main(String[] args) "+throwException()+" { <createTables:{createTable |<\\n> <\\t> <createTable> table<createTable> = new <createTable>(); <\\n><\\t> table<createTable>.load(); }> " +
+                        "<functionCall.header.name>(); }<\\n> >>" +
                 "addFunctions(functions , nameAndType)::=<< <functions:{ function|private static void <function.header.name>()"+throwException()+"{<\\n>" +
                         "<bodyCodeSorce(nameAndType)>" +
                         "   }> >>" +
-                        "bodyCodeSorce(nameAndType) ::=<< <nameAndType:{namesTypes | <namesTypes.typeName> <namesTypes.varName> = new <namesTypes.typeName>();<\\n>" +
+                        "bodyCodeSorce(nameAndType ) ::=<< <nameAndType:{namesTypes | <namesTypes.typeName> <namesTypes.varName> = new <namesTypes.typeName>();<\\n>" +
                         "<namesTypes.varName>.load();<\\n> }> >>" +
                 "EOF()::=<< <\\n> <\\t>}<\\n> }>>"
                 );
@@ -182,11 +206,14 @@ public class CodeGeneration {
         ST header = stGroup.getInstanceOf("header");
         header.add("className" ,className);
         header.add("packagePath" ,packagePath);
+        Set<String> settablesCaller = new HashSet<>(tablesCaller);
+        header.add("createTables" ,settablesCaller);
         Set<NameAndType> set = new HashSet<>(nameAndTypes);
         header.add("imports" ,set);
 
         ST mainFunction = stGroup.getInstanceOf("mainFunction");
         mainFunction.add("functionCall",functionDeclaration.get(0));
+        mainFunction.add("createTables",settablesCaller);
 
 
         ST addFunctions = stGroup.getInstanceOf("addFunctions");
@@ -219,7 +246,7 @@ public class CodeGeneration {
     }
     private  void createClassType(String className ,
                                            List<Column> columnArrayList, String tablePath
-            , String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
+            , String tableType,gneralcreating gneralcreating) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
         ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
         ArrayList<Column> columns = new ArrayList<>();
@@ -247,7 +274,7 @@ public class CodeGeneration {
         }
 
         String packagePath = "Java.SqlGenerated.TableClasses";
-        String stringTemplate = StringForCreateCurrentType(className);
+        String stringTemplate = StringForCreateCurrentType(gneralcreating);
 
         STGroup stGroup = new STGroupString(stringTemplate);
         ST header = stGroup.getInstanceOf("header");
@@ -486,13 +513,13 @@ public class CodeGeneration {
         return stringTemplate;
     }
 
-    public  String StringForCreateCurrentType(String className){
+    public  String StringForCreateCurrentType(gneralcreating gneralcreating){
         String  stringTemplate =
                 (
                 "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
                         importJarLoader()+
                         " public class <name> {>>" +
-                        "attribute(columns) ::=<<  <columns:{col |<\\n><\\t><col.column_type.name>    <col.column_name> ;}> >>" +
+                        "attribute(columns) ::=<<  <columns:{col |<\\n><\\t>public <col.column_type.name>    <col.column_name> ;}> >>" +
                         "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> $<aggFun.AggregationFunctionName> ; }>  >>" +
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
@@ -509,6 +536,7 @@ public class CodeGeneration {
                         "{<\\n><\\t>" +
                         "}<\\n><\\t>" +
                         "<else>" +
+//                        loadContent(p) +
                         "<endif>" +
                         "}<\\n> <if(aggList)> <loadAggFuncs(aggList)> <endif> >>  " +
                         "loadAggFuncs(aggList) ::= << " +
@@ -620,6 +648,53 @@ public class CodeGeneration {
             "<endif>"+
             "<\\n><\\t> }>>" ;
             return str;
+   }
+   private String loadContent(gneralcreating generalcreate) {
+        String tableName = "";
+       class NameAndType {
+           public String varName;
+           public String typeName ;
+       }
+       NameAndType nameAndTypes = new NameAndType();
+
+       if(generalcreate.getWithassign() !=null)//create with assign
+       {
+           if(generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)//assign var
+           {
+               NameAndType nameAndTypeobj = new NameAndType();
+               nameAndTypeobj.varName = generalcreate.getWithassign().getVar_wiht_assign().getVar().getVariable_with_opretor().get(0).getVariable_name();
+               if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored()!= null){//is it factored select ?
+                   Type type = getVariableType(nameAndTypeobj.varName,parse.getFunctions().get(0).getHeader().getName()+"_0");
+                   nameAndTypeobj.typeName =  type.getName();
+                   nameAndTypes = nameAndTypeobj;
+                   tableName = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getTableOrSubQueryList().get(0).getTableName().getName();
+               }
+           }
+       }
+
+//       Set<Field> fields = new HashSet<>(Arrays.asList(field)) ;
+//       System.out.println("set "+((Field) fields.iterator().next()).getName());
+//       ArrayList<String> s = new ArrayList<>();
+
+        String loadContent= ("loadContent(className)::=<< " +
+                "<\\n><\\t>Field tableField[] ="+tableName+".getClass().getFields();" +
+                "<\\n><\\t>Set<Field> fields = new HashSet<>(Arrays.asList(field)) ;" +
+                "<\\n><\\t>Field selectField[] =<className>.getClass().getFields();" +
+                "<\\n><\\t>ArrayList<String> matchField = new ArrayList();" +
+                "<\\n><\\t>for(int i = 0 ; i <= selectField.size() ;i++ ){" +
+                "<\\n><\\t><\\t>if(fields.contain(selectField[i]){ matchedField.add(selectField[i].getName()) }" +
+                "<\\n><\\t>}" +
+                "<\\n><\\t>for(int i = 0 ; i <= this.entityObject.size() ; i++ ){" +
+                "<\\n><\\t><\\t><className> <className>i = "+tableName+".entityObject.get(i);" +
+                "<\\n><\\t><\\t>for(int j = 0 ; j <= matchField.size() ; j++ ){" +
+                "<\\n><\\t><\\t><className>i = " +
+                "<\\n><\\t><\\t>}" +
+                "<\\n><\\t>}" +
+                "<\\n><\\t>System.out.println( field[0].getAnnotatedType().getType().getTypeName());" +
+                "<\\n><\\t>System.out.println(field[0].getName()); >>"
+
+                );
+        return loadContent ;
    }
 
     public  String jsonObjectPart(){
