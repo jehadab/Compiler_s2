@@ -277,6 +277,10 @@ public class CodeGeneration {
         readJsonFile.add("columns",columns);
         readJsonFile.add("tablePath",tablePath);
 
+        ST readCsvFile =stGroup.getInstanceOf("readCsvFile");
+        readCsvFile.add("className",className);
+        readCsvFile.add("tablePath",tablePath);
+//        readCsvFile.add("columns",columns);
 //        ST returnSpecificType = stGroup.getInstanceOf("returnSpecificType");
 //
 //        ST returnListOfColumn = stGroup.getInstanceOf("returnListOfColumn");
@@ -319,6 +323,7 @@ public class CodeGeneration {
             bufferedWriter.write(staticList.render());
             bufferedWriter.write(loadFunction.render());
             bufferedWriter.write(readJsonFile.render());
+            bufferedWriter.write(readCsvFile.render());
 //            bufferedWriter.write(getTypeFunction.render());
 //            bufferedWriter.write(returnSpecificType.render());
 //            bufferedWriter.write(returnListOfColumn.render());
@@ -458,6 +463,8 @@ public class CodeGeneration {
     {
         String stringTEmplate = ("import java.util.List; <\\n>" +
                 " import Java.Main;<\\n>" +
+                "import java.io.BufferedReader; <\\n>" +
+                "import java.io.*; <\\n>" +
                 "import com.google.gson.Gson; <\\n>" +
                 "import com.google.gson.JsonArray; <\\n>" +
                 "import com.google.gson.JsonElement; <\\n>" +
@@ -492,7 +499,7 @@ public class CodeGeneration {
                 "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
                         importJarLoader()+
                         " public class <name> {>>" +
-                        "attribute(columns) ::=<<  <columns:{col |<\\n><\\t><col.column_type.name>    <col.column_name> ;}> >>" +
+                        "attribute(columns) ::=<<  <columns:{col |<\\n><\\t> public <col.column_type.name>    <col.column_name> ;}> >>" +
                         "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> $<aggFun.AggregationFunctionName> ; }>  >>" +
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
@@ -519,7 +526,9 @@ public class CodeGeneration {
                         "}> >>" +
                         readFileJsonFunction()+
                         setterAndGetterFunction()+
-                        "EOF()::=<<<\\n> }>>"
+                        readFileCsvFunction()+
+                        "EOF()::=<< <\\n> " +
+                        "}>>"
         );
 
         return  stringTemplate;
@@ -546,8 +555,6 @@ public class CodeGeneration {
             "return this.$<agg.AggregationFunctionName>; <\\n><\\t>  \\}" +
             "}>"+
             " >>";
-
-
 //            "setterAttribute(columns) ::=<< " +
 //            "<if(columns)> "+
 //            "<columns:{col |<\\n><\\t> public void set<col.>(<col> value){<\\n><\\t>" +
@@ -572,6 +579,38 @@ public class CodeGeneration {
 ////            "}>"+
 //            ">>";
             return str;
+    }
+
+    public String readFileCsvFunction(){
+        String str = "readCsvFile(className,tablePath)::=<<" +
+                "public List\\<<className>\\> readCsvFile() throws IOException" +
+                "{<\\n><\\t>" +
+                "<if(tablePath)>" +
+                "List\\<<className>\\> result = new ArrayList\\<>(); <\\n><\\t>" +
+                "BufferedReader csvReader = null;<\\n><\\t>" +
+                "String[] data = new String[0];<\\n><\\t>" +
+                "File csvFile = new File(<tablePath>);<\\n><\\t>" +
+                "csvReader = new BufferedReader(new FileReader(csvFile));<\\n><\\t>" +
+                "if(csvFile.isFile())<\\n><\\t>" +
+                "{<\\n><\\t>" +
+                " String row; <\\n><\\t>" +
+                "while(((row = csvReader.readLine()) != null))<\\n><\\t>" +
+                "{<\\n><\\t>" +
+                "data = row.split(\",\");<\\n><\\t>" +
+                "<className> dd = new <className>();<\\n><\\t>" +
+                "for (int i = 0; i \\< data.length; i++)"+
+                "{<\\n><\\t>" +
+                "<className> ddd = new <className>();<\\n><\\t>"+
+                "}<\\n><\\t>" +
+                "}<\\n><\\t>" +
+                "}<\\n><\\t>" +
+                "return result;" +
+                "<else>"+
+                "return null;<\\n><\\t>"+
+                "<endif>"+
+                "}" +
+                ">>";
+        return str;
     }
 
     public  String readFileJsonFunction() {

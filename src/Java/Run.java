@@ -15,6 +15,5 @@ public class Run {
         Sum sum = Sum.getCommonAggregations();
         double d = sum.sumNumber(list);
         System.out.println("sum = "+d);
-
 }
 }

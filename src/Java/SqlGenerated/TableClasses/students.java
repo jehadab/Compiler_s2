@@ -48,6 +48,7 @@ import Java.SymbolTable.Type;
 	if(tableType == "json")
 	{
 	entityObject = readJsonFile();
+
 	}
 	else 
 	{

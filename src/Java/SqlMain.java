@@ -1,9 +1,9 @@
 package Java;
- import Java.SqlGenerated.TableClasses.students$sum; 
- import Java.SqlGenerated.TableClasses.students$sum_mark; 
- import Java.SqlGenerated.TableClasses.students_mark;   
+ import Java.SqlGenerated.TableClasses.colors_id_color_value;   
  import java.util.List; 
  import Java.Main;
+import java.io.BufferedReader; 
+import java.io.*; 
 import com.google.gson.Gson; 
 import com.google.gson.JsonArray; 
 import com.google.gson.JsonElement; 
@@ -25,12 +25,8 @@ import Java.SymbolTable.Type;
  public class SqlMain { 
 	public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException { Func(); }
   private static void Func()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException{
-  students$sum x = new students$sum();
+  colors_id_color_value x = new colors_id_color_value();
   x.load();
-   students$sum_mark y = new students$sum_mark();
-  y.load();
-   students_mark z = new students_mark();
-  z.load();
         
  	}
  }
