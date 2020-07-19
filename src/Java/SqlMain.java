@@ -1,6 +1,5 @@
 package Java;
- //import Java.SqlGenerated.TableClasses.colors_id;
- //import Java.SqlGenerated.TableClasses.colors;
+ import Java.SqlGenerated.TableClasses.colors_id; import Java.SqlGenerated.TableClasses.s; import Java.SqlGenerated.TableClasses.d;   
  import java.util.List; 
  import Java.Main;
 import java.io.BufferedReader; 
@@ -25,13 +24,15 @@ import Java.SymbolTable.Column;
 import Java.SymbolTable.Type; 
 import java.util.HashSet;
 import java.util.Set;
- /*public class SqlMain {
+ public class SqlMain { 
 	public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException { 
- 	 colors tablecolors = new colors(); 
-	 tablecolors.load();  Func(); }
+ 	 s tables = new s(); 
+	 tables.load(); 
+ 	 d tabled = new d(); 
+	 tabled.load();  Func(); }
   private static void Func()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException{
   colors_id x = new colors_id();
   x.load();
         
  	}
- }*/
+ }

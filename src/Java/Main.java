@@ -43,8 +43,8 @@ public class Main  {
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
             CodeGeneration codeGeneration = new CodeGeneration();
-           codeGeneration.run( p);
-            //codeGeneration.where_function(p);
+          // codeGeneration.run( p);
+            codeGeneration.where_function(p);
             csv_testing t = new csv_testing();
            // t.get_data_from_csv("C://Users//Dell//Desktop//Sql_compiler//src//Files_code_Json_csv//csv_testing.csv");
             testing_json_file();

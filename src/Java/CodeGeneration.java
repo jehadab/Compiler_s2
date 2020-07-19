@@ -47,12 +47,12 @@ import java.nio.file.FileSystem;
  */
 
 public class CodeGeneration {
-
-    //        private volatile boolean compiled = false;
-    public void run(Parse p) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
-        for (Type typ : Main.symbolTable.getDeclaredTypes()) {
+    Parse parse ;
+//        private volatile boolean compiled = false;
+    public  void run(Parse p ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
+        for (Type typ :Main.symbolTable.getDeclaredTypes()) {
 //           the type is table and have path and typeExtension
-//            String typeName = typ.getName();
+            String typeName = typ.getName();
 //            if(typeName.contains("_")){
 //                if(typeName.contains("+")){
 //
@@ -75,20 +75,20 @@ public class CodeGeneration {
 //                    compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
 //                }
 //            }
-            this.parse = p;
+            this.parse = p ;
 
-            if (p.getFunctions().get(0) != null) {//make sure there is function
-                if (p.getFunctions().get(0).getBody().getInstructions() != null) {//make sure there is instructions
-                    for (Object obj : p.getFunctions().get(0).getBody().getInstructions()
-                    ) {
-                        if (obj instanceof gneralcreating)//what is to cast
+            if(p.getFunctions().get(0) != null ){//make sure there is function
+                if(p.getFunctions().get(0).getBody().getInstructions() != null){//make sure there is instructions
+                    for (Object obj:p.getFunctions().get(0).getBody().getInstructions()
+                            ) {
+                        if(obj instanceof gneralcreating)//what is to cast
                         {
-                            gneralcreating generalcreate = (gneralcreating) obj;
-                            String className = returnTableName(typ);
+                            gneralcreating generalcreate =(gneralcreating) obj;
+                            String className  = returnTableName(typ);
                             ArrayList<Column> columnList = returnTableColumn(typ);
                             String classPath = returnTablePath(typ);
                             String classExtension = returnTableExtension(typ);
-                            createClassType(className, columnList, classPath, classExtension, generalcreate);
+                            createClassType(className,columnList,classPath,classExtension,generalcreate);
                         }
 //                        if(obj instanceof Print){
 //                            Print print = (Print) obj;
@@ -100,19 +100,23 @@ public class CodeGeneration {
 //                                    }
 //                                }
 //                            }
+                        }
                     }
                 }
-            }
-            //compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
-            //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
+                //compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
+                //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
+
+
+
+
 
 
 //            if( == 0){
 ////                runIt(className);
 //            }A
         }
-        createMainClass(p.getFunctions());
-        // compileClasses("SqlMain","src/Java/SqlGenerated/TableClasses/");
+            createMainClass(p.getFunctions());
+            // compileClasses("SqlMain","src/Java/SqlGenerated/TableClasses/");
 //            if(compiled){
 //                Class compiledClass= loadClasses("SqlMain","src/Java/SqlGenerated/TableClasses/","src.Java.SqlGenerated.TableClasses");
 //                invokeMethod("Main",compiledClass);
@@ -121,10 +125,9 @@ public class CodeGeneration {
 
 
     }
+    private  void createMainClass(List<FunctionDeclaration> functionDeclaration){
 
-    private void createMainClass(List<FunctionDeclaration> functionDeclaration) {
-
-        String packagePath = "Java";
+        String packagePath =  "Java";
         String className = "SqlMain";
 //        System.out.println(functionDeclaration.get(0).getHeader().getName().hashCode());
 //        String typeName = ((gneralcreating)functionDeclaration.get(0).getBody().getInstructions().get(0))
@@ -148,27 +151,27 @@ public class CodeGeneration {
 
         class NameAndType {
             public String varName;
-            public String typeName;
+            public String typeName ;
         }
         ArrayList<NameAndType> nameAndTypes = new ArrayList<>();
         ArrayList<String> tablesCaller = new ArrayList<>();
 
-        if (functionDeclaration.get(0) != null) {//make sure there is function
-            if (functionDeclaration.get(0).getBody().getInstructions() != null) {//make sure there is instructions
-                for (Object obj : functionDeclaration.get(0).getBody().getInstructions()
-                ) {
-                    if (obj instanceof gneralcreating)//what is to cast
+        if(functionDeclaration.get(0) != null ){//make sure there is function
+            if(functionDeclaration.get(0).getBody().getInstructions() != null){//make sure there is instructions
+                for (Object obj:functionDeclaration.get(0).getBody().getInstructions()
+                     ) {
+                    if(obj instanceof gneralcreating)//what is to cast
                     {
-                        gneralcreating generalcreate = (gneralcreating) obj;
-                        if (generalcreate.getWithassign() != null)//create with assign
+                        gneralcreating generalcreate =(gneralcreating) obj;
+                        if(generalcreate.getWithassign() !=null)//create with assign
                         {
-                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)//assign var
+                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)//assign var
                             {
                                 NameAndType nameAndTypeobj = new NameAndType();
                                 nameAndTypeobj.varName = generalcreate.getWithassign().getVar_wiht_assign().getVar().getVariable_with_opretor().get(0).getVariable_name();
-                                if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored() != null) {//is it factored select ?
-                                    Type type = getVariableType(nameAndTypeobj.varName, functionDeclaration.get(0).getHeader().getName() + "_0");
-                                    nameAndTypeobj.typeName = type.getName();
+                                if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored()!= null){//is it factored select ?
+                                    Type type = getVariableType(nameAndTypeobj.varName,functionDeclaration.get(0).getHeader().getName()+"_0");
+                                    nameAndTypeobj.typeName =  type.getName();
                                     nameAndTypes.add(nameAndTypeobj);
                                 }
                             }
@@ -177,12 +180,12 @@ public class CodeGeneration {
                 }
             }
         }
-        for (Type type : Main.symbolTable.getDeclaredTypes()
-        ) {
-            if (type.getName().contains("_") || type.getName().contains("$"))
+        for (Type type :Main.symbolTable.getDeclaredTypes()
+             ) {
+            if(type.getName().contains("_") || type.getName().contains("$"))
                 continue;
-            else {
-                if (type.isTable())
+            else  {
+                if(type.isTable())
                     tablesCaller.add(type.getName());
             }
 
@@ -198,43 +201,43 @@ public class CodeGeneration {
 
 
         String stringTemplate = (
-                "header(className,packagePath,imports,createTables)::=<<package <packagePath>;<addImports(imports,createTables)> <\\n> " + importJarLoader() + " public class <className> { >>" +
-                        "addImports(imports,createTables)::=<< <imports:{import |<\\n>import Java.SqlGenerated.TableClasses.<import.typeName>; }>" +
+                "header(className,packagePath,imports,createTables)::=<<package <packagePath>;<addImports(imports,createTables)> <\\n> "+importJarLoader()+" public class <className> { >>" +
+                "addImports(imports,createTables)::=<< <imports:{import |<\\n>import Java.SqlGenerated.TableClasses.<import.typeName>; }>" +
                         "<createTables:{  createTable| import Java.SqlGenerated.TableClasses.<createTable>; }> >>" +
-                        "mainFunction(functionCall,createTables)::= << <\\n><\\t>public static void main(String[] args) " + throwException() + " { <createTables:{createTable |<\\n> <\\t> <createTable> table<createTable> = new <createTable>(); <\\n><\\t> table<createTable>.load(); }> " +
+                "mainFunction(functionCall,createTables)::= << <\\n><\\t>public static void main(String[] args) "+throwException()+" { <createTables:{createTable |<\\n> <\\t> <createTable> table<createTable> = new <createTable>(); <\\n><\\t> table<createTable>.load(); }> " +
                         "<functionCall.header.name>(); }<\\n> >>" +
-                        "addFunctions(functions , nameAndType)::=<< <functions:{ function|private static void <function.header.name>()" + throwException() + "{<\\n>" +
+                "addFunctions(functions , nameAndType)::=<< <functions:{ function|private static void <function.header.name>()"+throwException()+"{<\\n>" +
                         "<bodyCodeSorce(nameAndType)>" +
                         "   }> >>" +
                         "bodyCodeSorce(nameAndType ) ::=<< <nameAndType:{namesTypes | <namesTypes.typeName> <namesTypes.varName> = new <namesTypes.typeName>();<\\n>" +
                         "<namesTypes.varName>.load();<\\n> }> >>" +
-                        "EOF()::=<< <\\n> <\\t>}<\\n> }>>"
-        );
+                "EOF()::=<< <\\n> <\\t>}<\\n> }>>"
+                );
         STGroup stGroup = new STGroupString(stringTemplate);
 
         ST header = stGroup.getInstanceOf("header");
-        header.add("className", className);
-        header.add("packagePath", packagePath);
+        header.add("className" ,className);
+        header.add("packagePath" ,packagePath);
         Set<String> settablesCaller = new HashSet<>(tablesCaller);
-        header.add("createTables", settablesCaller);
+        header.add("createTables" ,settablesCaller);
         Set<NameAndType> set = new HashSet<>(nameAndTypes);
-        header.add("imports", set);
+        header.add("imports" ,set);
 
         ST mainFunction = stGroup.getInstanceOf("mainFunction");
-        mainFunction.add("functionCall", functionDeclaration.get(0));
-        mainFunction.add("createTables", settablesCaller);
+        mainFunction.add("functionCall",functionDeclaration.get(0));
+        mainFunction.add("createTables",settablesCaller);
 
 
         ST addFunctions = stGroup.getInstanceOf("addFunctions");
         addFunctions.add("functions", functionDeclaration);
-        addFunctions.add("nameAndType", nameAndTypes);
+        addFunctions.add("nameAndType",nameAndTypes);
 
         ST eof = stGroup.getInstanceOf("EOF");
 
 
         try {
 
-            File file = new File("src/Java/" + className + ".java");
+            File   file = new File("src/Java/" + className + ".java");
             FileWriter fileWriter = new FileWriter(file);
             fileWriter.write(header.render());
             fileWriter.write(mainFunction.render());
@@ -251,29 +254,31 @@ public class CodeGeneration {
         }
 
 
-    }
 
-    private void createClassType(String className,
-                                 List<Column> columnArrayList, String tablePath
-            , String tableType, gneralcreating gneralcreating) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
+    }
+    private  void createClassType(String className ,
+                                           List<Column> columnArrayList, String tablePath
+            , String tableType,gneralcreating gneralcreating) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
         ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
         ArrayList<Column> columns = new ArrayList<>();
-        for (Column col : columnArrayList
-        ) {
+        for (Column col:columnArrayList
+             ) {
 //            System.err.println("sssssssssssssssssssssssssssss "+col.getColumn_name());
-            if (col.getColumn_type() instanceof AggregationFunction) {
+            if(col.getColumn_type() instanceof AggregationFunction)
+            {
                 aggregationFunctionArrayList.add((AggregationFunction) col.getColumn_type());
-                System.err.println("fffffffffffffffffffffffffff  " + (((AggregationFunction) col.getColumn_type()).getAggregationFunctionName()));
+                System.err.println("fffffffffffffffffffffffffff  "+(((AggregationFunction) col.getColumn_type()).getAggregationFunctionName()));
 
-                System.err.println("ggggggggggggggggggggggggg " + Main.symbolTable.getAgg().size());
+                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
 
-            } else {
-                if (col.getColumn_type().getName().equals(Type.NUMBER_CONST)) {
+            }
+            else {
+                if(col.getColumn_type().getName().equals(Type.NUMBER_CONST)){
                     col.setTypeNumber("true");
-                } else if (col.getColumn_type().getName().equals(Type.STRING_CONST)) {
+                }else if(col.getColumn_type().getName().equals(Type.STRING_CONST)){
                     col.setTypeString("true");
-                } else if (col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)) {
+                }else if(col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
                     col.setTypeboolean("true");
                 }
                 columns.add(col);
@@ -285,11 +290,11 @@ public class CodeGeneration {
 
         STGroup stGroup = new STGroupString(stringTemplate);
         ST header = stGroup.getInstanceOf("header");
-        header.add("name", className);
-        header.add("packagePath", packagePath);
+        header.add("name",className);
+        header.add("packagePath",packagePath);
 
         ST attribute = stGroup.getInstanceOf("attribute");
-        attribute.add("columns", columns);
+        attribute.add("columns",columns );
 
         ST aggFunc = stGroup.getInstanceOf("aggFunctions");
         aggFunc.add("aggList", aggregationFunctionArrayList);
@@ -346,8 +351,8 @@ public class CodeGeneration {
         Class cls = null;
 
         try {//create class and write on it with ST
-            File classFile = new File("src/Java/SqlGenerated/TableClasses/" + className + ".java");
-            FileWriter fileWriter = new FileWriter(classFile);
+            File classFile = new File("src/Java/SqlGenerated/TableClasses/"+className+".java");
+            FileWriter fileWriter = new FileWriter(classFile  );
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
             bufferedWriter.write(header.render());
