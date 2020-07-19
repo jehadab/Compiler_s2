@@ -1,5 +1,9 @@
 package Java;
 
+import Java.AST.expr.Expression;
+import Java.AST.expr.Expression_List;
+import Java.AST.instruction.Print_rule.Inside_the_print;
+import Java.AST.instruction.Print_rule.Print;
 import Java.SymbolTable.AggregationFunction;
 import Java.SymbolTable.Scope;
 import Java.AST.FunctionDeclaration;
@@ -85,12 +89,20 @@ public class CodeGeneration {
                             String classPath = returnTablePath(typ);
                             String classExtension = returnTableExtension(typ);
                             createClassType(className,columnList,classPath,classExtension,generalcreate);
-
+                        }
+//                        if(obj instanceof Print){
+//                            Print print = (Print) obj;
+//                            for(Object obj2 : print.getPrints()){
+//                                Inside_the_print inside_the_print = (Inside_the_print)obj2;
+//                                if(inside_the_print.getExpression().getExpression_list().getIntral_expression_value().getVariable_name()!=null){
+//
+//
+//                                    }
+//                                }
+//                            }
                         }
                     }
                 }
-            }
-
                 //compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
                 //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
 
@@ -256,9 +268,9 @@ public class CodeGeneration {
             if(col.getColumn_type() instanceof AggregationFunction)
             {
                 aggregationFunctionArrayList.add((AggregationFunction) col.getColumn_type());
-//                System.err.println("fffffffffffffffffffffffffff  "+((AggregationFunction)col.getColumn_type()).getJar_path());
+                System.err.println("fffffffffffffffffffffffffff  "+(((AggregationFunction) col.getColumn_type()).getAggregationFunctionName()));
 
-//                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
+                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
 
             }
             else {
@@ -298,12 +310,18 @@ public class CodeGeneration {
         ST loadFunction = stGroup.getInstanceOf("loadFunction");
         loadFunction.add("aggList",aggregationFunctionArrayList);
         loadFunction.add("tablePath",tablePath);
+        loadFunction.add("className",className);
+        loadFunction.add("columns",columns);
 
         ST readJsonFile = stGroup.getInstanceOf("readJsonFile");
         readJsonFile.add("className",className);
         readJsonFile.add("columns",columns);
         readJsonFile.add("tablePath",tablePath);
 
+        ST readCsvFile =stGroup.getInstanceOf("readCsvFile");
+        readCsvFile.add("className",className);
+        readCsvFile.add("tablePath",tablePath);
+//        readCsvFile.add("columns",columns);
 //        ST returnSpecificType = stGroup.getInstanceOf("returnSpecificType");
 //
 //        ST returnListOfColumn = stGroup.getInstanceOf("returnListOfColumn");
@@ -346,6 +364,7 @@ public class CodeGeneration {
             bufferedWriter.write(staticList.render());
             bufferedWriter.write(loadFunction.render());
             bufferedWriter.write(readJsonFile.render());
+            bufferedWriter.write(readCsvFile.render());
 //            bufferedWriter.write(getTypeFunction.render());
 //            bufferedWriter.write(returnSpecificType.render());
 //            bufferedWriter.write(returnListOfColumn.render());
@@ -485,6 +504,8 @@ public class CodeGeneration {
     {
         String stringTEmplate = ("import java.util.List; <\\n>" +
                 " import Java.Main;<\\n>" +
+                "import java.io.BufferedReader; <\\n>" +
+                "import java.io.*; <\\n>" +
                 "import com.google.gson.Gson; <\\n>" +
                 "import com.google.gson.JsonArray; <\\n>" +
                 "import com.google.gson.JsonElement; <\\n>" +
@@ -502,7 +523,9 @@ public class CodeGeneration {
                 "import java.util.Arrays;\n" +
                 "import java.util.List;\n" +
                 "import Java.SymbolTable.Column;<\\n>" +
-                "import Java.SymbolTable.Type; <\\n>"
+                "import Java.SymbolTable.Type; <\\n>" +
+                "import java.util.HashSet;<\\n>" +
+                "import java.util.Set;<\\n>"
                 );
 
         return stringTEmplate;
@@ -523,8 +546,8 @@ public class CodeGeneration {
                         "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> $<aggFun.AggregationFunctionName> ; }>  >>" +
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
-                        "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
-                        "loadFunction(aggList,tablePath)::= <<<\\t>public void load() <if(aggList)>" +throwException()+ "<endif> " +
+                        "staticList(className,tablePath)::=<< <\\n><\\t>public static List\\<<className>\\> entityObject = new ArrayList\\<>() ;<\\n> >>" +
+                        "loadFunction(aggList,tablePath,className,columns)::= <<<\\t>public void load() <if(aggList)>" +throwException()+ "<endif> " +
                         "{ <\\n><\\t>" +
                         "<if(tablePath)>" +
                         "if(tableType == \"json\")<\\n><\\t>" +
@@ -536,7 +559,7 @@ public class CodeGeneration {
                         "{<\\n><\\t>" +
                         "}<\\n><\\t>" +
                         "<else>" +
-//                        loadContent(p) +
+                        "<loadContent(className,columns)>" +
                         "<endif>" +
                         "}<\\n> <if(aggList)> <loadAggFuncs(aggList)> <endif> >>  " +
                         "loadAggFuncs(aggList) ::= << " +
@@ -547,7 +570,10 @@ public class CodeGeneration {
                         "}> >>" +
                         readFileJsonFunction()+
                         setterAndGetterFunction()+
-                        "EOF()::=<<<\\n> }>>"
+                        readFileCsvFunction()+
+                        loadContent(gneralcreating)+
+                        "EOF()::=<< <\\n> " +
+                        "}>>"
         );
 
         return  stringTemplate;
@@ -600,6 +626,38 @@ public class CodeGeneration {
 ////            "}>"+
 //            ">>";
             return str;
+    }
+
+    public String readFileCsvFunction(){
+        String str = "readCsvFile(className,tablePath)::=<<" +
+                "public List\\<<className>\\> readCsvFile() throws IOException" +
+                "{<\\n><\\t>" +
+                "<if(tablePath)>" +
+                "List\\<<className>\\> result = new ArrayList\\<>(); <\\n><\\t>" +
+                "BufferedReader csvReader = null;<\\n><\\t>" +
+                "String[] data = new String[0];<\\n><\\t>" +
+                "File csvFile = new File(<tablePath>);<\\n><\\t>" +
+                "csvReader = new BufferedReader(new FileReader(csvFile));<\\n><\\t>" +
+                "if(csvFile.isFile())<\\n><\\t>" +
+                "{<\\n><\\t>" +
+                " String row; <\\n><\\t>" +
+                "while(((row = csvReader.readLine()) != null))<\\n><\\t>" +
+                "{<\\n><\\t>" +
+                "data = row.split(\",\");<\\n><\\t>" +
+                "<className> dd = new <className>();<\\n><\\t>" +
+                "for (int i = 0; i \\< data.length; i++)"+
+                "{<\\n><\\t>" +
+                "<className> ddd = new <className>();<\\n><\\t>"+
+                "}<\\n><\\t>" +
+                "}<\\n><\\t>" +
+                "}<\\n><\\t>" +
+                "return result;" +
+                "<else>"+
+                "return null;<\\n><\\t>"+
+                "<endif>"+
+                "}" +
+                ">>";
+        return str;
     }
 
     public  String readFileJsonFunction() {
@@ -676,22 +734,30 @@ public class CodeGeneration {
 //       System.out.println("set "+((Field) fields.iterator().next()).getName());
 //       ArrayList<String> s = new ArrayList<>();
 
-        String loadContent= ("loadContent(className)::=<< " +
-                "<\\n><\\t>Field tableField[] ="+tableName+".getClass().getFields();" +
-                "<\\n><\\t>Set<Field> fields = new HashSet<>(Arrays.asList(field)) ;" +
-                "<\\n><\\t>Field selectField[] =<className>.getClass().getFields();" +
-                "<\\n><\\t>ArrayList<String> matchField = new ArrayList();" +
-                "<\\n><\\t>for(int i = 0 ; i <= selectField.size() ;i++ ){" +
-                "<\\n><\\t><\\t>if(fields.contain(selectField[i]){ matchedField.add(selectField[i].getName()) }" +
-                "<\\n><\\t>}" +
-                "<\\n><\\t>for(int i = 0 ; i <= this.entityObject.size() ; i++ ){" +
-                "<\\n><\\t><\\t><className> <className>i = "+tableName+".entityObject.get(i);" +
-                "<\\n><\\t><\\t>for(int j = 0 ; j <= matchField.size() ; j++ ){" +
-                "<\\n><\\t><\\t><className>i = " +
-                "<\\n><\\t><\\t>}" +
-                "<\\n><\\t>}" +
-                "<\\n><\\t>System.out.println( field[0].getAnnotatedType().getType().getTypeName());" +
-                "<\\n><\\t>System.out.println(field[0].getName()); >>"
+        String loadContent= ("loadContent(className , columns)::=<< " +
+                "<columns:{ col| " +
+                "<\\t><\\n>for(int i = 0 ; i \\< "+tableName+".entityObject.size(); i++){" +
+                "<\\n><className> <className> = new <className>();" +
+                "<\\n><className>.<col.column_name> = "+tableName+".entityObject.get(i).<col.column_name>;" +
+                "<\\n>System.out.println(<className>.<col.column_name>);"+
+                "\\}" +
+                "}>" +
+//                "<\\n><\\t>Field tableField[] ="+tableName+".getClass().getFields();" +
+//                "<\\n><\\t>Set<Field> fields = new HashSet<>(Arrays.asList(field)) ;" +
+//                "<\\n><\\t>Field selectField[] =<className>.getClass().getFields();" +
+//                "<\\n><\\t>ArrayList<String> matchField = new ArrayList();" +
+//                "<\\n><\\t>for(int i = 0 ; i <= selectField.size() ;i++ ){" +
+//                "<\\n><\\t><\\t>if(fields.contain(selectField[i]){ matchedField.add(selectField[i].getName()) }" +
+//                "<\\n><\\t>}" +
+//                "<\\n><\\t>for(int i = 0 ; i <= this.entityObject.size() ; i++ ){" +
+//                "<\\n><\\t><\\t><className> <className>i = "+tableName+".entityObject.get(i);" +
+//                "<\\n><\\t><\\t>for(int j = 0 ; j <= matchField.size() ; j++ ){" +
+//                "<\\n><\\t><\\t><className>i = " +
+//                "<\\n><\\t><\\t>}" +
+//                "<\\n><\\t>}" +
+//                "<\\n><\\t>System.out.println( field[0].getAnnotatedType().getType().getTypeName());" +
+//                "<\\n><\\t>System.out.println(field[0].getName());" +
+                        " >>"
 
                 );
         return loadContent ;
