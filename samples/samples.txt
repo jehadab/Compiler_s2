@@ -4,4 +4,10 @@ create type f (name String);
 func(){
 var x = select name  from s where id    >= 6;
 var y = select name from d;
+create aggregation function SUM ("src/AggregationFunctions.jar",CommonAggregations,SUM,double,[number])
+create table colors(id double, color String, value String) type= "json" path= "src/Colors.json";
+Func(){
+var x = select id from colors;
+
+
 }

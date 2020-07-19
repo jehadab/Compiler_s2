@@ -31,7 +31,7 @@ import static org.antlr.v4.runtime.CharStreams.fromFileName;
 
 public class Main  {
     public static SymbolTable symbolTable = new SymbolTable();
-    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
+    public static void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException { ;
         try {
             File file = new File("samples/samples.txt");
             String fileName = file.getAbsolutePath();
@@ -43,9 +43,11 @@ public class Main  {
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
             CodeGeneration codeGeneration = new CodeGeneration();
-            codeGeneration.run( p);
-            codeGeneration.where_function(p);
-
+           codeGeneration.run( p);
+            //codeGeneration.where_function(p);
+            csv_testing t = new csv_testing();
+           // t.get_data_from_csv("C://Users//Dell//Desktop//Sql_compiler//src//Files_code_Json_csv//csv_testing.csv");
+            testing_json_file();
 //            try {
 //                double count = (double) Max(new ArrayList<>(Arrays.asList(1, 2, 3)));
 //                System.out.println("Count is: " + count);

@@ -427,13 +427,18 @@ column_default_value
 */
 
 expr
- : literal_value
+ :
+ '('(expr)(','expr)*')'
+ |literal_value
 // | BIND_PARAMETER
  | expr commn_expr_opreator expr
  | ( ( database_name '.' )? table_name '.' )? column_name
  | unary_operator expr
  | function_name '(' ( K_DISTINCT? expr ( ',' expr )* | '*' )? ')'
  | '(' expr ')'
+ | expr (K_OR || '||') expr
+
+
 // | K_CAST '(' expr K_AS type_name ')'
 // | expr K_COLLATE collation_name
 // | expr K_NOT? ( K_LIKE | K_GLOB | K_REGEXP | K_MATCH ) expr ( K_ESCAPE expr )?
@@ -457,7 +462,7 @@ expr
 //  | ( ( database_name '.' )? table_name '.' )? column_name
 //  | unary_operator right_expr
 //  |left_expr commn_expr_opreator right_expr
-//  | function_name '(' ( K_DISTINCT? left_expr ( ',' left_expr )* | '*' )? ')'
+//  | function_name (' ( K_DISTINCT? left_expr ( ',' left_expr )* | '*' )? ')'
 //  | '(' left_expr ')'
 // ;
 
@@ -468,8 +473,9 @@ expr
  |( '<<' | '>>' | '&' | '|' )
  |( '<' | '<=' | '>' | '>=' )
  |( '=' | '==' | '!=' | '<>' | K_IS | K_IS K_NOT | K_IN | K_LIKE | K_GLOB | K_MATCH | K_REGEXP )
- |K_AND
- |K_OR
+ //|K_AND
+ //
+  //|K_OR
 
  ;
 // right_expr:

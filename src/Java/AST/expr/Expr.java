@@ -6,6 +6,8 @@ import Java.AST.commn_classes_Sql.name_rule.DataBaseName;
 import Java.AST.commn_classes_Sql.name_rule.TableName;
 import Java.Visitor.AstVistor;
 
+import java.util.ArrayList;
+
 /**
  * Created by moham on 1/2/2020.
  */
@@ -18,6 +20,16 @@ private DataBaseName dataBaseName;
 private TableName tableName;
 private ColumnName columnName;
 private  String  op;
+
+private ArrayList<String > Array_list_od_right_side = new ArrayList<String >();
+
+    public ArrayList<String> getArray_list_od_right_side() {
+        return Array_list_od_right_side;
+    }
+
+    public void setArray_list_od_right_side(ArrayList<String> array_list_od_right_side) {
+        Array_list_od_right_side = array_list_od_right_side;
+    }
 
     public String getOp() {
         return op;
@@ -124,6 +136,10 @@ private  String  op;
 
     public void setVisited(boolean visited) {
         isVisited = visited;
+    }
+    public void add_to_list(String ex)
+    {
+       this.Array_list_od_right_side.add(ex);
     }
 }
 

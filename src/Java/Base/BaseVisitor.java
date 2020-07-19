@@ -270,6 +270,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                         System.out.println("------------------------------------------------------------------------------------------------");
                     }
                     col.setColumn_type(columnDefs.get(i).getType());
+                    System.out.println();
                     table.addColumnMap(columnDefs.get(i).getColumnName() , col);
                     tableType.addColumns(columnDefs.get(i).getColumnName(),col.getColumn_type());
                     checkDecleratedType(col.getColumn_type());
@@ -1363,10 +1364,27 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         }
         if (ctx.commn_expr_opreator() != null) {
             System.out.println("have expr opreator fill left and right");
-            expr.setLeft(visitExpr(ctx.expr(0)));
-            System.out.println("fill left");
-            (expr).setRight(visitExpr(ctx.expr(1)));
-            System.out.println("fill right");
+            if (ctx.commn_expr_opreator().K_IN() == null) {
+                expr.setLeft(visitExpr(ctx.expr(0)));
+                System.out.println("fill left");
+                (expr).setRight(visitExpr(ctx.expr(1)));
+                System.out.println("fill right");
+                System.out.println(" the right side of expre " + ctx.expr(1));
+            }
+            //System.out.println(" what we store in the right side " + expr.getRight());}
+            if (ctx.commn_expr_opreator().K_IN() != null) {
+                System.out.println(" we are here ..... in the bracnh we want ");
+                expr.setLeft(visitExpr(ctx.expr(0)));
+                for (int i = 0; i < ctx.expr(1).expr().size(); i++) {
+                    //expr.add_to_list(ctx.expr(1).expr().get(i).getText());
+                    //System.out.println(" the list is" + ctx.expr(1).expr().get(i).getText());
+                    expr.getArray_list_od_right_side().add(ctx.expr(1).expr().get(i).getText());
+                }
+            }
+        }
+
+        for (int i = 0; i < expr.getArray_list_od_right_side().size(); i++) {
+            System.out.println(" the right side of expretion will be " + expr.getArray_list_od_right_side().get(i));
         }
         if(ctx.function_name()!=null){
             System.out.println("visit the function name ");
@@ -1381,8 +1399,15 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         }
         if(ctx.commn_expr_opreator()!=null)
             expr.setOp(ctx.commn_expr_opreator().getText());
+        if(ctx.K_OR()!=null)
+        {
+
+
+
+        }
 
         return expr;
+
     }
 
 
