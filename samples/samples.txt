@@ -1,7 +1,9 @@
 create aggregation function SUM ("src/AggregationFunctions.jar",CommonAggregations,SUM,double,[number])
 create table colors(id double, color String, value String) type= "json" path= "src/Colors.json";
+create table colors1(id double, color String, value String) type= "json" path= "src/Colors.json";
 Func(){
-var x = select id from colors;
+
+var y = select id from colors ,colors1;
 
 
 }

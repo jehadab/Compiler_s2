@@ -1,5 +1,6 @@
 package Java;
 
+import Java.AST.commn_classes_Sql.name_rule.TableOrSubQuery;
 import Java.AST.expr.Expression;
 import Java.AST.expr.Expression_List;
 import Java.AST.instruction.Print_rule.Inside_the_print;
@@ -34,6 +35,8 @@ import javax.tools.StandardLocation;
 import java.util.Arrays;
 import Java.AST.Parse;
 import Java.AST.creating.gneralcreating;
+import org.stringtemplate.v4.STWriter;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.io.IOException;
@@ -89,6 +92,7 @@ public class CodeGeneration {
                             String classPath = returnTablePath(typ);
                             String classExtension = returnTableExtension(typ);
                             createClassType(className,columnList,classPath,classExtension,generalcreate);
+
                         }
 //                        if(obj instanceof Print){
 //                            Print print = (Print) obj;
@@ -182,7 +186,7 @@ public class CodeGeneration {
         }
         for (Type type :Main.symbolTable.getDeclaredTypes()
              ) {
-            if(type.getName().contains("_") || type.getName().contains("$"))
+            if(type.getName().contains("_") || type.getName().contains("_AGG"))
                 continue;
             else  {
                 if(type.isTable())
@@ -268,9 +272,9 @@ public class CodeGeneration {
             if(col.getColumn_type() instanceof AggregationFunction)
             {
                 aggregationFunctionArrayList.add((AggregationFunction) col.getColumn_type());
-                System.err.println("fffffffffffffffffffffffffff  "+(((AggregationFunction) col.getColumn_type()).getAggregationFunctionName()));
+//                System.err.println("fffffffffffffffffffffffffff  "+(((AggregationFunction) col.getColumn_type()).getAggregationFunctionName()));
 
-                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
+//                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
 
             }
             else {
@@ -311,7 +315,8 @@ public class CodeGeneration {
         loadFunction.add("aggList",aggregationFunctionArrayList);
         loadFunction.add("tablePath",tablePath);
         loadFunction.add("className",className);
-        loadFunction.add("columns",columns);
+        loadFunction.add("columns",splitColomNames(columns));
+
 
         ST readJsonFile = stGroup.getInstanceOf("readJsonFile");
         readJsonFile.add("className",className);
@@ -543,7 +548,7 @@ public class CodeGeneration {
                         importJarLoader()+
                         " public class <name> {>>" +
                         "attribute(columns) ::=<<  <columns:{col |<\\n><\\t>public <col.column_type.name>    <col.column_name> ;}> >>" +
-                        "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> $<aggFun.AggregationFunctionName> ; }>  >>" +
+                        "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> _AGG<aggFun.AggregationFunctionName> ; }>  >>" +
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
                         "staticList(className,tablePath)::=<< <\\n><\\t>public static List\\<<className>\\> entityObject = new ArrayList\\<>() ;<\\n> >>" +
@@ -585,8 +590,8 @@ public class CodeGeneration {
             "this.<col.column_name>  = value ; <\\n><\\t>" +
             "\\}" +
             " } > " +
-            "<aggList:{ agg|<\\n><\\t> public void set$<agg.AggregationFunctionName> (<agg.returnType> value){<\\n><\\t>" +
-            "this.$<agg.AggregationFunctionName> = value; <\\n><\\t> " +
+            "<aggList:{ agg|<\\n><\\t> public void set_AGG<agg.AggregationFunctionName> (<agg.returnType> value){<\\n><\\t>" +
+            "this._AGG<agg.AggregationFunctionName> = value; <\\n><\\t> " +
             "\\} }> " +
             ">>" +
 
@@ -596,8 +601,8 @@ public class CodeGeneration {
             "return <col.column_name> ;   <\\n><\\t>" +
             "\\}" +
             " } >" +
-            "<aggList:{ agg|<\\n><\\t> public <agg.returnType> get$<agg.AggregationFunctionName>(){<\\n><\\t>" +
-            "return this.$<agg.AggregationFunctionName>; <\\n><\\t>  \\}" +
+            "<aggList:{ agg|<\\n><\\t> public <agg.returnType> get_AGG<agg.AggregationFunctionName>(){<\\n><\\t>" +
+            "return this._AGG<agg.AggregationFunctionName>; <\\n><\\t>  \\}" +
             "}>"+
             " >>";
 
@@ -708,38 +713,18 @@ public class CodeGeneration {
             return str;
    }
    private String loadContent(gneralcreating generalcreate) {
-        String tableName = "";
-       class NameAndType {
-           public String varName;
-           public String typeName ;
-       }
-       NameAndType nameAndTypes = new NameAndType();
 
-       if(generalcreate.getWithassign() !=null)//create with assign
-       {
-           if(generalcreate.getWithassign().getVar_wiht_assign().getVar() != null)//assign var
-           {
-               NameAndType nameAndTypeobj = new NameAndType();
-               nameAndTypeobj.varName = generalcreate.getWithassign().getVar_wiht_assign().getVar().getVariable_with_opretor().get(0).getVariable_name();
-               if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored()!= null){//is it factored select ?
-                   Type type = getVariableType(nameAndTypeobj.varName,parse.getFunctions().get(0).getHeader().getName()+"_0");
-                   nameAndTypeobj.typeName =  type.getName();
-                   nameAndTypes = nameAndTypeobj;
-                   tableName = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getTableOrSubQueryList().get(0).getTableName().getName();
-               }
-           }
-       }
 
 //       Set<Field> fields = new HashSet<>(Arrays.asList(field)) ;
 //       System.out.println("set "+((Field) fields.iterator().next()).getName());
 //       ArrayList<String> s = new ArrayList<>();
 
-        String loadContent= ("loadContent(className , columns)::=<< " +
+        String loadContent= ("loadContent(className , columns )::=<< " +
                 "<columns:{ col| " +
-                "<\\t><\\n>for(int i = 0 ; i \\< "+tableName+".entityObject.size(); i++){" +
+                "<\\t><\\n>for(int i = 0 ; i \\< <col.tableName>.entityObject.size(); i++){" +
                 "<\\n><className> <className> = new <className>();" +
-                "<\\n><className>.<col.column_name> = "+tableName+".entityObject.get(i).<col.column_name>;" +
-                "<\\n>System.out.println(<className>.<col.column_name>);"+
+                "<\\n><className>.<col.thisColumn.column_name> = <col.tableName>.entityObject.get(i).<col.columnName>;" +
+                "<\\n>System.out.println(<className>.<col.thisColumn.column_name>);"+
                 "\\}" +
                 "}>" +
 //                "<\\n><\\t>Field tableField[] ="+tableName+".getClass().getFields();" +
@@ -760,6 +745,7 @@ public class CodeGeneration {
                         " >>"
 
                 );
+
         return loadContent ;
    }
 
@@ -771,8 +757,34 @@ public class CodeGeneration {
                 "\\}<\\n><\\t>" ;
         return str;
     }
+    class TableAndColumn {
+        public String columnName;
+        public Column thisColumn ;
+        public String tableName ;
+
+    }
+     private  ArrayList<TableAndColumn> splitColomNames (ArrayList<Column> columns){
 
 
+         ArrayList<TableAndColumn> tableAndColumnArrayList = new ArrayList<>();
+
+             for (Column col:columns
+                  ) {
+                 String[] names ;
+                 TableAndColumn tableAndColumn = new TableAndColumn();
+                 if(col.getColumn_name().contains("$")){
+                    names = col.getColumn_name().substring(1).split("_");
+                    tableAndColumn.tableName = names[0];
+                    tableAndColumn.thisColumn = col;
+                    tableAndColumn.columnName = names[1];
+                    tableAndColumnArrayList.add(tableAndColumn);
+
+
+
+             }
+         }
+         return tableAndColumnArrayList;
+     }
 }
 //             case the colunmn all is Table or Type
 //                    case the object is type

@@ -1,5 +1,5 @@
 package Java;
- import Java.SqlGenerated.TableClasses.colors_id; import Java.SqlGenerated.TableClasses.colors;   
+ import Java.SqlGenerated.TableClasses.colors_id$colors1_id; import Java.SqlGenerated.TableClasses.colors1; import Java.SqlGenerated.TableClasses.colors;   
  import java.util.List; 
  import Java.Main;
 import java.io.BufferedReader; 
@@ -26,11 +26,13 @@ import java.util.HashSet;
 import java.util.Set;
  public class SqlMain { 
 	public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException { 
+ 	 colors1 tablecolors1 = new colors1(); 
+	 tablecolors1.load(); 
  	 colors tablecolors = new colors(); 
 	 tablecolors.load();  Func(); }
   private static void Func()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException{
-  colors_id x = new colors_id();
-  x.load();
+  colors_id$colors1_id y = new colors_id$colors1_id();
+  y.load();
         
  	}
  }
