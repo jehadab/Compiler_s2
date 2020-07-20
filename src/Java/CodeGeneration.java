@@ -280,7 +280,7 @@ public class CodeGeneration {
         ST readCsvFile =stGroup.getInstanceOf("readCsvFile");
         readCsvFile.add("className",className);
         readCsvFile.add("tablePath",tablePath);
-//        readCsvFile.add("columns",columns);
+        readCsvFile.add("columns",columns);
 //        ST returnSpecificType = stGroup.getInstanceOf("returnSpecificType");
 //
 //        ST returnListOfColumn = stGroup.getInstanceOf("returnListOfColumn");
@@ -393,14 +393,17 @@ public class CodeGeneration {
 
     private  ArrayList<Column> returnTableColumn(Type typeclass){
         ArrayList<Column> columnList = new ArrayList<>();
+        int l =  typeclass.getColumns().keySet().toArray().length;
         for (Object col:typeclass.getColumns().keySet().toArray() ) {
             Column column = new Column();
             column.setColumn_name(col.toString());
             column.setColumn_type(typeclass.getColumns().get(col.toString()));
+            if(l == 1){
+                column.setLastColumn("true");
+            }
             columnList.add(column);
+            l--;
         }
-
-
         return columnList;
     }
 
@@ -461,7 +464,11 @@ public class CodeGeneration {
     }
     private String importJarLoader()
     {
-        String stringTEmplate = ("import java.util.List; <\\n>" +
+        String stringTEmplate = (
+                "<\\n>import java.util.List;<\\n>" +
+                "import org.apache.commons.csv.CSVFormat;<\\n>" +
+                "import org.apache.commons.csv.CSVParser;<\\n>" +
+                "import org.apache.commons.csv.CSVRecord;<\\n>" +
                 " import Java.Main;<\\n>" +
                 "import java.io.BufferedReader; <\\n>" +
                 "import java.io.*; <\\n>" +
@@ -489,7 +496,7 @@ public class CodeGeneration {
     }
     private String throwException(){
         String stringTemplate = ("throws ClassNotFoundException, NoSuchMethodException" +
-                ", InvocationTargetException, IllegalAccessException, MalformedURLException");
+                ", InvocationTargetException, IllegalAccessException, MalformedURLException , IOException");
         return stringTemplate;
     }
 
@@ -504,7 +511,7 @@ public class CodeGeneration {
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
                         "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
-                        "loadFunction(aggList,tablePath)::= <<<\\t>public void load() <if(aggList)>" +throwException()+ "<endif> " +
+                        "loadFunction(aggList,tablePath)::= <<<\\t>public void load() " +throwException()+
                         "{ <\\n><\\t>" +
                         "<if(tablePath)>" +
                         "if(tableType == \"json\")<\\n><\\t>" +
@@ -514,6 +521,7 @@ public class CodeGeneration {
                         "}<\\n><\\t>" +
                         "else <\\n><\\t>" +
                         "{<\\n><\\t>" +
+                        "entityObject = readCsvFile();<\\n><\\t>" +
                         "}<\\n><\\t>" +
                         "<else>" +
                         "<endif>" +
@@ -582,7 +590,7 @@ public class CodeGeneration {
     }
 
     public String readFileCsvFunction(){
-        String str = "readCsvFile(className,tablePath)::=<<" +
+        String str = "readCsvFile(className,columns,tablePath)::=<<" +
                 "public List\\<<className>\\> readCsvFile() throws IOException" +
                 "{<\\n><\\t>" +
                 "<if(tablePath)>" +
@@ -594,15 +602,30 @@ public class CodeGeneration {
                 "if(csvFile.isFile())<\\n><\\t>" +
                 "{<\\n><\\t>" +
                 " String row; <\\n><\\t>" +
-                "while(((row = csvReader.readLine()) != null))<\\n><\\t>" +
+                "<className> classname = new <className>();<\\n><\\t>" +
+                "CSVParser csvParser = new CSVParser(csvReader, CSVFormat.DEFAULT.withHeader(" +
+                "<columns:{col | <if(col.LastColumn)> \"<col.column_name>\" <else> \"<col.column_name>\", <endif>  }>).withIgnoreHeaderCase().withTrim());<\\n><\\t>" +
+                " for (CSVRecord csvRecord: csvParser)<\\n><\\t>" +
                 "{<\\n><\\t>" +
-                "data = row.split(\",\");<\\n><\\t>" +
-                "<className> dd = new <className>();<\\n><\\t>" +
-                "for (int i = 0; i \\< data.length; i++)"+
+                "<columns:{col | " +
+                "if(csvRecord.get(\"<col.column_name>\") != null)" +
                 "{<\\n><\\t>" +
-                "<className> ddd = new <className>();<\\n><\\t>"+
+                "classname.set<col.column_name>(" +
+                "<if(col.TypeNumber)>Double.parseDouble(" +
+                "csvRecord.get(\"<col.column_name>\")));" +
+                "<endif>" +
+                "<if(col.Typeboolean)>" +
+                "Boolean.parseBoolean(" +
+                "csvRecord.get(\"<col.column_name>\")));" +
+                "<endif>" +
+                "<if(col.TypeString)>" +
+                "csvRecord.get(\"<col.column_name>\"));" +
+                "<endif>" +
+                "<\\n><\\t>" +
+                "\\}<\\n><\\t>" +
+                "}>" +
                 "}<\\n><\\t>" +
-                "}<\\n><\\t>" +
+                " result.add(classname);<\\n><\\t>" +
                 "}<\\n><\\t>" +
                 "return result;" +
                 "<else>"+

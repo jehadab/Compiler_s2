@@ -1,5 +1,9 @@
  package Java.SqlGenerated.TableClasses; 
-import java.util.List; 
+
+import java.util.List;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
  import Java.Main;
 import java.io.BufferedReader; 
 import java.io.*; 
@@ -46,13 +50,14 @@ import Java.SymbolTable.Type;
  	String tablePath = "C://Users//Dell//Desktop//Final//Data//colors.json";
 	String tableType = "json"; 
  	static List<colors> entityObject  ;
- 	public void load()  { 
+ 	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException , IOException{ 
 	if(tableType == "json")
 	{
 	entityObject = readJsonFile();
 	}
 	else 
 	{
+	entityObject = readCsvFile();
 	}
 	}
   
@@ -93,14 +98,21 @@ import Java.SymbolTable.Type;
 	if(csvFile.isFile())
 	{
 	 String row; 
-	while(((row = csvReader.readLine()) != null))
+	colors classname = new colors();
+	CSVParser csvParser = new CSVParser(csvReader, CSVFormat.DEFAULT.withHeader( "color",    "id",    "value"   ).withIgnoreHeaderCase().withTrim());
+	 for (CSVRecord csvRecord: csvParser)
 	{
-	data = row.split(",");
-	colors dd = new colors();
-	for (int i = 0; i < data.length; i++){
-	colors ddd = new colors();
+	if(csvRecord.get("color") != null){
+	classname.setcolor(csvRecord.get("color"));
+	}
+	if(csvRecord.get("id") != null){
+	classname.setid(Double.parseDouble(csvRecord.get("id")));
+	}
+	if(csvRecord.get("value") != null){
+	classname.setvalue(csvRecord.get("value"));
 	}
 	}
+	 result.add(classname);
 	}
 	return result;}
  }

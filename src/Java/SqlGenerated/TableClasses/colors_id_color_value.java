@@ -1,5 +1,9 @@
  package Java.SqlGenerated.TableClasses; 
-import java.util.List; 
+
+import java.util.List;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
  import Java.Main;
 import java.io.BufferedReader; 
 import java.io.*; 
@@ -43,7 +47,7 @@ import Java.SymbolTable.Type;
  	 public String getvalue(){
  	return value ;   
  	}   
- 	public void load()  { 
+ 	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException , IOException{ 
 	}
   
 	 public List<colors_id_color_value> readJsonFile(){
