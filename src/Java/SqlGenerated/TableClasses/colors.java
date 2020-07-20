@@ -49,7 +49,7 @@ import Java.SymbolTable.Type;
  	}    
  	String tablePath = "C://Users//Dell//Desktop//Final//Data//colors.json";
 	String tableType = "json"; 
- 	static List<colors> entityObject  ;
+	static List<colors> entityObject ;
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException , IOException{ 
 	if(tableType == "json")
 	{
@@ -115,4 +115,15 @@ import Java.SymbolTable.Type;
 	 result.add(classname);
 	}
 	return result;}
+	 public void printContentFunction()
+	{
+	System.out.println("-----------------------------------------------------------------------------");
+	System.out.printf("%30s %30s %30s " ,  "color" ,  "id" ,  "value" ) ;
+	for(colors obj:entityObject)
+	{
+	System.out.format("%30s %30s %30s " , obj.getcolor(),obj.getid(),obj.getvalue());
+	System.out.println();
+	}
+	System.out.println("-----------------------------------------------------------------------------");
+	}
  }

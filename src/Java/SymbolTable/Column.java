@@ -7,6 +7,15 @@ public class Column {
     private String TypeString ;
     private String Typeboolean ;
     private String LastColumn ;
+    private String FirstColumn ;
+
+    public String getFirstColumn() {
+        return FirstColumn;
+    }
+
+    public void setFirstColumn(String firstColumn) {
+        FirstColumn = firstColumn;
+    }
 
     public String getLastColumn() {
         return LastColumn;

@@ -1,5 +1,4 @@
 package Java;
-
 import Java.SymbolTable.AggregationFunction;
 import Java.SymbolTable.Scope;
 import Java.AST.FunctionDeclaration;
@@ -36,12 +35,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.FileSystem;
-
-
-/**
- * Created by Jehad on 7/13/2020.
- */
-
 public class CodeGeneration {
 
 //        private volatile boolean compiled = false;
@@ -272,6 +265,7 @@ public class CodeGeneration {
         loadFunction.add("aggList",aggregationFunctionArrayList);
         loadFunction.add("tablePath",tablePath);
 
+
         ST readJsonFile = stGroup.getInstanceOf("readJsonFile");
         readJsonFile.add("className",className);
         readJsonFile.add("columns",columns);
@@ -293,6 +287,9 @@ public class CodeGeneration {
         getterAttribute.add("columns",columns);
         getterAttribute.add("aggList",aggregationFunctionArrayList);
 
+        ST printContent = stGroup.getInstanceOf("printContent");
+        printContent.add("className",className);
+        printContent.add("columns",columns);
 
 
         ST EOF = stGroup.getInstanceOf("EOF");
@@ -324,6 +321,7 @@ public class CodeGeneration {
             bufferedWriter.write(loadFunction.render());
             bufferedWriter.write(readJsonFile.render());
             bufferedWriter.write(readCsvFile.render());
+            bufferedWriter.write(printContent.render());
 //            bufferedWriter.write(getTypeFunction.render());
 //            bufferedWriter.write(returnSpecificType.render());
 //            bufferedWriter.write(returnListOfColumn.render());
@@ -400,6 +398,9 @@ public class CodeGeneration {
             column.setColumn_type(typeclass.getColumns().get(col.toString()));
             if(l == 1){
                 column.setLastColumn("true");
+            }
+            if(l==typeclass.getColumns().keySet().toArray().length){
+                column.setFirstColumn("true");
             }
             columnList.add(column);
             l--;
@@ -510,8 +511,12 @@ public class CodeGeneration {
                         "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> $<aggFun.AggregationFunctionName> ; }>  >>" +
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
-                        "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
-                        "loadFunction(aggList,tablePath)::= <<<\\t>public void load() " +throwException()+
+                        "staticList(className,tablePath)::=<<" +
+//                        " <if(tablePath)>" +
+                        "<\\n><\\t>static List\\<<className>\\> entityObject ;" +
+//                        "<endif>" +
+                        "<\\n> >>" +
+                        "loadFunction(aggList,tablePath,isType)::= <<<\\t>public void load() " +throwException()+
                         "{ <\\n><\\t>" +
                         "<if(tablePath)>" +
                         "if(tableType == \"json\")<\\n><\\t>" +
@@ -534,6 +539,7 @@ public class CodeGeneration {
                         "}> >>" +
                         readFileJsonFunction()+
                         setterAndGetterFunction()+
+                        printContentFunction() +
                         readFileCsvFunction()+
                         "EOF()::=<< <\\n> " +
                         "}>>"
@@ -563,29 +569,6 @@ public class CodeGeneration {
             "return this.$<agg.AggregationFunctionName>; <\\n><\\t>  \\}" +
             "}>"+
             " >>";
-//            "setterAttribute(columns) ::=<< " +
-//            "<if(columns)> "+
-//            "<columns:{col |<\\n><\\t> public void set<col.>(<col> value){<\\n><\\t>" +
-//            "this.<col>  = value ; <\\n><\\t>" +
-//            "\\}" +
-//            " }>" +
-//            "<endif>"+
-////            "<aggList:{ agg|<\\n><\\t> public void set<agg.AggregationFunctionName> (<agg.returnType> value){<\\n><\\t>" +
-////            "this.<agg.AggregationFunctionName> = value;<\\n><\\t> \\} }> " +
-//            ">>" +
-//
-//            "getterAttribute(columns) ::=<< " +
-//            "<if(columns)>"+
-//            "<columns:{col |<\\n><\\t> public <col> get<col>(){<\\n><\\t>" +
-//            "return this.<col> ;   <\\n><\\t>" +
-//            "\\}" +
-//            " }> " +
-//            "<endif>"+
-//
-////            "<aggList:{ agg|<\\n><\\t> public <agg.returnType> get<agg.AggregationFunctionName>(){<\\n><\\t>" +
-////            "return this.<agg.AggregationFunctionName>; <\\n><\\t>  \\}" +
-////            "}>"+
-//            ">>";
             return str;
     }
 
@@ -636,6 +619,25 @@ public class CodeGeneration {
         return str;
     }
 
+    public String printContentFunction(){
+        String str = "printContent(className,columns)::=<<" +
+                "<\\n><\\t> public void printContentFunction()<\\n><\\t>" +
+                "{<\\n><\\t>" +
+                "System.out.println(\"-----------------------------------------------------------------------------\");<\\n><\\t>" +
+                "System.out.printf(\"<columns:{col | %30s }>\" , <columns:{col |<if(col.LastColumn)> \"<col.column_name>\" <else> \"<col.column_name>\" , <endif>}>) ;" +
+                "<\\n><\\t>for(<className> obj:entityObject)<\\n><\\t>" +
+                "{<\\n><\\t>" +
+                "System.out.format(\"<columns:{col | %30s }>\" , " +
+                "<columns:{col | <if(col.LastColumn)>obj.get<col.column_name>()<else>obj.get<col.column_name>(),<endif>}>" +
+                ");<\\n><\\t>" +
+                "System.out.println();<\\n><\\t>" +
+                "}<\\n><\\t>" +
+                "System.out.println(\"-----------------------------------------------------------------------------\");<\\n><\\t>" +
+                "}" +
+                ">>";
+        return str;
+    }
+
     public  String readFileJsonFunction() {
     String str  = "readJsonFile(className,columns,tablePath)::=<<" +
             "<\\n><\\t> public List\\<<className>\\> readJsonFile(){<\\n><\\t>" +
@@ -652,23 +654,17 @@ public class CodeGeneration {
             "JsonObject testing = json.fromJson(fr, JsonObject.class);<\\n><\\t>" +
             "JsonElement json_ele = testing.get(\"<className>\");<\\n><\\t>" +
             "JsonArray j = json_ele.getAsJsonArray();<\\n><\\t>" +
-//                    "Type type = returnSpecificType(\"<className>\");<\\n><\\t>" +
-//                    "List\\<Column> columnList = new ArrayList\\<>();<\\n><\\t>" +
-//                    "columnList = returnListOfColumn(type);<\\n><\\t>" +
             "for (int i = 0 ; i \\< j.size() ; i++ )" +
             " {<\\n><\\t>" +
             "<className> tableName = new <className>();<\\n><\\t>" +
             "<columns:{col | if(j.get(i).getAsJsonObject().get(\"<col.column_name>\") != null);<\\n><\\t>" +
             "{<\\n><\\t>" +
-            //             case the colunmn all is double
             "<if(col.TypeNumber)>" +
             "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsDouble());<\\n><\\t>" +
             "<endif>"+
-//                                 case the colunmn all is String
             "<if(col.TypeString)>" +
             "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsString());<\\n><\\t>" +
             "<endif>"+
-            //             case the colunmn all is boolean
             "<if(col.Typeboolean)>" +
             "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsBoolean());<\\n><\\t>" +
             "<endif>"+
@@ -691,6 +687,14 @@ public class CodeGeneration {
                 "set<col.column_name>(get_table(nested_one));<\\n><\\t>" +
                 "\\}<\\n><\\t>" ;
         return str;
+    }
+    public Type returnSpecificType(String typeName){
+        for(Type typ :Main.symbolTable.getDeclaredTypes()){
+            if(typ.getName() == typeName){
+                return typ;
+            }
+        }
+        return null;
     }
 
 

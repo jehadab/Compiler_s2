@@ -47,6 +47,7 @@ import Java.SymbolTable.Type;
  	 public String getvalue(){
  	return value ;   
  	}   
+	static List<colors_id_color_value> entityObject ;
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException , IOException{ 
 	}
   
@@ -55,5 +56,16 @@ import Java.SymbolTable.Type;
 	
 	 }public List<colors_id_color_value> readCsvFile() throws IOException{
 	return null;
+	}
+	 public void printContentFunction()
+	{
+	System.out.println("-----------------------------------------------------------------------------");
+	System.out.printf("%30s %30s %30s " ,  "color" ,  "id" ,  "value" ) ;
+	for(colors_id_color_value obj:entityObject)
+	{
+	System.out.format("%30s %30s %30s " , obj.getcolor(),obj.getid(),obj.getvalue());
+	System.out.println();
+	}
+	System.out.println("-----------------------------------------------------------------------------");
 	}
  }
