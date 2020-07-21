@@ -1412,6 +1412,14 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
          expr.setOp(ctx.K_AND().toString());
          if(ctx.AMP()!=null)
              expr.setOp(ctx.AMP().toString());
+         if(ctx.K_OR()!=null)
+         {
+             expr.setOp(ctx.K_OR().toString());
+         }
+         if(ctx.PIPE2()!=null)
+         {
+             expr.setOp(ctx.PIPE2().toString());
+         }
            // System.out.println("check if we store the value in the right way"+expr.getRight().getOp());
             //System.out.println("check if we store the value in the right way"+expr.getRight().getLeft().getColumnName().getName());
             //System.out.println("check if we store the value in the right way"+expr.getRight().getRight().getLiteral_value().getReturnType().toString());

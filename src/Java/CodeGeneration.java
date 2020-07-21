@@ -735,8 +735,12 @@ public class CodeGeneration {
         return null;
     }
     public void expression_with_logic(Expr left_side , Expr right_side , String logical_operator,String we_select_on, ArrayList<employess> e ) {
-        String left_one = "";
-        String rigth_one = "";
+        String left_one_from_the_left_logic_operator = "";
+        String rigth_one_from_the_left_logica_opeartor = "";
+        ArrayList<employess> from_the_left_side_of_logic_operator = new ArrayList<employess>();
+        ArrayList<employess> from_the_right_side_of_logical_operator  = new ArrayList<employess>();
+        String left_side_from_the_right_one="";
+        String right_side_from_the_right_one="";
    /* if(left_side.getLeft().getColumnName()!=null)
     {
         String left = left_side.getLeft().getColumnName().getName();
@@ -748,22 +752,22 @@ public class CodeGeneration {
     }*/
 
         if (left_side.getLeft().getColumnName().getName() != null) {
-            left_one = left_side.getLeft().getColumnName().getName();
+            left_one_from_the_left_logic_operator = left_side.getLeft().getColumnName().getName();
         }
         if (left_side.getRight().getLiteral_value().getReturnType().toString() != null) {
-            rigth_one = left_side.getRight().getLiteral_value().getReturnType().toString();
+            rigth_one_from_the_left_logica_opeartor = left_side.getRight().getLiteral_value().getReturnType().toString();
         }
-        ArrayList<employess> from_the_left_side_of_logic_operator = get_where_result(left_one, rigth_one, left_side.getOp().toString(), e);
+         from_the_left_side_of_logic_operator = get_where_result(left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp().toString(), e);
         if(right_side.getLeft().getColumnName().getName()!=null)
         {
-            left_one=left_side.getLeft().getColumnName().getName();
+            left_side_from_the_right_one=left_side.getLeft().getColumnName().getName();
         }
         if(right_side.getRight().getLiteral_value().getReturnType().toString()!=null)
         {
-            rigth_one=right_side.getRight().getLiteral_value().getReturnType().toString();
+            right_side_from_the_right_one=right_side.getRight().getLiteral_value().getReturnType().toString();
         }
 if(logical_operator.equals("&")|| logical_operator.equals("and")||logical_operator.equals("AND")) {
-    ArrayList<employess> from_the_right_side_of_logical_operator = get_where_result(left_one, rigth_one, right_side.getOp().toString(), from_the_left_side_of_logic_operator);
+     from_the_right_side_of_logical_operator = get_where_result(left_side_from_the_right_one,right_side_from_the_right_one, right_side.getOp().toString(), from_the_left_side_of_logic_operator);
     if(from_the_right_side_of_logical_operator.size()==0)
     {
         System.out.println(" no result we have !!");
@@ -785,10 +789,28 @@ if(logical_operator.equals("&")|| logical_operator.equals("and")||logical_operat
     for(int i=0;i<from_the_right_side_of_logical_operator.size();i++)
         System.out.println("the result value"+from_the_right_side_of_logical_operator.get(i).getId());
 }
+if(logical_operator.equals("||") || logical_operator.equals("OR")|| logical_operator.equals("or")) {
+    from_the_left_side_of_logic_operator = get_where_result(left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp(), e);
+    from_the_right_side_of_logical_operator = get_where_result(left_side_from_the_right_one, right_side_from_the_right_one, right_side.getOp(), e);
+    if (from_the_left_side_of_logic_operator.size() > from_the_right_side_of_logical_operator.size()) {
+        for (int i = 0; i < from_the_right_side_of_logical_operator.size(); i++) {
+            for (int j = 0; j < from_the_left_side_of_logic_operator.size(); j++) {
+                if (from_the_right_side_of_logical_operator.get(i) != from_the_left_side_of_logic_operator.get(j)) {
+                    from_the_left_side_of_logic_operator.add(from_the_right_side_of_logical_operator.get(i));
+                }
+            }
+        }
+    } else {
+        for (int i = 0; i < from_the_left_side_of_logic_operator.size(); i++) {
+            for (int j = 0; j < from_the_right_side_of_logical_operator.size(); j++) {
+                if (from_the_right_side_of_logical_operator.get(i) != from_the_left_side_of_logic_operator.get(j)) {
+                    from_the_right_side_of_logical_operator.add(from_the_left_side_of_logic_operator.get(i));
+                }
+            }
+        }
+    }
 
-
-
-
+}
     }
     public void  get_where_result_for_complixity_right_side(String left_side , ArrayList<String > right_side, String operator , ArrayList<employess> data_list,String  select_valu  ) {
         //if left side is number conver list from string to integer ......
