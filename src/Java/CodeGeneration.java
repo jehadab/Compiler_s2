@@ -770,6 +770,7 @@ public class CodeGeneration {
 
              for (Column col:columns
                   ) {
+//                 System.err.println(col.getColumn_name());
                  String[] names ;
                  TableAndColumn tableAndColumn = new TableAndColumn();
                  if(col.getColumn_name().contains("$")){
