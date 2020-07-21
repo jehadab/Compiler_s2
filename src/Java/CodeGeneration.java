@@ -1,6 +1,7 @@
 package Java;
 
 import Files_code_Json_csv.employess;
+import Java.AST.expr.Expr;
 import Java.SymbolTable.AggregationFunction;
 import Java.SymbolTable.Scope;
 import Java.AST.FunctionDeclaration;
@@ -31,6 +32,8 @@ import javax.tools.StandardLocation;
 import java.util.Arrays;
 import Java.AST.Parse;
 import Java.AST.creating.gneralcreating;
+import sun.plugin.javascript.navig.Array;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.io.IOException;
@@ -504,6 +507,8 @@ public class CodeGeneration {
         String left_side = "";
         String righ_side = "";
         String operator = "";
+        Expr left_one= null;
+        Expr right_one = null;
         String select_value_we_have = "";
         ArrayList<employess> e = new ArrayList<employess>();
         for (int i = 0; i < 4; i++) {
@@ -532,19 +537,26 @@ public class CodeGeneration {
 
                             if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored() != null) {//is it factored select ?
                                 if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core() != null) {
+                                   // System.out.println("what we have herev "+generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getReslult_cloumnList().size());
                                     select_value_we_have = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getReslult_cloumnList().get(0).getExpr().getColumnName().getName();
                                     if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr() != null) {
+
                                         if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft() != null) {
                                             if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName() != null) {
                                                 left_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName().getName();
                                                 //  System.out.println(" the left side will -----"+left_side);
                                             }
+                                            else {  left_one= generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft();}
                                         }
                                         if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp() != null) {
                                             operator = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp();
-                                            //System.out.println("the operatore is ---"+operator);
+                                            System.out.println("the operatore is ---"+operator);
                                         }
                                         if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side()!=null) {
+                                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side().size()!=0)
+
+                                            //in
+                                        //   System.out.println(" here we are !!!!");
                                             get_where_result_for_complixity_right_side(left_side,generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side(),operator,e,select_value_we_have);
                                         }
                                         if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight() != null) {
@@ -552,12 +564,19 @@ public class CodeGeneration {
                                                 righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName().getName();
                                                 get_where_final_result(left_side, righ_side, operator, select_value_we_have, e);
 
+
                                             }
                                             if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value() != null) {
                                                 righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value().getReturnType().toString();
                                                 get_where_final_result(left_side, righ_side, operator, select_value_we_have, e);
 
                                             }
+                                            else {
+                                                 right_one =  generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight();
+
+                                            expression_with_logic(left_one, right_one,operator,select_value_we_have,e);
+                                            }
+
 
                                         }
                                        // System.out.println("the right side here will be "+righ_side);
@@ -573,7 +592,7 @@ public class CodeGeneration {
         }
     }
     public void get_where_final_result(String left_side, String right_side, String operator, String select_column, ArrayList<employess> datalist) {
-        ArrayList<employess> temp_list = get_where_result(right_side, left_side, operator, datalist);
+        ArrayList<employess> temp_list = get_where_result( left_side,right_side, operator, datalist);
         ArrayList<String> result_list = new ArrayList<String>();
         System.out.println("the select column " + select_column);
         if (select_column.equals("name")) {
@@ -588,7 +607,7 @@ public class CodeGeneration {
         }
     }
 
-    public ArrayList<employess> get_where_result(String right_side, String left_side, String operator, ArrayList<employess> datalist) {
+    public ArrayList<employess> get_where_result( String left_side,String right_side, String operator, ArrayList<employess> datalist) {
         //know what the right real type
         //symbole map column name --> type
         //if type double // convert string ->double
@@ -643,6 +662,7 @@ public class CodeGeneration {
             return temp_list;
         }
         if (operator.equals(">")) {
+            //System.out.println("inside the main fucntion ........"+right_side);
             int temp_righ_value = Integer.valueOf(right_side);
             for (int i = 0; i < datalist.size(); i++) {
                 // System.out.println("int he arraylist we have "+datalist.get(i).getId());
@@ -713,6 +733,62 @@ public class CodeGeneration {
         }
 
         return null;
+    }
+    public void expression_with_logic(Expr left_side , Expr right_side , String logical_operator,String we_select_on, ArrayList<employess> e ) {
+        String left_one = "";
+        String rigth_one = "";
+   /* if(left_side.getLeft().getColumnName()!=null)
+    {
+        String left = left_side.getLeft().getColumnName().getName();
+    }
+    if(right_side.getRight().getLiteral_value()!=null)
+    {
+        String right = right_side.getRight().getLiteral_value().getReturnType().toString();
+        System.out.println(" show the right side "+right_side.getRight().getLiteral_value().getReturnType().toString());
+    }*/
+
+        if (left_side.getLeft().getColumnName().getName() != null) {
+            left_one = left_side.getLeft().getColumnName().getName();
+        }
+        if (left_side.getRight().getLiteral_value().getReturnType().toString() != null) {
+            rigth_one = left_side.getRight().getLiteral_value().getReturnType().toString();
+        }
+        ArrayList<employess> from_the_left_side_of_logic_operator = get_where_result(left_one, rigth_one, left_side.getOp().toString(), e);
+        if(right_side.getLeft().getColumnName().getName()!=null)
+        {
+            left_one=left_side.getLeft().getColumnName().getName();
+        }
+        if(right_side.getRight().getLiteral_value().getReturnType().toString()!=null)
+        {
+            rigth_one=right_side.getRight().getLiteral_value().getReturnType().toString();
+        }
+if(logical_operator.equals("&")|| logical_operator.equals("and")||logical_operator.equals("AND")) {
+    ArrayList<employess> from_the_right_side_of_logical_operator = get_where_result(left_one, rigth_one, right_side.getOp().toString(), from_the_left_side_of_logic_operator);
+    if(from_the_right_side_of_logical_operator.size()==0)
+    {
+        System.out.println(" no result we have !!");
+    }
+    else {
+        ArrayList<String> the_final  = new ArrayList<String>();
+        for(int i=0;i<from_the_right_side_of_logical_operator.size();i++)
+        {
+            if(we_select_on.equals("name "))
+            {
+                the_final.add(from_the_right_side_of_logical_operator.get(i).getName());
+            }
+        }
+        for(int i=0;i<from_the_right_side_of_logical_operator.size();i++)
+        {
+            System.out.println( the_final.get(i).toString());
+        }
+    }
+    for(int i=0;i<from_the_right_side_of_logical_operator.size();i++)
+        System.out.println("the result value"+from_the_right_side_of_logical_operator.get(i).getId());
+}
+
+
+
+
     }
     public void  get_where_result_for_complixity_right_side(String left_side , ArrayList<String > right_side, String operator , ArrayList<employess> data_list,String  select_valu  ) {
         //if left side is number conver list from string to integer ......

@@ -436,9 +436,8 @@ expr
  | unary_operator expr
  | function_name '(' ( K_DISTINCT? expr ( ',' expr )* | '*' )? ')'
  | '(' expr ')'
- | expr (K_OR || '||') expr
-
-
+ | expr ((K_AND | AMP) | (K_OR | PIPE2)) expr
+;
 // | K_CAST '(' expr K_AS type_name ')'
 // | expr K_COLLATE collation_name
 // | expr K_NOT? ( K_LIKE | K_GLOB | K_REGEXP | K_MATCH ) expr ( K_ESCAPE expr )?
@@ -453,7 +452,7 @@ expr
 // | ( ( K_NOT )? K_EXISTS )? '(' select_stmt ')'
 // | K_CASE expr? ( K_WHEN expr K_THEN expr )+ ( K_ELSE expr )? K_END
 // | raise_function
- ;
+
 
 //
 // left_expr:
@@ -467,10 +466,10 @@ expr
 // ;
 
  commn_expr_opreator:
- '||'
+ //'||'
  |( '*' | '/' | '%' )
  |( '+' | '-' )
- |( '<<' | '>>' | '&' | '|' )
+ |( '<<' | '>>'  | '|' ) //&
  |( '<' | '<=' | '>' | '>=' )
  |( '=' | '==' | '!=' | '<>' | K_IS | K_IS K_NOT | K_IN | K_LIKE | K_GLOB | K_MATCH | K_REGEXP )
  //|K_AND
