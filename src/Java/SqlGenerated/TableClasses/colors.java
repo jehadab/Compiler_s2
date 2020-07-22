@@ -49,7 +49,7 @@ import java.util.Set;
  	 public String getvalue(){
  	return value ;   
  	}    
- 	String tablePath = "src/Colors.json";
+ 	String tablePath = "C:/Users/Dell/Desktop/Final/Data/Colors.json";
 	String tableType = "json"; 
 	static List<colors> entityObject  = new ArrayList<>();
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{ 
@@ -95,7 +95,7 @@ import java.util.Set;
 	List<colors> result = new ArrayList<>(); 
 	BufferedReader csvReader = null;
 	String[] data = new String[0];
-	File csvFile = new File("src/Colors.json");
+	File csvFile = new File("C:/Users/Dell/Desktop/Final/Data/Colors.json");
 	csvReader = new BufferedReader(new FileReader(csvFile));
 	if(csvFile.isFile())
 	{
@@ -120,11 +120,14 @@ import java.util.Set;
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf("%30s %30s %30s " ,  "color" ,  "id" ,  "value" ) ;	System.out.println();
+	System.out.printf(" %10s    %20s   %20s  " ,  "color" ,  "id" ,  "value" ) ;	System.out.println();
+
+	System.out.println("-----------------------------------------------------------------------------");
+		System.out.println();
 
 	for(colors obj:entityObject)
 	{
-	System.out.format("%30s %30s %30s " , obj.getcolor(),obj.getid(),obj.getvalue());
+	System.out.format("  %5s    %20s    %20s  " ,  obj.getcolor(), obj.getid(),obj.getvalue() );
 	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");

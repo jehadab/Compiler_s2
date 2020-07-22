@@ -676,12 +676,14 @@ public class CodeGeneration {
                 "<\\n><\\t> public void printContentFunction()<\\n><\\t>" +
                 "{<\\n><\\t>" +
                 "System.out.println(\"-----------------------------------------------------------------------------\");<\\n><\\t>" +
-                "System.out.printf(\"<columns:{col | %30s }>\" , <columns:{col |<if(col.LastColumn)> \"<col.column_name>\" <else> \"<col.column_name>\" , <endif>}>) ;" +
+                "System.out.printf(\"<columns:{col | <if(col.FirstColumn)> %10s <else> %20s<endif>  }>\" , <columns:{col |<if(col.LastColumn)> \"<col.column_name>\" <else> \"<col.column_name>\" , <endif>}>) ;" +
                 "<\\t>System.out.println();<\\n>"+
+                "<\\n><\\t>System.out.println(\"-----------------------------------------------------------------------------\");" +
+                "<\\n><\\t>"+
                 "<\\n><\\t>for(<className> obj:entityObject)<\\n><\\t>" +
                 "{<\\n><\\t>" +
-                "System.out.format(\"<columns:{col | %30s }>\" , " +
-                "<columns:{col | <if(col.LastColumn)>obj.get<col.column_name>()<else>obj.get<col.column_name>(),<endif>}>" +
+                "System.out.format(\"<columns:{col |  <if(col.FirstColumn)> %5s<else> %20s<endif>  }>\" , " +
+                "<columns:{col | <if(col.LastColumn)>obj.get<col.column_name>() <else> obj.get<col.column_name>(),<endif>}>" +
                 ");<\\n><\\t>" +
                 "System.out.println();<\\n><\\t>" +
                 "}<\\n><\\t>" +
