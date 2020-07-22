@@ -1358,11 +1358,13 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         if (ctx.table_name() != null)
         {
             expr.setTableName(visitTable_name(ctx.table_name()));
-           // System.out.println("testing it "+expr.getTableName().getName());
+            System.out.println("testing it "+expr.getTableName().getName());
+
         }
         if (ctx.column_name() != null)
         {
             expr.setColumnName(visitColumn_name(ctx.column_name()));
+            System.out.println(" testign t as well"+expr.getColumnName().getName().toString());
         }
         if (ctx.unary_operator() != null && ctx.expr() != null) {
             System.out.println("hy");

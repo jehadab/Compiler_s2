@@ -546,30 +546,51 @@ public class CodeGeneration {
                                                 left_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName().getName();
                                                 //  System.out.println(" the left side will -----"+left_side);
                                             }
+                                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getLiteral_value()!=null)
+                                            {
+                                                left_side=generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getLiteral_value().getReturnType();
+
+                                            }
+                                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getTableName()!=null)
+                                            {
+                                               if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName() != null)
+                                               {
+                                                   left_side=generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName().getName();
+
+                                               }
+                                            }
                                             else {  left_one= generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft();}
                                         }
                                         if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp() != null) {
                                             operator = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp();
                                             System.out.println("the operatore is ---"+operator);
                                         }
-                                        if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side()!=null) {
-                                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side().size()!=0)
 
-                                            //in
-                                        //   System.out.println(" here we are !!!!");
-                                            get_where_result_for_complixity_right_side(left_side,generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side(),operator,e,select_value_we_have);
-                                        }
                                         if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight() != null) {
                                             if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName() != null) {
                                                 righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName().getName();
-                                                get_where_final_result(left_side, righ_side, operator, select_value_we_have, e);
+                                                get_where_final_result(false ,left_side, righ_side, operator, select_value_we_have, e);
 
 
                                             }
+                                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getTableName()!=null)
+                                            {
+                                                if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName()!=null) {
+                                                    righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName().getName();
+                                                   get_where_final_result(false ,left_side,righ_side,operator,select_value_we_have,e);
+                                                }
+                                            }
                                             if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value() != null) {
                                                 righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value().getReturnType().toString();
-                                                get_where_final_result(left_side, righ_side, operator, select_value_we_have, e);
+                                                get_where_final_result(true,left_side, righ_side, operator, select_value_we_have, e);
 
+                                            }
+                                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side()!=null) {
+                                                if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side().size()!=0)
+
+                                                    //in
+                                                    //   System.out.println(" here we are !!!!");
+                                                    get_where_result_for_complixity_right_side(left_side,generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side(),operator,e,select_value_we_have);
                                             }
                                             else {
                                                  right_one =  generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight();
@@ -591,8 +612,8 @@ public class CodeGeneration {
             }
         }
     }
-    public void get_where_final_result(String left_side, String right_side, String operator, String select_column, ArrayList<employess> datalist) {
-        ArrayList<employess> temp_list = get_where_result( left_side,right_side, operator, datalist);
+    public void get_where_final_result(boolean column_in_the_left,String left_side, String right_side, String operator, String select_column, ArrayList<employess> datalist) {
+        ArrayList<employess> temp_list = get_where_result(column_in_the_left , left_side,right_side, operator, datalist);
         ArrayList<String> result_list = new ArrayList<String>();
         System.out.println("the select column " + select_column);
         if (select_column.equals("name")) {
@@ -607,22 +628,30 @@ public class CodeGeneration {
         }
     }
 
-    public ArrayList<employess> get_where_result( String left_side,String right_side, String operator, ArrayList<employess> datalist) {
+    public ArrayList<employess> get_where_result( boolean what_is_the_column,String left_side,String right_side, String operator, ArrayList<employess> datalist) {
         //know what the right real type
         //symbole map column name --> type
         //if type double // convert string ->double
         // if type boolean ///convert strign -> boolean
         // print_the_list(datalist);
        // System.out.println("the right side here will be "+right_side);
+        // if the type of leftside is integer we should convert the
+        String value_convert_it_type_and_compare_with_it="";
+        if(what_is_the_column==true)
+        {
+            value_convert_it_type_and_compare_with_it=right_side;
+
+        }
+        else {value_convert_it_type_and_compare_with_it=left_side;}
         ArrayList<employess> temp_list = new ArrayList<employess>();
         if (operator.equals("=")) {
-           // int temp_righ_value = Integer.valueOf(right_side);
+            int temp_righ_value = Integer.valueOf(value_convert_it_type_and_compare_with_it);
             if (left_side.equals("name")) {
                 for (int i = 0; i < datalist.size(); i++) {
                     // System.out.println("int he arraylist we have "+datalist.get(i).getId());
                    // righ_side.contains()
                     //datalist.get(i) == "1";
-                    if (datalist.get(i).name == right_side) {
+                    if (datalist.get(i).name == value_convert_it_type_and_compare_with_it) {
                         //System.out.println("int he arraylist we have "+datalist.get(i).getId());
                         temp_list.add(datalist.get(i));
 
@@ -635,7 +664,7 @@ public class CodeGeneration {
             return temp_list;
         }
         if (operator.equals(("!=")) || operator.equals("<>")) {
-            int temp_righ_value = Integer.valueOf(right_side);
+            int temp_righ_value = Integer.valueOf(value_convert_it_type_and_compare_with_it);
             for (int i = 0; i < datalist.size(); i++) {
                 // System.out.println("int he arraylist we have "+datalist.get(i).getId());
                 if (datalist.get(i).getId() != temp_righ_value) {
@@ -649,13 +678,20 @@ public class CodeGeneration {
         }
         if (operator.equals("<")) {
             for (int i = 0; i < datalist.size(); i++) {
-                int temp_righ_value = Integer.valueOf(right_side);
+                int temp_righ_value = Integer.valueOf(value_convert_it_type_and_compare_with_it);
                 // System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                if (datalist.get(i).getId() < temp_righ_value) {
-                    //System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                    temp_list.add(datalist.get(i));
+                if(what_is_the_column==true) {
+                    if (datalist.get(i).getId() < temp_righ_value) {
+                        //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                        temp_list.add(datalist.get(i));
 
+                    }
                 }
+                else {
+                    if(datalist.get(i).getId() >temp_righ_value)
+                    {temp_list.add(datalist.get(i));}
+                }
+
 
             }
             // System.out.println(" size of temp_list "+temp_list.size());
@@ -663,13 +699,18 @@ public class CodeGeneration {
         }
         if (operator.equals(">")) {
             //System.out.println("inside the main fucntion ........"+right_side);
-            int temp_righ_value = Integer.valueOf(right_side);
+            int temp_value = Integer.valueOf(value_convert_it_type_and_compare_with_it);
             for (int i = 0; i < datalist.size(); i++) {
                 // System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                if (datalist.get(i).getId() > temp_righ_value) {
+                if(what_is_the_column==true)
+                { if (datalist.get(i).getId() > temp_value) {
                     //System.out.println("int he arraylist we have "+datalist.get(i).getId());
                     temp_list.add(datalist.get(i));
 
+                }}
+                else {
+                    if(datalist.get(i).getId() < temp_value)
+                    {  temp_list.add(datalist.get(i));}
                 }
 
             }
@@ -677,36 +718,51 @@ public class CodeGeneration {
             return temp_list;
         }
         if (operator.equals("<=")) {
-            int temp_righ_value = Integer.valueOf(right_side);
+            int temp_righ_value = Integer.valueOf(value_convert_it_type_and_compare_with_it);
             for (int i = 0; i < datalist.size(); i++) {
                 // System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                if (datalist.get(i).getId() <= temp_righ_value) {
+                if(what_is_the_column==true) {
+                    if (datalist.get(i).getId() <= temp_righ_value) {
+                        //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                        temp_list.add(datalist.get(i));
+
+                    }
+                }else { if (datalist.get(i).getId() >= temp_righ_value) {
                     //System.out.println("int he arraylist we have "+datalist.get(i).getId());
                     temp_list.add(datalist.get(i));
 
-                }
+                }}
 
             }
             return temp_list;
         }
         if (operator.equals(">=")) {
-            int temp_righ_value = Integer.valueOf(right_side);
+            int temp_righ_value = Integer.valueOf(value_convert_it_type_and_compare_with_it);
             for (int i = 0; i < datalist.size(); i++) {
+
                 // System.out.println("int he arraylist we have "+datalist.get(i).getId());
-                if (datalist.get(i).getId() >= temp_righ_value) {
+                if(what_is_the_column==true) {
+                    if (datalist.get(i).getId() >= temp_righ_value) {
+                        //System.out.println("int he arraylist we have "+datalist.get(i).getId());
+                        temp_list.add(datalist.get(i));
+
+                    }
+                }
+                else { if (datalist.get(i).getId() <= temp_righ_value) {
                     //System.out.println("int he arraylist we have "+datalist.get(i).getId());
                     temp_list.add(datalist.get(i));
 
-                }
-
+                }}
             }
+
             return temp_list;
         }
         if(operator.equals("like")||operator.equals("LIKE"))
         {
-            int temp_righ_value = Integer.valueOf(right_side);
+
             if(!right_side.contains("%"))
             {
+                int temp_righ_value = Integer.valueOf(value_convert_it_type_and_compare_with_it);
                 if (left_side.equals("id")) {
                     for (int i = 0; i < datalist.size(); i++) {
                         // System.out.println("int he arraylist we have "+datalist.get(i).getId());
@@ -742,6 +798,7 @@ public class CodeGeneration {
         ArrayList<employess> from_the_right_side_of_logical_operator = new ArrayList<employess>();
         String left_side_from_the_right_one = "";
         String right_side_from_the_right_one = "";
+        boolean check_it=false;
    /* if(left_side.getLeft().getColumnName()!=null)
     {
         String left = left_side.getLeft().getColumnName().getName();
@@ -752,21 +809,52 @@ public class CodeGeneration {
         System.out.println(" show the right side "+right_side.getRight().getLiteral_value().getReturnType().toString());
     }*/
 
+
         if (left_side.getLeft().getColumnName().getName() != null) {
             left_one_from_the_left_logic_operator = left_side.getLeft().getColumnName().getName();
+
+        }
+        if(left_side.getLeft().getTableName()!=null)
+        {
+            left_one_from_the_left_logic_operator=left_side.getLeft().getColumnName().getName();
+        }
+        if (left_side.getLeft().getLiteral_value().getReturnType().toString() != null) {
+            left_one_from_the_left_logic_operator = left_side.getRight().getLiteral_value().getReturnType().toString();
+           // from_the_left_side_of_logic_operator = get_where_result(true,left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp().toString(), e);
+        }
+        if (left_side.getRight().getColumnName().getName() != null) {
+           rigth_one_from_the_left_logica_opeartor = left_side.getLeft().getColumnName().getName();
+
+        }
+        if(left_side.getRight().getTableName()!=null)
+        {
+            left_one_from_the_left_logic_operator=left_side.getLeft().getColumnName().getName();
         }
         if (left_side.getRight().getLiteral_value().getReturnType().toString() != null) {
             rigth_one_from_the_left_logica_opeartor = left_side.getRight().getLiteral_value().getReturnType().toString();
+            check_it=true;
+            // from_the_left_side_of_logic_operator = get_where_result(true,left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp().toString(), e);
         }
-        from_the_left_side_of_logic_operator = get_where_result(left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp().toString(), e);
-        if (right_side.getLeft().getColumnName().getName() != null) {
-            left_side_from_the_right_one = left_side.getLeft().getColumnName().getName();
+
+        if (right_side.getRight().getColumnName().getName() != null) {
+            left_side_from_the_right_one = left_side.getRight().getColumnName().getName();
         }
+        if(right_side.getRight().getTableName()!=null){ left_side_from_the_right_one= right_side.getRight().getColumnName().getName();}
         if (right_side.getRight().getLiteral_value().getReturnType().toString() != null) {
-            right_side_from_the_right_one = right_side.getRight().getLiteral_value().getReturnType().toString();
+            left_side_from_the_right_one = right_side.getRight().getLiteral_value().getReturnType().toString();
         }
+        if (right_side.getRight().getColumnName().getName() != null) {
+            left_side_from_the_right_one = left_side.getRight().getColumnName().getName();
+        }
+        if(right_side.getLeft().getTableName()!=null){ left_side_from_the_right_one= right_side.getLeft().getColumnName().getName();}
+        if (right_side.getRight().getLiteral_value().getReturnType().toString() != null) {
+            left_side_from_the_right_one = right_side.getRight().getLiteral_value().getReturnType().toString();
+            check_it=true;
+        }
+
         if (logical_operator.equals("&") || logical_operator.equals("and") || logical_operator.equals("AND")) {
-            from_the_right_side_of_logical_operator = get_where_result(left_side_from_the_right_one, right_side_from_the_right_one, right_side.getOp().toString(), from_the_left_side_of_logic_operator);
+            from_the_left_side_of_logic_operator = get_where_result(check_it,left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp().toString(), e);
+            from_the_right_side_of_logical_operator = get_where_result(check_it,left_side_from_the_right_one, right_side_from_the_right_one, right_side.getOp().toString(), from_the_left_side_of_logic_operator);
             if (from_the_right_side_of_logical_operator.size() == 0) {
                 System.out.println(" no result we have !!");
             } else {
@@ -784,8 +872,8 @@ public class CodeGeneration {
                 System.out.println("the result value" + from_the_right_side_of_logical_operator.get(i).getId());
         }
         if (logical_operator.equals("||") || logical_operator.equals("OR") || logical_operator.equals("or")) {
-            from_the_left_side_of_logic_operator = get_where_result(left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp(), e);
-            from_the_right_side_of_logical_operator = get_where_result(left_side_from_the_right_one, right_side_from_the_right_one, right_side.getOp(), e);
+            from_the_left_side_of_logic_operator = get_where_result(check_it,left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp(), e);
+            from_the_right_side_of_logical_operator = get_where_result(check_it,left_side_from_the_right_one, right_side_from_the_right_one, right_side.getOp(), e);
             if (from_the_left_side_of_logic_operator.size() > from_the_right_side_of_logical_operator.size()) {
                 for (int i = 0; i < from_the_right_side_of_logical_operator.size(); i++) {
                     for (int j = 0; j < from_the_left_side_of_logic_operator.size(); j++) {
@@ -841,6 +929,9 @@ public class CodeGeneration {
         //if left side is number conver list from string to integer ......
         ArrayList<employess> temp_list = new ArrayList<employess>();
         for (int j = 0; j < right_side.size(); j++) {
+            //according to what we will get the type is for the columnn we will conver
+            // type number convert string got number
+            // type boolean convert string to boolean
             int value = Integer.valueOf(right_side.get(j));
             for (int i = 0; i < data_list.size(); i++) {
                 if (left_side.equals("id")) {
