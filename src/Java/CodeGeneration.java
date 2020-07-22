@@ -565,7 +565,7 @@ public class CodeGeneration {
                         "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> _AGG<aggFun.AggregationFunctionName> ; }>  >>" +
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
-                        "staticList(className,tablePath)::=<< <if(tablePath)><\\n><\\t>static List\\<<className>\\> entityObject  ;<endif><\\n> >>" +
+                        "staticList(className,tablePath)::=<< <\\n><\\t>static List\\<<className>\\> entityObject  = new ArrayList\\<>();<\\n> >>" +
                         "loadFunction(aggList,tablePath,isType,className,columns)::= <<<\\t>public void load() " +throwException()+
                         "{ <\\n><\\t>" +
                         "<if(tablePath)>" +
@@ -677,6 +677,7 @@ public class CodeGeneration {
                 "{<\\n><\\t>" +
                 "System.out.println(\"-----------------------------------------------------------------------------\");<\\n><\\t>" +
                 "System.out.printf(\"<columns:{col | %30s }>\" , <columns:{col |<if(col.LastColumn)> \"<col.column_name>\" <else> \"<col.column_name>\" , <endif>}>) ;" +
+                "<\\t>System.out.println();<\\n>"+
                 "<\\n><\\t>for(<className> obj:entityObject)<\\n><\\t>" +
                 "{<\\n><\\t>" +
                 "System.out.format(\"<columns:{col | %30s }>\" , " +

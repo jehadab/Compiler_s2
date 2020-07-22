@@ -1,7 +1,10 @@
 package Java;
- import Java.SqlGenerated.TableClasses.colors_id$colors1_id1_color1;
- import Java.SqlGenerated.TableClasses.colors1; import Java.SqlGenerated.TableClasses.colors;
- import java.util.List; 
+ import Java.SqlGenerated.TableClasses.colors_id; import Java.SqlGenerated.TableClasses.colors;   
+ 
+import java.util.List;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
  import Java.Main;
 import java.io.BufferedReader; 
 import java.io.*; 
@@ -26,13 +29,12 @@ import Java.SymbolTable.Type;
 import java.util.HashSet;
 import java.util.Set;
  public class SqlMain { 
-	public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException { 
- 	 colors1 tablecolors1 = new colors1(); 
-	 tablecolors1.load(); 
+	public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException { 
  	 colors tablecolors = new colors(); 
-	 tablecolors.load();  Func(); }
-  private static void Func()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException{
-  colors_id$colors1_id1_color1 y = new colors_id$colors1_id1_color1();
+	 tablecolors.load();
+	 Func(); }
+  private static void Func()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{
+  colors_id y = new colors_id();
   y.load();
         
  	}

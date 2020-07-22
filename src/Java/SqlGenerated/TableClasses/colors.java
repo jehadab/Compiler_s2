@@ -25,10 +25,12 @@ import java.util.Arrays;
 import java.util.List;
 import Java.SymbolTable.Column;
 import Java.SymbolTable.Type; 
- public class colors {
-  	 public String    color ;
-  	 public double    id ;
-  	 public String    value ;   
+import java.util.HashSet;
+import java.util.Set;
+ public class colors implements Cloneable {
+  	public String    color ;
+  	public double    id ;
+  	public String    value ;   
  	 public void setcolor(String value){
  	this.color  = value ; 
  	} 
@@ -47,10 +49,10 @@ import Java.SymbolTable.Type;
  	 public String getvalue(){
  	return value ;   
  	}    
- 	String tablePath = "C://Users//Dell//Desktop//Final//Data//colors.json";
+ 	String tablePath = "src/Colors.json";
 	String tableType = "json"; 
-	static List<colors> entityObject ;
- 	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException , IOException{ 
+	static List<colors> entityObject  = new ArrayList<>();
+ 	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{ 
 	if(tableType == "json")
 	{
 	entityObject = readJsonFile();
@@ -93,7 +95,7 @@ import Java.SymbolTable.Type;
 	List<colors> result = new ArrayList<>(); 
 	BufferedReader csvReader = null;
 	String[] data = new String[0];
-	File csvFile = new File("C://Users//Dell//Desktop//Final//Data//colors.json");
+	File csvFile = new File("src/Colors.json");
 	csvReader = new BufferedReader(new FileReader(csvFile));
 	if(csvFile.isFile())
 	{
@@ -118,7 +120,8 @@ import Java.SymbolTable.Type;
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf("%30s %30s %30s " ,  "color" ,  "id" ,  "value" ) ;
+	System.out.printf("%30s %30s %30s " ,  "color" ,  "id" ,  "value" ) ;	System.out.println();
+
 	for(colors obj:entityObject)
 	{
 	System.out.format("%30s %30s %30s " , obj.getcolor(),obj.getid(),obj.getvalue());
