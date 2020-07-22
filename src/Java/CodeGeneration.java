@@ -5,11 +5,8 @@ import Java.AST.expr.Expression;
 import Java.AST.expr.Expression_List;
 import Java.AST.instruction.Print_rule.Inside_the_print;
 import Java.AST.instruction.Print_rule.Print;
-import Java.SymbolTable.AggregationFunction;
-import Java.SymbolTable.Scope;
+import Java.SymbolTable.*;
 import Java.AST.FunctionDeclaration;
-import Java.SymbolTable.Column;
-import Java.SymbolTable.Type;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupString;
@@ -262,10 +259,11 @@ public class CodeGeneration {
     }
     private  void createClassType(String className ,
                                            List<Column> columnArrayList, String tablePath
-            , String tableType,gneralcreating gneralcreating) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
+            , String tableType,gneralcreating generalcreating) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
         ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
         ArrayList<Column> columns = new ArrayList<>();
+        ArrayList<Table> tables = new ArrayList<>();
         for (Column col:columnArrayList
              ) {
 //            System.err.println("sssssssssssssssssssssssssssss "+col.getColumn_name());
@@ -289,8 +287,9 @@ public class CodeGeneration {
             }
         }
 
+
         String packagePath = "Java.SqlGenerated.TableClasses";
-        String stringTemplate = StringForCreateCurrentType(gneralcreating);
+        String stringTemplate = StringForCreateCurrentType(generalcreating);
 
         STGroup stGroup = new STGroupString(stringTemplate);
         ST header = stGroup.getInstanceOf("header");
@@ -315,7 +314,10 @@ public class CodeGeneration {
         loadFunction.add("aggList",aggregationFunctionArrayList);
         loadFunction.add("tablePath",tablePath);
         loadFunction.add("className",className);
-        loadFunction.add("columns",splitColomNames(columns));
+        ArrayList<TableAndColumn> tableAndColumnArrayList = splitColomNames(columns);
+        loadFunction.add("columns",tableAndColumnArrayList);
+//        loadFunction.add("tables",splitColomNames(columns));
+
 
 
         ST readJsonFile = stGroup.getInstanceOf("readJsonFile");
@@ -537,7 +539,7 @@ public class CodeGeneration {
     }
     private String throwException(){
         String stringTemplate = ("throws ClassNotFoundException, NoSuchMethodException" +
-                ", InvocationTargetException, IllegalAccessException, MalformedURLException");
+                ", InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException");
         return stringTemplate;
     }
 
@@ -546,7 +548,7 @@ public class CodeGeneration {
                 (
                 "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
                         importJarLoader()+
-                        " public class <name> {>>" +
+                        " public class <name> implements Cloneable {>>" +
                         "attribute(columns) ::=<<  <columns:{col |<\\n><\\t>public <col.column_type.name>    <col.column_name> ;}> >>" +
                         "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> _AGG<aggFun.AggregationFunctionName> ; }>  >>" +
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
@@ -571,7 +573,7 @@ public class CodeGeneration {
                         "<aggList :{ agg|<\\n><\\t> public static void <agg.AggregationFunctionName>() "+throwException()+
                         "{<\\n><\\t>"+
                         loadAggClassToSelect()+
-                        "\\}<\\n><\\t>" +
+                        "<\\n><\\t> \\}" +
                         "}> >>" +
                         readFileJsonFunction()+
                         setterAndGetterFunction()+
@@ -720,13 +722,18 @@ public class CodeGeneration {
 //       ArrayList<String> s = new ArrayList<>();
 
         String loadContent= ("loadContent(className , columns )::=<< " +
+                "<\\n><\\t> <className> obj<className> = new <className>();" +
                 "<columns:{ col| " +
-                "<\\t><\\n>for(int i = 0 ; i \\< <col.tableName>.entityObject.size(); i++){" +
-                "<\\n><className> <className> = new <className>();" +
-                "<\\n><className>.<col.thisColumn.column_name> = <col.tableName>.entityObject.get(i).<col.columnName>;" +
-                "<\\n>System.out.println(<className>.<col.thisColumn.column_name>);"+
-                "\\}" +
+                "<\\n><\\t>for(int <col.tableName>counter = 0 ; <col.tableName>counter \\< <col.tableName>.entityObject.size(); <col.tableName>counter++){" +
+                "<col.columns:{innerCol| <\\n><\\t><\\t> obj<className>.<innerCol.thisColumn.column_name> = <innerCol.tableName>.entityObject.get(<col.tableName>counter).<innerCol.columnName>; }>" +
+                "<\\n><\\t><\\t>"+
                 "}>" +
+                "<\\n><\\t> try{" +
+                "<\\n><\\t><\\t>entityObject.add((<className>)obj<className>.clone()); <\\n> \\} <\\n>" +
+                "catch (CloneNotSupportedException c){<\\n>" +
+                "<\\t><\\t><\\t> c.printStackTrace();<\\n>" +
+                "<\\t> }<\\n>" +
+                " <columns:{ col| \\} }>"  +
 //                "<\\n><\\t>Field tableField[] ="+tableName+".getClass().getFields();" +
 //                "<\\n><\\t>Set<Field> fields = new HashSet<>(Arrays.asList(field)) ;" +
 //                "<\\n><\\t>Field selectField[] =<className>.getClass().getFields();" +
@@ -748,6 +755,13 @@ public class CodeGeneration {
 
         return loadContent ;
    }
+    private String joinTemplate(){
+        String joinString = ("joinTemplate()::=<< " +
+                "" +
+                ">>");
+
+        return joinString;
+    }
 
     public  String jsonObjectPart(){
         String str ="if (j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsJsonArray() != null) <\\n><\\t> " +
@@ -757,10 +771,14 @@ public class CodeGeneration {
                 "\\}<\\n><\\t>" ;
         return str;
     }
-    class TableAndColumn {
+    class Columns{
         public String columnName;
         public Column thisColumn ;
-        public String tableName ;
+        public String tableName;
+    }
+    class TableAndColumn {
+       public String tableName;
+       public ArrayList<Columns> columns = new ArrayList<>();
 
     }
      private  ArrayList<TableAndColumn> splitColomNames (ArrayList<Column> columns){
@@ -773,19 +791,45 @@ public class CodeGeneration {
 //                 System.err.println(col.getColumn_name());
                  String[] names ;
                  TableAndColumn tableAndColumn = new TableAndColumn();
+                 Columns columnsInTable = new Columns();
+
                  if(col.getColumn_name().contains("$")){
                     names = col.getColumn_name().substring(1).split("_");
-                    tableAndColumn.tableName = names[0];
-                    tableAndColumn.thisColumn = col;
-                    tableAndColumn.columnName = names[1];
-                    tableAndColumnArrayList.add(tableAndColumn);
+                    columnsInTable.tableName = names[0];
+                     boolean found = false;
+                     columnsInTable.thisColumn = col;
+                     columnsInTable.columnName = names[1];
+                     tableAndColumn.columns.add(columnsInTable);
 
+                     if(!tableAndColumnArrayList.isEmpty()){
 
+                         for (TableAndColumn table:tableAndColumnArrayList
+                              ) {
+                             if(table.tableName != null)
+                             {
+                                 if(table.tableName.equals(names[0]))
+                                 {
+                                     found = false;
+                                     tableAndColumnArrayList.get(tableAndColumnArrayList.indexOf(table)).columns.add(columnsInTable);
 
+                                    break;
+                                 }else {
+                                     found = true;
+                                 }
+                             }
+                         }
+                     }else found =true;
+
+                     if(found){
+                         tableAndColumn.tableName = names[0];
+                         tableAndColumnArrayList.add(tableAndColumn);
+                     }
              }
          }
+//         tableAndColumnArrayList.forEach(tableAndColumn1 -> System.err.println(tableAndColumn1.Columns));
          return tableAndColumnArrayList;
      }
+
 }
 //             case the colunmn all is Table or Type
 //                    case the object is type
