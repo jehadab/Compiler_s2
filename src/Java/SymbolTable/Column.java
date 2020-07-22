@@ -6,6 +6,24 @@ public class Column {
     private String TypeNumber  ;
     private String TypeString ;
     private String Typeboolean ;
+    private String LastColumn ;
+    private String FirstColumn ;
+
+    public String getFirstColumn() {
+        return FirstColumn;
+    }
+
+    public void setFirstColumn(String firstColumn) {
+        FirstColumn = firstColumn;
+    }
+
+    public String getLastColumn() {
+        return LastColumn;
+    }
+
+    public void setLastColumn(String lastColumn) {
+        LastColumn = lastColumn;
+    }
 
     public String getTypeNumber() {
         return TypeNumber;
