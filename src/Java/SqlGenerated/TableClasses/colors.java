@@ -123,8 +123,7 @@ import java.util.Set;
 	System.out.printf(" %10s    %20s   %20s  " ,  "color" ,  "id" ,  "value" ) ;	System.out.println();
 
 	System.out.println("-----------------------------------------------------------------------------");
-		System.out.println();
-
+	
 	for(colors obj:entityObject)
 	{
 	System.out.format("  %5s    %20s    %20s  " ,  obj.getcolor(), obj.getid(),obj.getvalue() );

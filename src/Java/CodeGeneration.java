@@ -1,11 +1,6 @@
 package Java;
 import Java.SymbolTable.AggregationFunction;
 import Java.SymbolTable.Scope;
-import Java.AST.commn_classes_Sql.name_rule.TableOrSubQuery;
-import Java.AST.expr.Expression;
-import Java.AST.expr.Expression_List;
-import Java.AST.instruction.Print_rule.Inside_the_print;
-import Java.AST.instruction.Print_rule.Print;
 import Java.SymbolTable.*;
 import Java.AST.FunctionDeclaration;
 import Java.SymbolTable.Column;
@@ -19,14 +14,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.lang.ClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.tools.JavaFileObject;
@@ -35,14 +28,9 @@ import javax.tools.StandardLocation;
 import java.util.Arrays;
 import Java.AST.Parse;
 import Java.AST.creating.gneralcreating;
-import org.stringtemplate.v4.STWriter;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.FileSystem;
 
 public class CodeGeneration {
     Parse parse ;
@@ -262,8 +250,8 @@ public class CodeGeneration {
         ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
         ArrayList<Column> columns = new ArrayList<>();
         ArrayList<Table> tables = new ArrayList<>();
-        for (Column col:columnArrayList
-             ) {
+        for (Column col:columnArrayList)
+        {
 //            System.err.println("sssssssssssssssssssssssssssss "+col.getColumn_name());
             if(col.getColumn_type() instanceof AggregationFunction)
             {
@@ -281,6 +269,7 @@ public class CodeGeneration {
                 }else if(col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
                     col.setTypeboolean("true");
                 }
+
                 columns.add(col);
             }
         }
@@ -458,6 +447,51 @@ public class CodeGeneration {
             l--;
         }
         return columnList;
+    }
+
+    public List<Column> returnTableFlatColumn(Type typeclass){
+        ArrayList<Column> columnList = new ArrayList<>();
+        int l =  typeclass.getColumns().keySet().toArray().length;
+        for (Object col:typeclass.getColumns().keySet().toArray() ) {
+            Column column = new Column();
+            column.setColumn_name(col.toString());
+            column.setColumn_type(typeclass.getColumns().get(col.toString()));
+            if(l == 1){
+                column.setLastColumn("true");
+            }
+            if(l==typeclass.getColumns().keySet().toArray().length){
+                column.setFirstColumn("true");
+            }
+            if(column.getColumn_type().getName().equals(Type.NUMBER_CONST)){
+                column.setTypeNumber("true");
+            }else if(column.getColumn_type().getName().equals(Type.STRING_CONST)){
+                column.setTypeString("true");
+            }else if(column.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
+                column.setTypeboolean("true");
+            }
+            else if (column.getTypeNumber()==null&&column.getTypeboolean()==null&&column.getTypeString()==null){
+                Type  nestypeclass = returnSpecificType(column.getColumn_name());
+                if(nestypeclass.isTable()){
+                    for (Object nescol:nestypeclass.getColumns().keySet().toArray() ) {
+                        List<Column> nescolumnList =  returnTableFlatColumn(nestypeclass);
+                        for (Column deepcol : nescolumnList) {
+                            columnList.add(deepcol);
+                        }
+                    }
+                }else{
+                    for (Object nescol:nestypeclass.getColumns().keySet().toArray() ) {
+                        List<Column> nescolumnList =  returnTableFlatColumn(nestypeclass);
+                        for (Column deepcol : nescolumnList) {
+                            columnList.add(deepcol);
+                        }
+                    }
+                }
+
+            }
+            columnList.add(column);
+            l--;
+        }
+        return null;
     }
 
     private   String returnTablePath(Type typeclass){

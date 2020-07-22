@@ -64,7 +64,7 @@ import java.util.Set;
 catch (CloneNotSupportedException c){
 			 c.printStackTrace();
 	 }
- } printContentFunction(); }
+ }  printContentFunction();}
   
 	 public List<colors_id_color_value> readJsonFile(){
 	return null;
@@ -78,8 +78,7 @@ catch (CloneNotSupportedException c){
 	System.out.printf(" %10s    %20s   %20s  " ,  "$colors_id" ,  "$colors_value" ,  "$colors_color" ) ;	System.out.println();
 
 	System.out.println("-----------------------------------------------------------------------------");
-		System.out.println();
-
+	
 	for(colors_id_color_value obj:entityObject)
 	{
 	System.out.format("  %5s    %20s    %20s  " ,  obj.get$colors_id(), obj.get$colors_value(),obj.get$colors_color() );
