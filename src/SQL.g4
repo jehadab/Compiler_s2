@@ -437,6 +437,7 @@ expr
  | function_name '(' ( K_DISTINCT? expr ( ',' expr )* | '*' )? ')'
  | '(' expr ')'
  | expr ((K_AND | AMP) | (K_OR | PIPE2)) expr
+ | (K_TRUE|K_FALSE)
 ;
 // | K_CAST '(' expr K_AS type_name ')'
 // | expr K_COLLATE collation_name
@@ -655,6 +656,8 @@ literal_value
  | K_CURRENT_TIME
  | K_CURRENT_DATE
  | K_CURRENT_TIMESTAMP
+ |K_TRUE
+ |K_FALSE
  ;
 
 unary_operator

@@ -1347,7 +1347,10 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         System.out.println("visitExpr");
         Expr expr = new Expr();
         if (ctx.literal_value() != null) {
+
             expr.setLiteral_value(visitLiteral_value(ctx.literal_value()));
+           // System.out.println(" print what we store "+expr.getLiteral_value().getReturnType().toString());
+            System.out.println(" the returning in the visite "+visitLiteral_value(ctx.literal_value()).toString());
         }
         if (ctx.database_name() != null) {
             expr.setDataBaseName(visitDatabase_name(ctx.database_name()));
@@ -1402,7 +1405,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         }
         if(ctx.commn_expr_opreator()!=null)
             expr.setOp(ctx.commn_expr_opreator().getText());
-        if(ctx.K_AND()!=null ||ctx.AMP()!=null)
+        if(ctx.K_AND()!=null ||ctx.AMP()!=null ||ctx.K_OR()!=null||ctx.PIPE2()!=null)
         {
             //System.out.println(" the right side of logic operator "+ctx.expr(1).getText());
             expr.setLeft(visitExpr(ctx.expr(0)));
@@ -1448,8 +1451,22 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         } else if (ctx.K_CURRENT_TIMESTAMP() != null) {
             literal_value.setReturnType(ctx.K_CURRENT_TIMESTAMP().getText());
         } else if (ctx.STRING_LITERAL() != null) {
+
             literal_value.setReturnType(ctx.STRING_LITERAL().getText());
         }
+        else if (ctx.IDENTIFIER()!=null)
+        {
+            literal_value.setReturnType(ctx.IDENTIFIER().getSymbol().getText());
+        }
+        else if(ctx.K_TRUE()!=null)
+        {
+            literal_value.setReturnType(ctx.K_TRUE().getSymbol().getText());
+        }
+        else if (ctx.K_FALSE()!=null)
+        {
+            literal_value.setReturnType(ctx.K_FALSE().getSymbol().getText());
+        }
+        System.out.println(" the value of it "+literal_value.getReturnType().toString());
         return literal_value;
     }
 

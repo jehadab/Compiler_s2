@@ -4,7 +4,7 @@ public class employess {
 
     public int id;
    // int id ;
- String name ;
+ public  String name ;
  int age;
  twon c ;
 city cc ;

@@ -511,7 +511,7 @@ public class CodeGeneration {
         Expr right_one = null;
         String select_value_we_have = "";
         ArrayList<employess> e = new ArrayList<employess>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 10; i++) {
             employess temp = new employess();
             temp.setId(i);
             temp.setName("testing  " + i);
@@ -616,13 +616,13 @@ public class CodeGeneration {
        // System.out.println("the right side here will be "+right_side);
         ArrayList<employess> temp_list = new ArrayList<employess>();
         if (operator.equals("=")) {
-            int temp_righ_value = Integer.valueOf(right_side);
-            if (left_side.equals("id")) {
+           // int temp_righ_value = Integer.valueOf(right_side);
+            if (left_side.equals("name")) {
                 for (int i = 0; i < datalist.size(); i++) {
                     // System.out.println("int he arraylist we have "+datalist.get(i).getId());
                    // righ_side.contains()
                     //datalist.get(i) == "1";
-                    if (datalist.get(i).id == temp_righ_value) {
+                    if (datalist.get(i).name == right_side) {
                         //System.out.println("int he arraylist we have "+datalist.get(i).getId());
                         temp_list.add(datalist.get(i));
 
@@ -735,12 +735,13 @@ public class CodeGeneration {
         return null;
     }
     public void expression_with_logic(Expr left_side , Expr right_side , String logical_operator,String we_select_on, ArrayList<employess> e ) {
+        boolean is_there = false;
         String left_one_from_the_left_logic_operator = "";
         String rigth_one_from_the_left_logica_opeartor = "";
         ArrayList<employess> from_the_left_side_of_logic_operator = new ArrayList<employess>();
-        ArrayList<employess> from_the_right_side_of_logical_operator  = new ArrayList<employess>();
-        String left_side_from_the_right_one="";
-        String right_side_from_the_right_one="";
+        ArrayList<employess> from_the_right_side_of_logical_operator = new ArrayList<employess>();
+        String left_side_from_the_right_one = "";
+        String right_side_from_the_right_one = "";
    /* if(left_side.getLeft().getColumnName()!=null)
     {
         String left = left_side.getLeft().getColumnName().getName();
@@ -757,61 +758,85 @@ public class CodeGeneration {
         if (left_side.getRight().getLiteral_value().getReturnType().toString() != null) {
             rigth_one_from_the_left_logica_opeartor = left_side.getRight().getLiteral_value().getReturnType().toString();
         }
-         from_the_left_side_of_logic_operator = get_where_result(left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp().toString(), e);
-        if(right_side.getLeft().getColumnName().getName()!=null)
-        {
-            left_side_from_the_right_one=left_side.getLeft().getColumnName().getName();
+        from_the_left_side_of_logic_operator = get_where_result(left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp().toString(), e);
+        if (right_side.getLeft().getColumnName().getName() != null) {
+            left_side_from_the_right_one = left_side.getLeft().getColumnName().getName();
         }
-        if(right_side.getRight().getLiteral_value().getReturnType().toString()!=null)
-        {
-            right_side_from_the_right_one=right_side.getRight().getLiteral_value().getReturnType().toString();
+        if (right_side.getRight().getLiteral_value().getReturnType().toString() != null) {
+            right_side_from_the_right_one = right_side.getRight().getLiteral_value().getReturnType().toString();
         }
-if(logical_operator.equals("&")|| logical_operator.equals("and")||logical_operator.equals("AND")) {
-     from_the_right_side_of_logical_operator = get_where_result(left_side_from_the_right_one,right_side_from_the_right_one, right_side.getOp().toString(), from_the_left_side_of_logic_operator);
-    if(from_the_right_side_of_logical_operator.size()==0)
-    {
-        System.out.println(" no result we have !!");
-    }
-    else {
-        ArrayList<String> the_final  = new ArrayList<String>();
-        for(int i=0;i<from_the_right_side_of_logical_operator.size();i++)
-        {
-            if(we_select_on.equals("name "))
-            {
-                the_final.add(from_the_right_side_of_logical_operator.get(i).getName());
-            }
-        }
-        for(int i=0;i<from_the_right_side_of_logical_operator.size();i++)
-        {
-            System.out.println( the_final.get(i).toString());
-        }
-    }
-    for(int i=0;i<from_the_right_side_of_logical_operator.size();i++)
-        System.out.println("the result value"+from_the_right_side_of_logical_operator.get(i).getId());
-}
-if(logical_operator.equals("||") || logical_operator.equals("OR")|| logical_operator.equals("or")) {
-    from_the_left_side_of_logic_operator = get_where_result(left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp(), e);
-    from_the_right_side_of_logical_operator = get_where_result(left_side_from_the_right_one, right_side_from_the_right_one, right_side.getOp(), e);
-    if (from_the_left_side_of_logic_operator.size() > from_the_right_side_of_logical_operator.size()) {
-        for (int i = 0; i < from_the_right_side_of_logical_operator.size(); i++) {
-            for (int j = 0; j < from_the_left_side_of_logic_operator.size(); j++) {
-                if (from_the_right_side_of_logical_operator.get(i) != from_the_left_side_of_logic_operator.get(j)) {
-                    from_the_left_side_of_logic_operator.add(from_the_right_side_of_logical_operator.get(i));
+        if (logical_operator.equals("&") || logical_operator.equals("and") || logical_operator.equals("AND")) {
+            from_the_right_side_of_logical_operator = get_where_result(left_side_from_the_right_one, right_side_from_the_right_one, right_side.getOp().toString(), from_the_left_side_of_logic_operator);
+            if (from_the_right_side_of_logical_operator.size() == 0) {
+                System.out.println(" no result we have !!");
+            } else {
+                ArrayList<String> the_final = new ArrayList<String>();
+                for (int i = 0; i < from_the_right_side_of_logical_operator.size(); i++) {
+                    if (we_select_on.equals("name ")) {
+                        the_final.add(from_the_right_side_of_logical_operator.get(i).getName());
+                    }
+                }
+                for (int i = 0; i < from_the_right_side_of_logical_operator.size(); i++) {
+                    System.out.println(the_final.get(i).toString());
                 }
             }
+            for (int i = 0; i < from_the_right_side_of_logical_operator.size(); i++)
+                System.out.println("the result value" + from_the_right_side_of_logical_operator.get(i).getId());
         }
-    } else {
-        for (int i = 0; i < from_the_left_side_of_logic_operator.size(); i++) {
-            for (int j = 0; j < from_the_right_side_of_logical_operator.size(); j++) {
-                if (from_the_right_side_of_logical_operator.get(i) != from_the_left_side_of_logic_operator.get(j)) {
-                    from_the_right_side_of_logical_operator.add(from_the_left_side_of_logic_operator.get(i));
+        if (logical_operator.equals("||") || logical_operator.equals("OR") || logical_operator.equals("or")) {
+            from_the_left_side_of_logic_operator = get_where_result(left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp(), e);
+            from_the_right_side_of_logical_operator = get_where_result(left_side_from_the_right_one, right_side_from_the_right_one, right_side.getOp(), e);
+            if (from_the_left_side_of_logic_operator.size() > from_the_right_side_of_logical_operator.size()) {
+                for (int i = 0; i < from_the_right_side_of_logical_operator.size(); i++) {
+                    for (int j = 0; j < from_the_left_side_of_logic_operator.size(); j++) {
+                        if (from_the_right_side_of_logical_operator.get(i).equals(from_the_left_side_of_logic_operator.get(j))) {
+                            is_there=true;
+                            break;
+                        }
+                    }
+                    if(is_there==false)
+                    {
+                        from_the_left_side_of_logic_operator.add(from_the_right_side_of_logical_operator.get(i));
+                    }
                 }
+
+                if(we_select_on.equals("name"))
+                {
+                    for(int i = 0; i < from_the_left_side_of_logic_operator.size(); i++)
+                    {
+                        System.out.println(" the result will be"+from_the_left_side_of_logic_operator.get(i).getName());
+                    }
+                }
+
+            } else {
+                System.out.println("the size for every side from left " + from_the_left_side_of_logic_operator.size());
+                System.out.println(" the size from the right " + from_the_right_side_of_logical_operator.size());
+                for (int i = 0; i < from_the_left_side_of_logic_operator.size(); i++) {
+                    for (int j = 0; j < from_the_right_side_of_logical_operator.size(); j++) {
+                        if (from_the_right_side_of_logical_operator.get(j).equals(from_the_left_side_of_logic_operator.get(i))) {
+                            //System.out.println(" we should not get in there !!!!!!!");
+                            is_there = true;
+                            break;
+
+                        }
+                    }
+                    if (is_there == false)
+                        from_the_right_side_of_logical_operator.add(from_the_left_side_of_logic_operator.get(i));
+                }
+                if(we_select_on.equals("name"))
+                {
+                    for(int i = 0; i < from_the_right_side_of_logical_operator.size(); i++)
+                    {
+                        System.out.println(" the result will be"+from_the_right_side_of_logical_operator.get(i).getName());
+                    }
+                }
+
             }
+
+
         }
     }
 
-}
-    }
     public void  get_where_result_for_complixity_right_side(String left_side , ArrayList<String > right_side, String operator , ArrayList<employess> data_list,String  select_valu  ) {
         //if left side is number conver list from string to integer ......
         ArrayList<employess> temp_list = new ArrayList<employess>();

@@ -2,6 +2,6 @@ create table s (name String , id double) type ="json"  path = "D:";
 create table d (name s , id double) type ="json"  path = "D:";
 create type f (name String);
 Func(){
-var x = select id from d where id > 1 and id like  1;
+var x = select name  from d where  name = true;
 
 }
