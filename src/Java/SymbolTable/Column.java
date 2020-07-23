@@ -8,9 +8,18 @@ public class Column {
     private String Typeboolean ;
     private String LastColumn ;
     private String FirstColumn ;
-
+    private String TypeObject;
     public String getFirstColumn() {
         return FirstColumn;
+    }
+
+
+    public String getTypeObject() {
+        return TypeObject;
+    }
+
+    public void setTypeObject(String typeObject) {
+        TypeObject = typeObject;
     }
 
     public void setFirstColumn(String firstColumn) {

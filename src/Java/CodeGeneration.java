@@ -269,7 +269,9 @@ public class CodeGeneration {
                 }else if(col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
                     col.setTypeboolean("true");
                 }
-
+                else if(col.getTypeString()==null&&col.getTypeboolean()==null&&col.getTypeNumber()==null){
+                    col.setTypeObject("true");
+                }
                 columns.add(col);
             }
         }
@@ -332,6 +334,9 @@ public class CodeGeneration {
         printContent.add("className",className);
         printContent.add("columns",columns);
 
+        ST getTypeFunction = stGroup.getInstanceOf("getTypeFunction");
+
+        ST getTableFunction = stGroup.getInstanceOf("getTableFunction");
 
         ST EOF = stGroup.getInstanceOf("EOF");
 
@@ -363,6 +368,8 @@ public class CodeGeneration {
             bufferedWriter.write(readJsonFile.render());
             bufferedWriter.write(readCsvFile.render());
             bufferedWriter.write(printContent.render());
+            bufferedWriter.write(getTypeFunction.render());
+            bufferedWriter.write(getTableFunction.render());
 //            bufferedWriter.write(getTypeFunction.render());
 //            bufferedWriter.write(returnSpecificType.render());
 //            bufferedWriter.write(returnListOfColumn.render());
@@ -624,9 +631,15 @@ public class CodeGeneration {
                         "}> >>" +
                         readFileJsonFunction()+
                         setterAndGetterFunction()+
-                        printContentFunction() +
+//                        "<if(!tablePath)>"+
+                        printContentFunction()+
+//                        "<endif>"+
                         readFileCsvFunction()+
                         loadContent(gneralcreating)+
+//                        "<if(tablePath)>"+
+                        getTableElementFunction()+
+                        getTypeElementFunction()+
+//                        "<endif>"+
                         "EOF()::=<< <\\n> " +
                         "}>>"
         );
@@ -690,6 +703,7 @@ public class CodeGeneration {
                 "<if(col.TypeString)>" +
                 "csvRecord.get(\"<col.column_name>\"));" +
                 "<endif>" +
+                "<if(col.TypeObject)>new Object());<endif>" +
                 "<\\n><\\t>" +
                 "\\}<\\n><\\t>" +
                 "}>" +
@@ -727,6 +741,26 @@ public class CodeGeneration {
         return str;
     }
 
+    public String getTypeElementFunction(){
+        String str = "getTypeFunction()::=<<" +
+                "public \\<T> T get_types(JsonElement object)<\\n><\\t>" +
+                "{<\\n>" +
+                "return null;<\\n>" +
+                "}" +
+                ">>";
+        return str;
+    }
+
+    public String getTableElementFunction(){
+        String str = "getTableFunction()::=<<" +
+                "public \\<T> T get_table(JsonArray array)<\\n><\\t>" +
+                "{<\\n>" +
+                "return null;<\\n>" +
+                "}" +
+                ">>";
+        return str;
+    }
+
     public  String readFileJsonFunction() {
     String str  = "readJsonFile(className,columns,tablePath)::=<<" +
             "<\\n><\\t> public List\\<<className>\\> readJsonFile(){<\\n><\\t>" +
@@ -756,6 +790,20 @@ public class CodeGeneration {
             "<endif>"+
             "<if(col.Typeboolean)>" +
             "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsBoolean());<\\n><\\t>" +
+            "<endif>" +
+            "<if(col.TypeObject)>" +
+//            "<if(col.isNewTable)>" +
+            "if (j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsJsonArray() != null)" +
+            "{<\\n><\\t>" +
+            "JsonArray nested_one = j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsJsonArray();<\\n><\\t>" +
+            "set<col.column_name>(get_table(nested_one));<\\n><\\t>" +
+            "\\}<\\n><\\t>" +
+//            "<else>" +
+            "if (j.get(i).getAsJsonObject().get(\"<col.column_name>\").isJsonObject() == true)<\\n><\\t>" +
+            "{<\\n><\\t>" +
+            "<col.column_type> t_<col.column_name> = new <col.column_type>();" +
+            "\\}<\\n><\\t>"+
+//            "<endif>" +
             "<endif>"+
             "\\}<\\n><\\t>" +
             " }>" +

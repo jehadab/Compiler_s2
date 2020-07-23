@@ -27,38 +27,24 @@ import Java.SymbolTable.Column;
 import Java.SymbolTable.Type; 
 import java.util.HashSet;
 import java.util.Set;
- public class colors implements Cloneable {
-  	public Address    address ;
-  	public String    color ;
+ public class Address implements Cloneable {
   	public double    id ;
-  	public String    value ;   
- 	 public void setaddress(Address value){
- 	this.address  = value ; 
- 	} 
- 	 public void setcolor(String value){
- 	this.color  = value ; 
- 	} 
+  	public Street    streetInfo ;   
  	 public void setid(double value){
  	this.id  = value ; 
  	} 
- 	 public void setvalue(String value){
- 	this.value  = value ; 
+ 	 public void setstreetInfo(Street value){
+ 	this.streetInfo  = value ; 
  	}   
- 	 public Address getaddress(){
- 	return address ;   
- 	} 
- 	 public String getcolor(){
- 	return color ;   
- 	} 
  	 public double getid(){
  	return id ;   
  	} 
- 	 public String getvalue(){
- 	return value ;   
+ 	 public Street getstreetInfo(){
+ 	return streetInfo ;   
  	}    
  	String tablePath = "C:/Users/Dell/Desktop/Final/Data/Colors.json";
 	String tableType = "json"; 
-	static List<colors> entityObject  = new ArrayList<>();
+	static List<Address> entityObject  = new ArrayList<>();
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{ 
 	if(tableType == "json")
 	{
@@ -70,8 +56,8 @@ import java.util.Set;
 	}
 	}
   
-	 public List<colors> readJsonFile(){
-	List<colors> result = new ArrayList<>();
+	 public List<Address> readJsonFile(){
+	List<Address> result = new ArrayList<>();
 	FileReader fr = null;Gson json = new Gson();
 	try {
 	fr=new FileReader(tablePath);
@@ -79,37 +65,29 @@ import java.util.Set;
 	e.printStackTrace();}
 	JsonReader reader = new JsonReader(fr);
 	JsonObject testing = json.fromJson(fr, JsonObject.class);
-	JsonElement json_ele = testing.get("colors");
+	JsonElement json_ele = testing.get("Address");
 	JsonArray j = json_ele.getAsJsonArray();
 	for (int i = 0 ; i < j.size() ; i++ ) {
-	colors tableName = new colors();
-	if(j.get(i).getAsJsonObject().get("address") != null);
-	{
-	if (j.get(i).getAsJsonObject().get("address").getAsJsonArray() != null){
-	JsonArray nested_one = j.get(i).getAsJsonObject().get("address").getAsJsonArray();
-	setaddress(get_table(nested_one));
-	}
-	if (j.get(i).getAsJsonObject().get("address").isJsonObject() == true)
-	{
-//	Java.SymbolTable.Type@5939a379 t_address = new Java.SymbolTable.Type@5939a379();}
-	}}
-	 if(j.get(i).getAsJsonObject().get("color") != null);
-	{
-	tableName.setcolor(j.get(i).getAsJsonObject().get("color").getAsString());
-	}
-	 if(j.get(i).getAsJsonObject().get("id") != null);
+	Address tableName = new Address();
+	if(j.get(i).getAsJsonObject().get("id") != null);
 	{
 	tableName.setid(j.get(i).getAsJsonObject().get("id").getAsDouble());
 	}
-	 if(j.get(i).getAsJsonObject().get("value") != null);
+	 if(j.get(i).getAsJsonObject().get("streetInfo") != null);
 	{
-	tableName.setvalue(j.get(i).getAsJsonObject().get("value").getAsString());
+	if (j.get(i).getAsJsonObject().get("streetInfo").getAsJsonArray() != null){
+	JsonArray nested_one = j.get(i).getAsJsonObject().get("streetInfo").getAsJsonArray();
+	setstreetInfo(get_table(nested_one));
 	}
+	if (j.get(i).getAsJsonObject().get("streetInfo").isJsonObject() == true)
+	{
+//	Java.SymbolTable.Type@5136d012 t_streetInfo = new Java.SymbolTable.Type@5136d012();}
+	}}
 	 result.add(tableName);
 	}
 	return result;
-	 }public List<colors> readCsvFile() throws IOException{
-	List<colors> result = new ArrayList<>(); 
+	 }public List<Address> readCsvFile() throws IOException{
+	List<Address> result = new ArrayList<>(); 
 	BufferedReader csvReader = null;
 	String[] data = new String[0];
 	File csvFile = new File("C:/Users/Dell/Desktop/Final/Data/Colors.json");
@@ -117,21 +95,15 @@ import java.util.Set;
 	if(csvFile.isFile())
 	{
 	 String row; 
-	colors classname = new colors();
-	CSVParser csvParser = new CSVParser(csvReader, CSVFormat.DEFAULT.withHeader( "address",    "color",    "id",    "value"   ).withIgnoreHeaderCase().withTrim());
+	Address classname = new Address();
+	CSVParser csvParser = new CSVParser(csvReader, CSVFormat.DEFAULT.withHeader( "id",    "streetInfo"   ).withIgnoreHeaderCase().withTrim());
 	 for (CSVRecord csvRecord: csvParser)
 	{
-	if(csvRecord.get("address") != null){
-//	classname.setaddress(new Object());
-	}
-	if(csvRecord.get("color") != null){
-	classname.setcolor(csvRecord.get("color"));
-	}
 	if(csvRecord.get("id") != null){
 	classname.setid(Double.parseDouble(csvRecord.get("id")));
 	}
-	if(csvRecord.get("value") != null){
-	classname.setvalue(csvRecord.get("value"));
+	if(csvRecord.get("streetInfo") != null){
+//	classname.setstreetInfo(new Object());
 	}
 	}
 	 result.add(classname);
@@ -140,13 +112,13 @@ import java.util.Set;
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf(" %10s    %20s   %20s   %20s  " ,  "address" ,  "color" ,  "id" ,  "value" ) ;	System.out.println();
+	System.out.printf(" %10s    %20s  " ,  "id" ,  "streetInfo" ) ;	System.out.println();
 
 	System.out.println("-----------------------------------------------------------------------------");
 	
-	for(colors obj:entityObject)
+	for(Address obj:entityObject)
 	{
-	System.out.format("  %5s    %20s    %20s    %20s  " ,  obj.getaddress(), obj.getcolor(), obj.getid(),obj.getvalue() );
+	System.out.format("  %5s    %20s  " ,  obj.getid(),obj.getstreetInfo() );
 	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
