@@ -21,13 +21,13 @@ private TableName tableName;
 private ColumnName columnName;
 private  String  op;
 
-private ArrayList<String > Array_list_od_right_side = new ArrayList<String >();
+private ArrayList<Expr> Array_list_od_right_side = new ArrayList<>();
 
-    public ArrayList<String> getArray_list_od_right_side() {
+    public ArrayList<Expr> getArray_list_od_right_side() {
         return Array_list_od_right_side;
     }
 
-    public void setArray_list_od_right_side(ArrayList<String> array_list_od_right_side) {
+    public void setArray_list_od_right_side(ArrayList<Expr> array_list_od_right_side) {
         Array_list_od_right_side = array_list_od_right_side;
     }
 
@@ -137,7 +137,7 @@ private ArrayList<String > Array_list_od_right_side = new ArrayList<String >();
     public void setVisited(boolean visited) {
         isVisited = visited;
     }
-    public void add_to_list(String ex)
+    public void add_to_list(Expr ex)
     {
        this.Array_list_od_right_side.add(ex);
     }

@@ -387,3 +387,9 @@ p = false;
 if this is not it will not work .....
 5- is working
 6- is working
+-----------------------------------------
+ 1<id or name ="testing1"
+ where   id <=1 and  name  = "testing1"
+ where name  = "testing1" and id < 1 and
+ name  = "testing1" or id > 1
+ where name  in ("testing1","testing2")

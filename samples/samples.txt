@@ -2,6 +2,6 @@ create table s (name String , id double) type ="json"  path = "D:";
 create table d (name s , id double) type ="json"  path = "D:";
 create type f (name String);
 Func(){
-var x =  select name from user where  name like '%t';
+var x =  select name from user where d.name=5
 
 }

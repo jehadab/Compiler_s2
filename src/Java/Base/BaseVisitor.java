@@ -1386,13 +1386,14 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 for (int i = 0; i < ctx.expr(1).expr().size(); i++) {
                     //expr.add_to_list(ctx.expr(1).expr().get(i).getText());
                     //System.out.println(" the list is" + ctx.expr(1).expr().get(i).getText());
-                    expr.getArray_list_od_right_side().add(ctx.expr(1).expr().get(i).getText());
+                    expr.getArray_list_od_right_side().add(visitExpr(ctx.expr(1).expr().get(i)));
                 }
             }
+
         }
 
         for (int i = 0; i < expr.getArray_list_od_right_side().size(); i++) {
-            System.out.println(" the right side of expretion will be " + expr.getArray_list_od_right_side().get(i));
+            System.out.println(" the right side of expretion will be " + expr.getArray_list_od_right_side().get(i).getLiteral_value());
         }
         if(ctx.function_name()!=null){
             System.out.println("visit the function name ");
@@ -1410,9 +1411,10 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         if(ctx.K_AND()!=null ||ctx.AMP()!=null ||ctx.K_OR()!=null||ctx.PIPE2()!=null)
         {
             //System.out.println(" the right side of logic operator "+ctx.expr(1).getText());
-            expr.setLeft(visitExpr(ctx.expr(0)));
 
+            expr.setLeft(visitExpr(ctx.expr(0)));
          expr.setRight(visitExpr(ctx.expr(1)));
+           // System.out.println("dwfwjqpoejpqg"+expr.getRight().getRight().getLiteral_value().getReturnType().toString());
          if(ctx.K_AND()!=null)
          expr.setOp(ctx.K_AND().toString());
          if(ctx.AMP()!=null)
@@ -1443,6 +1445,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             literal_value.setReturnType(ctx.BLOB_LITERAL().getText());
         } else if (ctx.NUMERIC_LITERAL() != null) {
             literal_value.setReturnType(ctx.NUMERIC_LITERAL().getText());
+
             System.out.println("th number is : " + literal_value.getReturnType());
         } else if (ctx.K_CURRENT_TIME() != null) {
             literal_value.setReturnType(ctx.K_CURRENT_TIME().getText());
@@ -1459,6 +1462,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         else if (ctx.IDENTIFIER()!=null)
         {
             literal_value.setReturnType(ctx.IDENTIFIER().getSymbol().getText());
+
         }
         else if(ctx.K_TRUE()!=null)
         {
@@ -1468,7 +1472,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         {
             literal_value.setReturnType(ctx.K_FALSE().getSymbol().getText());
         }
-        System.out.println(" the value of it "+literal_value.getReturnType().toString());
+
         return literal_value;
     }
 
