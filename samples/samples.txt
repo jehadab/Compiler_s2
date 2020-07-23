@@ -4,4 +4,8 @@ create type f (name String);
 Func(){
 var x =  select name from user where d.name=5
 
+var y = select  id  from colors ;
+print(y);
+
+
 }
