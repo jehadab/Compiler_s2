@@ -468,7 +468,7 @@ expr
 
  commn_expr_opreator:
  //'||'
- |( '*' | '/' | '%' )
+ ( '*' | '/' | '%' )
  |( '+' | '-' )
  |( '<<' | '>>'  | '|' ) //&
  |( '<' | '<=' | '>' | '>=' )
@@ -911,7 +911,7 @@ create_aggregation_function : K_CREATE  K_AGGREGATION K_FUNCTION  use_random_nam
  ;
 
   // jar_pathe: (use_random_name ':' '/' use_random_name) ('/' use_random_name)*| use_random_name;
-      parames: K_STRING |K_NUMBER| K_BOOLEAN  |table_name |column_name;
+      parames: K_STRING |K_DOUBLE| K_BOOLEAN  |table_name |column_name;
 // start section instraction and functions defination --------------------------------------------------------------
 
 

@@ -1,4 +1,9 @@
 package Java;
+import Java.AST.QueryStmt.Join.Join_Constrain;
+import Java.AST.QueryStmt.Join.Join_Opreator;
+import Java.AST.QueryStmt.SelectStmt.Select_Core;
+import Java.AST.commn_classes_Sql.name_rule.TableName;
+import Java.AST.expr.Expr;
 import Java.SymbolTable.AggregationFunction;
 import Java.SymbolTable.Scope;
 import Java.AST.commn_classes_Sql.name_rule.TableOrSubQuery;
@@ -274,15 +279,20 @@ public class CodeGeneration {
         ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
         ArrayList<Column> columns = new ArrayList<>();
         ArrayList<Table> tables = new ArrayList<>();
+        ArrayList<AggrAndColums>aggrAndColumsArrayList = new ArrayList<>();
+        ArrayList<TablesInQuery> tablesInQueryArrayList = new ArrayList<>();
         for (Column col:columnArrayList
              ) {
 //            System.err.println("sssssssssssssssssssssssssssss "+col.getColumn_name());
             if(col.getColumn_type() instanceof AggregationFunction)
             {
+                AggrAndColums aggrAndColums = new AggrAndColums();
                 aggregationFunctionArrayList.add((AggregationFunction) col.getColumn_type());
+                aggrAndColums.aggregationFunction =(AggregationFunction) col.getColumn_type();
 //                System.err.println("fffffffffffffffffffffffffff  "+(((AggregationFunction) col.getColumn_type()).getAggregationFunctionName()));
 
 //                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
+                aggrAndColumsArrayList.add(aggrAndColums);
 
             }
             else {
@@ -294,6 +304,70 @@ public class CodeGeneration {
                     col.setTypeboolean("true");
                 }
                 columns.add(col);
+            }
+        }
+        Select_Core select_core =  generalcreating.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core();
+        ArrayList<JoinClause> joinClauseArrayList = new ArrayList<>();
+        if(select_core.getJoin_clause() != null ){
+            for (int i = 0; i < select_core.getJoin_clause().getJoin_opreatorList().size(); i++) {
+                JoinClause joinClause = new JoinClause();
+                TablesInQuery tablesInQuery = new TablesInQuery();
+                if(select_core.getJoin_clause().getJoin_constrain() != null){
+                    if(select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getLeft().getTableName() !=null)
+                    {
+
+                        joinClause.leftTableName = select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getLeft().getTableName().getName();
+
+                    }
+                    if(select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getLeft().getColumnName() !=null)
+                    {
+                        joinClause.LeftColumnName = select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getLeft().getColumnName().getName();
+
+
+                    }
+                    if(select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getRight().getTableName() !=null)
+                    {
+
+
+                        joinClause.rightTableName = select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getRight().getTableName().getName();
+                    }
+                    if(select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getRight().getColumnName() !=null)
+                    {
+                        joinClause.rightColumnName = select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getRight().getColumnName().getName();
+
+                    }
+                }
+                joinClauseArrayList.add(joinClause);
+
+            }
+            for (int i = 0; i <select_core.getJoin_clause().getTableOrSubQueryList().size() ; i++) {
+                tablesInQueryArrayList.add(getTableColumns(select_core.getJoin_clause().getTableOrSubQueryList().get(i).getTableName().getName()));
+            }
+            System.out.println(tablesInQueryArrayList);
+        }
+        else if (select_core.getReslult_cloumnList()!= null){
+            for (int i = 0; i < select_core.getReslult_cloumnList().size(); i++) {
+                if(select_core.getReslult_cloumnList().get(i).getExpr().getFunction_name() != null)
+                {
+                    if(!aggrAndColumsArrayList.isEmpty()){
+
+                        AggrAndColums aggrAndColums = aggrAndColumsArrayList.get(i);
+                        aggrAndColums.columnName =  select_core.getReslult_cloumnList().get(i).getExpr().getColumnName().getName();
+                        if(select_core.getReslult_cloumnList().get(i).getExpr().getTableName() != null)
+                        {
+                            aggrAndColums.tableName =  select_core.getReslult_cloumnList().get(i).getExpr().getTableName().getName();
+                        }else {
+                            aggrAndColums.tableName=  select_core.getTableOrSubQueryList().get(0).getTableName().getName();
+                        }
+                    }
+
+                }
+            }
+
+            if(select_core.getTableOrSubQueryList() != null){
+                for (int i = 0; i <select_core.getTableOrSubQueryList().size() ; i++) {
+                    tablesInQueryArrayList.add(getTableColumns(select_core.getTableOrSubQueryList().get(i).getTableName().getName()));
+                }
             }
         }
 
@@ -326,6 +400,10 @@ public class CodeGeneration {
         loadFunction.add("className",className);
         ArrayList<TableAndColumn> tableAndColumnArrayList = splitColomNames(columns);
         loadFunction.add("columns",tableAndColumnArrayList);
+//        System.out.println(joinClauseArrayList);
+        loadFunction.add("joinClause",joinClauseArrayList);
+        loadFunction.add("aggrAndColums",aggrAndColumsArrayList);
+        loadFunction.add("tablesInQuery",tablesInQueryArrayList);
 //        loadFunction.add("tables",splitColomNames(columns));
 
 
@@ -505,20 +583,33 @@ public class CodeGeneration {
         return null;
 
     }
+
+    private TablesInQuery getTableColumns(String tableName){
+        TablesInQuery tablesInQuery = new TablesInQuery();
+        for (Type type:Main.symbolTable.getDeclaredTypes()
+             ) {
+            if(type.getName().equals(tableName)){
+                tablesInQuery.tableName = type.getName();
+                tablesInQuery.columns = returnTableColumn(type);
+                break;
+            }
+        }
+        return tablesInQuery;
+    }
     private String loadAggClassToSelect(){
         String stringTEmplate =(
                 " <\\t><\\n>String JarPath = <agg.jar_path>;<\\n>" +
                 "<\\t>String JarName = \"<agg.AggregationFunctionName>.jar\";<\\n>" +
                 "<\\t>String ClassName = \"<agg.ClassName>\";<\\n>" +
                 "<\\t>String MethodName = \"<agg.MethodName>\";<\\n>" +
-                "<\\t>ArrayList\\<Double> myNumbers = new ArrayList\\<>(Arrays.asList(1.0, 2.0, 3.0, 12.0));<\\n>" +
+//                "<\\t>ArrayList\\<Double> myNumbers = new ArrayList\\<>(Arrays.asList(1.0, 2.0, 3.0, 12.0));<\\n>" +
                 "<\\t>URLClassLoader myClassLoader = new URLClassLoader(" +
                 "<\\t>new URL[]{new File(JarPath ).toURI().toURL()\\},Main.class.getClassLoader()); <\\n>" +
                 "<\\t>Class\\<?> myClass = Class.forName(ClassName, true, myClassLoader);<\\n>" +
                 "<\\t>Method mySingeltonGetterMethod = myClass.getMethod(\"get\" + ClassName,null);<\\n>" +
                 "<\\t>Object myObject = mySingeltonGetterMethod.invoke(null);<\\n>" +
                 "<\\t>Object myValue = myObject.getClass().getDeclaredMethod(MethodName, List.class).invoke(myObject, myNumbers);<\\n>" +
-                "<\\t>System.out.println(myValue);<\\n>"
+                "<\\t>return (<agg.returnType>)myValue;<\\n>"
 
         );
 
@@ -578,7 +669,7 @@ public class CodeGeneration {
                         "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
                         "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
                         "staticList(className,tablePath)::=<< <\\n><\\t>static List\\<<className>\\> entityObject  = new ArrayList\\<>();<\\n> >>" +
-                        "loadFunction(aggList,tablePath,isType,className,columns)::= <<<\\t>public void load() " +throwException()+
+                        "loadFunction(aggList,tablePath,isType,className,columns,joinClause,aggrAndColums,tablesInQuery)::= <<<\\t>public void load() " +throwException()+
                         "{ <\\n><\\t>" +
                         "<if(tablePath)>" +
                         "if(tableType == \"json\")<\\n><\\t>" +
@@ -591,11 +682,11 @@ public class CodeGeneration {
                         "entityObject = readCsvFile();<\\n><\\t>" +
                         "}<\\n><\\t>" +
                         "<else>" +
-                        "<loadContent(className,columns)>" +
+                        "<loadContent(className,columns,joinClause,aggrAndColums,tablesInQuery)>" +
                         "<endif>" +
                         "}<\\n> <if(aggList)> <loadAggFuncs(aggList)> <endif> >>  " +
                         "loadAggFuncs(aggList) ::= << " +
-                        "<aggList :{ agg|<\\n><\\t> public static void <agg.AggregationFunctionName>() "+throwException()+
+                        "<aggList :{ agg|<\\n><\\t> public static <agg.returnType> <agg.AggregationFunctionName>(List\\<?> myNumbers) "+throwException()+
                         "{<\\n><\\t>"+
                         loadAggClassToSelect()+
                         "<\\n><\\t> \\}" +
@@ -765,20 +856,39 @@ public class CodeGeneration {
 //       System.out.println("set "+((Field) fields.iterator().next()).getName());
 //       ArrayList<String> s = new ArrayList<>();
 
-        String loadContent= ("loadContent(className , columns )::=<< " +
+
+        String loadContent= ("loadContent(className , columns ,joinClause ,aggrAndColums, tablesInQuery , whereExprList)::=<< " +
                 "<\\n><\\t> <className> obj<className> = new <className>();" +
+                "<\\n><\\t> <tablesInQuery:{ originalTable|  List\\<<originalTable.tableName>\\> <originalTable.tableName>List = <originalTable.tableName>.entityObject ;<\\n>  }>" +
+                "<\\n><\\t> <whereExprList :{ whereExp | for (int i = 0 ; i \\< <whereExpr.tableName>List.size() ; i++ ) {<\\n> " +
+                "<\\n><\\t> if( <if(whereExp.inExpr> " +
+                "<else> !(<whereExpr.tableName>List.get(i).<whereExpr.columnName> <whereExpr.operator> <whereExpr.rightSide> <endif>))  <\\n> " +
+                "<\\n><\\t> <whereExpr.tableName>List.remove(i);<\\n>" +
+                "" +
+                "\\} }>" +
                 "<columns:{ col| " +
-                "<\\n><\\t>for(int <col.tableName>counter = 0 ; <col.tableName>counter \\< <col.tableName>.entityObject.size(); <col.tableName>counter++){" +
-                "<col.columns:{innerCol| <\\n><\\t><\\t> obj<className>.<innerCol.thisColumn.column_name> = <innerCol.tableName>.entityObject.get(<col.tableName>counter).<innerCol.columnName>; }>" +
+                "<\\n><\\t>for(int <col.tableName>counter = 0 ; <col.tableName>counter \\< <col.tableName>List.size(); <col.tableName>counter++){" +
+                "<col.columns:{innerCol| <\\n><\\t><\\t> obj<className>.<innerCol.thisColumn.column_name> = <innerCol.tableName>List.get(<col.tableName>counter).<innerCol.columnName>; }>" +
                 "<\\n><\\t><\\t>"+
                 "}>" +
                 "<\\n><\\t> try{" +
-                "<\\n><\\t><\\t>entityObject.add((<className>)obj<className>.clone()); <\\n> \\} <\\n>" +
+                "<\\n><\\t><\\t><joinClause:{ joinCondition | if(  <joinCondition.leftTableName>List.get(<joinCondition.leftTableName>counter).<joinCondition.LeftColumnName>" +
+                "== <joinCondition.rightTableName>List.get(<joinCondition.rightTableName>counter).<joinCondition.rightColumnName>  ) }> <\\n>" +
+                "<\\n><\\t><\\t><\\t>entityObject.add((<className>)obj<className>.clone()); <\\n> \\} <\\n>" +
                 "catch (CloneNotSupportedException c){<\\n>" +
                 "<\\t><\\t><\\t> c.printStackTrace();<\\n>" +
-                "<\\t> }<\\n>" +
+                "<\\t> }<\\n>"+
+                "<\\n>"+
+                "<\\t><\\t> <aggrAndColums :{ agg |  List\\<<agg.aggregationFunction.returnType>\\> <agg.aggregationFunction.returnType>s = new ArrayList\\<>() ;<\\n>" +
+                "<\\t><\\t> <agg.tableName>.entityObject.forEach(fafa -> <agg.aggregationFunction.returnType>s.add(fafa.<agg.columnName>));<\\n>" +
+                "<\\t><\\t> _AGG<agg.aggregationFunction.MethodName> = <agg.aggregationFunction.MethodName>(<agg.aggregationFunction.returnType>s);<\\n>" +
+                "<\\t><\\t> System.out.println(_AGG<agg.aggregationFunction.MethodName>); }>" +
                 " <columns:{ col| \\} }>"  +
 //                "<\\n><\\t>Field tableField[] ="+tableName+".getClass().getFields();" +
+//                String  leftTableName;
+//       String LeftColumnName;
+//       String rightTableName ;
+//       String rightColumnName;
 //                "<\\n><\\t>Set<Field> fields = new HashSet<>(Arrays.asList(field)) ;" +
 //                "<\\n><\\t>Field selectField[] =<className>.getClass().getFields();" +
 //                "<\\n><\\t>ArrayList<String> matchField = new ArrayList();" +
@@ -833,12 +943,47 @@ public class CodeGeneration {
        public ArrayList<Columns> columns = new ArrayList<>();
 
     }
+    class TablesInQuery{
+        public String tableName;
+        public ArrayList<Column> columns ;
+    }
+
+    class JoinClause {
+        public String leftTableName ;
+        public String LeftColumnName;
+        public String rightTableName ;
+        public  String rightColumnName;
+    }
+    class AggrAndColums{
+        public AggregationFunction aggregationFunction;
+        public String columnName;
+        public String tableName;
+    }
+    class whereExpr{
+        public String RightExpr;
+        public String operator;
+        public String tableName ;
+        public String columnName;
+        public InExpr inExpr;
+    }
+    class InExpr {
+//        public String firstExpr;
+//        public String secondExpr;
+        ArrayList<String> strings;
+
+
+    }
+
+
+
      private  ArrayList<TableAndColumn> splitColomNames (ArrayList<Column> columns){
 
 
          ArrayList<TableAndColumn> tableAndColumnArrayList = new ArrayList<>();
 
-             for (Column col:columns
+
+
+         for (Column col:columns
                   ) {
 //                 System.err.println(col.getColumn_name());
                  String[] names ;
@@ -852,6 +997,7 @@ public class CodeGeneration {
                      columnsInTable.thisColumn = col;
                      columnsInTable.columnName = names[1];
                      tableAndColumn.columns.add(columnsInTable);
+
 
                      if(!tableAndColumnArrayList.isEmpty()){
 
@@ -877,6 +1023,8 @@ public class CodeGeneration {
                          tableAndColumnArrayList.add(tableAndColumn);
                      }
              }
+             else if(col.getColumn_name().contains("_AGG")){
+                 }
          }
 //         tableAndColumnArrayList.forEach(tableAndColumn1 -> System.err.println(tableAndColumn1.Columns));
          return tableAndColumnArrayList;
@@ -920,63 +1068,64 @@ public class CodeGeneration {
 
                             if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored() != null) {//is it factored select ?
                                 if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core() != null) {
+                                    Select_Core select_core = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core();
                                     // System.out.println("what we have herev "+generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getReslult_cloumnList().size());
-                                    select_value_we_have = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getReslult_cloumnList().get(0).getExpr().getColumnName().getName();
-                                    if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr() != null) {
+                                    select_value_we_have = select_core.getReslult_cloumnList().get(0).getExpr().getColumnName().getName();
+                                    if (select_core.getWhereExpr() != null) {
 
-                                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft() != null) {
-                                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName() != null) {
-                                                left_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName().getName();
+                                        if (select_core.getWhereExpr().getExpr().getLeft() != null) {
+                                            if (select_core.getWhereExpr().getExpr().getLeft().getColumnName() != null) {
+                                                left_side = select_core.getWhereExpr().getExpr().getLeft().getColumnName().getName();
                                                 //  System.out.println(" the left side will -----"+left_side);
                                             }
-                                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getLiteral_value()!=null)
+                                            else if(select_core.getWhereExpr().getExpr().getLeft().getLiteral_value()!=null)
                                             {
-                                                left_side=generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getLiteral_value().getReturnType();
+                                                left_side=select_core.getWhereExpr().getExpr().getLeft().getLiteral_value().getReturnType();
 
                                             }
-                                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getTableName()!=null)
+                                            else if(select_core.getWhereExpr().getExpr().getLeft().getTableName()!=null)
                                             {
-                                                if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName() != null)
+                                                if(select_core.getWhereExpr().getExpr().getLeft().getColumnName() != null)
                                                 {
-                                                    left_side=generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft().getColumnName().getName();
+                                                    left_side=select_core.getWhereExpr().getExpr().getLeft().getColumnName().getName();
 
                                                 }
                                             }
-                                            else {  left_one= generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getLeft();}
+                                            else {  left_one= select_core.getWhereExpr().getExpr().getLeft();}
                                         }
-                                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp() != null) {
-                                            operator = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getOp();
-                                            System.out.println("the operatore is ---"+operator);
+                                        if (select_core.getWhereExpr().getExpr().getOp() != null) {
+                                            operator = select_core.getWhereExpr().getExpr().getOp();
+//                                            System.out.println("the operatore is ---"+operator);
                                         }
 
-                                        if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight() != null) {
-                                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName() != null) {
-                                                righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName().getName();
+                                        if (select_core.getWhereExpr().getExpr().getRight() != null) {
+                                            if (select_core.getWhereExpr().getExpr().getRight().getColumnName() != null) {
+                                                righ_side = select_core.getWhereExpr().getExpr().getRight().getColumnName().getName();
                                                 get_where_final_result(false ,left_side, righ_side, operator, select_value_we_have, e);
 
 
                                             }
-                                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getTableName()!=null)
+                                            else if(select_core.getWhereExpr().getExpr().getRight().getTableName()!=null)
                                             {
-                                                if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName()!=null) {
-                                                    righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getColumnName().getName();
+                                                if(select_core.getWhereExpr().getExpr().getRight().getColumnName()!=null) {
+                                                    righ_side = select_core.getWhereExpr().getExpr().getRight().getColumnName().getName();
                                                     get_where_final_result(false ,left_side,righ_side,operator,select_value_we_have,e);
                                                 }
                                             }
-                                            if (generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value() != null) {
-                                                righ_side = generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight().getLiteral_value().getReturnType().toString();
+                                            else if (select_core.getWhereExpr().getExpr().getRight().getLiteral_value() != null) {
+                                                righ_side = select_core.getWhereExpr().getExpr().getRight().getLiteral_value().getReturnType();
                                                 get_where_final_result(true,left_side, righ_side, operator, select_value_we_have, e);
 
                                             }
-                                            if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side()!=null) {
-                                                if(generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side().size()!=0)
+                                            else if(select_core.getWhereExpr().getExpr().getArray_list_od_right_side()!=null) {
+                                                if(select_core.getWhereExpr().getExpr().getArray_list_od_right_side().size()!=0)
 
                                                     //in
                                                     //   System.out.println(" here we are !!!!");
-                                                    get_where_result_for_complixity_right_side(left_side,generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getArray_list_od_right_side(),operator,e,select_value_we_have);
+                                                    get_where_result_for_complixity_right_side(left_side,select_core.getWhereExpr().getExpr().getArray_list_od_right_side(),operator,e,select_value_we_have);
                                             }
                                             else {
-                                                right_one =  generalcreate.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core().getWhereExpr().getExpr().getRight();
+                                                right_one =  select_core.getWhereExpr().getExpr().getRight();
 
                                                 expression_with_logic(left_one, right_one,operator,select_value_we_have,e);
                                             }
@@ -1201,8 +1350,8 @@ public class CodeGeneration {
         {
             left_one_from_the_left_logic_operator=left_side.getLeft().getColumnName().getName();
         }
-        if (left_side.getLeft().getLiteral_value().getReturnType().toString() != null) {
-            left_one_from_the_left_logic_operator = left_side.getRight().getLiteral_value().getReturnType().toString();
+        if (left_side.getLeft().getLiteral_value().getReturnType() != null) {
+            left_one_from_the_left_logic_operator = left_side.getRight().getLiteral_value().getReturnType();
             // from_the_left_side_of_logic_operator = get_where_result(true,left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp().toString(), e);
         }
         if (left_side.getRight().getColumnName().getName() != null) {
@@ -1213,8 +1362,8 @@ public class CodeGeneration {
         {
             left_one_from_the_left_logic_operator=left_side.getLeft().getColumnName().getName();
         }
-        if (left_side.getRight().getLiteral_value().getReturnType().toString() != null) {
-            rigth_one_from_the_left_logica_opeartor = left_side.getRight().getLiteral_value().getReturnType().toString();
+        if (left_side.getRight().getLiteral_value().getReturnType() != null) {
+            rigth_one_from_the_left_logica_opeartor = left_side.getRight().getLiteral_value().getReturnType();
             check_it=true;
             // from_the_left_side_of_logic_operator = get_where_result(true,left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp().toString(), e);
         }
@@ -1223,21 +1372,21 @@ public class CodeGeneration {
             left_side_from_the_right_one = left_side.getRight().getColumnName().getName();
         }
         if(right_side.getRight().getTableName()!=null){ left_side_from_the_right_one= right_side.getRight().getColumnName().getName();}
-        if (right_side.getRight().getLiteral_value().getReturnType().toString() != null) {
-            left_side_from_the_right_one = right_side.getRight().getLiteral_value().getReturnType().toString();
+        if (right_side.getRight().getLiteral_value().getReturnType() != null) {
+            left_side_from_the_right_one = right_side.getRight().getLiteral_value().getReturnType();
         }
         if (right_side.getRight().getColumnName().getName() != null) {
             left_side_from_the_right_one = left_side.getRight().getColumnName().getName();
         }
         if(right_side.getLeft().getTableName()!=null){ left_side_from_the_right_one= right_side.getLeft().getColumnName().getName();}
-        if (right_side.getRight().getLiteral_value().getReturnType().toString() != null) {
-            left_side_from_the_right_one = right_side.getRight().getLiteral_value().getReturnType().toString();
+        if (right_side.getRight().getLiteral_value().getReturnType() != null) {
+            left_side_from_the_right_one = right_side.getRight().getLiteral_value().getReturnType();
             check_it=true;
         }
 
         if (logical_operator.equals("&") || logical_operator.equals("and") || logical_operator.equals("AND")) {
-            from_the_left_side_of_logic_operator = get_where_result(check_it,left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp().toString(), e);
-            from_the_right_side_of_logical_operator = get_where_result(check_it,left_side_from_the_right_one, right_side_from_the_right_one, right_side.getOp().toString(), from_the_left_side_of_logic_operator);
+            from_the_left_side_of_logic_operator = get_where_result(check_it,left_one_from_the_left_logic_operator, rigth_one_from_the_left_logica_opeartor, left_side.getOp(), e);
+            from_the_right_side_of_logical_operator = get_where_result(check_it,left_side_from_the_right_one, right_side_from_the_right_one, right_side.getOp(), from_the_left_side_of_logic_operator);
             if (from_the_right_side_of_logical_operator.size() == 0) {
                 System.out.println(" no result we have !!");
             } else {
@@ -1248,7 +1397,7 @@ public class CodeGeneration {
                     }
                 }
                 for (int i = 0; i < from_the_right_side_of_logical_operator.size(); i++) {
-                    System.out.println(the_final.get(i).toString());
+                    System.out.println(the_final.get(i));
                 }
             }
             for (int i = 0; i < from_the_right_side_of_logical_operator.size(); i++)
@@ -1265,7 +1414,7 @@ public class CodeGeneration {
                             break;
                         }
                     }
-                    if(is_there==false)
+                    if(!is_there)
                     {
                         from_the_left_side_of_logic_operator.add(from_the_right_side_of_logical_operator.get(i));
                     }
@@ -1291,7 +1440,7 @@ public class CodeGeneration {
 
                         }
                     }
-                    if (is_there == false)
+                    if (!is_there)
                         from_the_right_side_of_logical_operator.add(from_the_left_side_of_logic_operator.get(i));
                 }
                 if(we_select_on.equals("name"))

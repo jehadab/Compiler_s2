@@ -1,5 +1,5 @@
 package Java;
- import Java.SqlGenerated.TableClasses.colors_id; import Java.SqlGenerated.TableClasses.colors;   
+ import Java.SqlGenerated.TableClasses.colors_id; import Java.SqlGenerated.TableClasses.colors1; import Java.SqlGenerated.TableClasses.colors;   
  
 import java.util.List;
 import org.apache.commons.csv.CSVFormat;
@@ -30,9 +30,10 @@ import java.util.HashSet;
 import java.util.Set;
  public class SqlMain { 
 	public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException { 
+ 	 colors1 tablecolors1 = new colors1(); 
+	 tablecolors1.load(); 
  	 colors tablecolors = new colors(); 
-	 tablecolors.load();
-	 Func(); }
+	 tablecolors.load();  Func(); }
   private static void Func()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{
   colors_id y = new colors_id();
   y.load();

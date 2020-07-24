@@ -1,8 +1,10 @@
-create aggregation function SUM ("src/AggregationFunctions.jar",CommonAggregations,SUM,double,[number])
+create aggregation function SUM ("src/AggregationFunctions.jar",CommonAggregations,SUM,Double,[Double])
+create aggregation function COUNT ("src/AggregationFunctions.jar",CommonAggregations,COUNT,Integer,[Double])
 create table colors(id double, color String, value String) type= "json" path= "src/Colors.json";
+create table colors1(id1 double, color1 String, value1 String) type= "json" path= "src/Colors1.json";
 Func(){
 
-var y = select  id  from colors ;
+var y = select  id from colors where id > 2;
 print(y);
 
 

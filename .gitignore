@@ -27,3 +27,4 @@ out/
 src/generated/
 Sql_Compiler.iml
 *.iml
+src/Java/SqlGenerated/TableClasses

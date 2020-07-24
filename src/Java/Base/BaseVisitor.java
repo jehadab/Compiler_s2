@@ -1111,6 +1111,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                         System.err.println("Missing On join Constraint");
                     }
                 }
+                join_clause.setJoin_constrain(join_constrains);
                 join_clause.setJoin_opreatorList(join_opreators);
 
             }
@@ -1397,8 +1398,12 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         if(ctx.function_name()!=null){
             System.out.println("visit the function name ");
             expr.setFunction_name(ctx.function_name().use_random_name().getText());
+            if(ctx.expr(0).column_name()!=null){
+                expr.setColumnName(visitColumn_name(ctx.expr(0).column_name()));
+            }
           if(Error_UNdeclared_aggregation_Function(ctx.function_name().use_random_name().getText()))
           {
+
               System.err.println("error group by clause can not contain   "+ctx.function_name().use_random_name().getText()+"   aggregation function");
           }
         }
@@ -1410,7 +1415,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         if(ctx.K_AND()!=null ||ctx.AMP()!=null ||ctx.K_OR()!=null||ctx.PIPE2()!=null)
         {
             //System.out.println(" the right side of logic operator "+ctx.expr(1).getText());
-            expr.setLeft(visitExpr(ctx.expr(0)));
+         expr.setLeft(visitExpr(ctx.expr(0)));
 
          expr.setRight(visitExpr(ctx.expr(1)));
          if(ctx.K_AND()!=null)
@@ -3030,10 +3035,10 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             p.setStrng(ctx.K_BOOLEAN().toString());
             System.out.println("visite boolean ");
         }
-        if (ctx.K_NUMBER() != null) {
+        if (ctx.K_DOUBLE() != null) {
 
-            p.setStrng(ctx.K_NUMBER().toString());
-            System.out.println("visite number");
+            p.setStrng(ctx.K_DOUBLE().toString());
+            System.out.println("visite Double");
         }
         if (ctx.K_STRING() != null) {
 
@@ -3643,6 +3648,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                             }
                         }
                         type.addColumns(aggFuncName,aggregationFunction);
+
                     }
                     else {
 
@@ -3691,27 +3697,27 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                     typeName = selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQuery().getTableName().getName();
                     Scope currentScope = scopesStack.peek();
                     boolean found = false;
-                    while (currentScope != null)//set type for left hand of join
-                    {
-                        found = currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQuery().getTableName().getName());
-                        if(found)
-                        {
-                            break;
-                        }
-                        currentScope = currentScope.getParent();
-                    }
-                    if(found){
-                        Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQuery().getTableName().getName());
-                        Iterator<Column> columns = table.getColumnMap().values().iterator();
-                        while (columns.hasNext())
-                        {//todo remove this
-
-                            Column col = columns.next();
-                            typeName =  typeName.concat("_"+col.getColumn_name()) ;
-                            type.addColumns(col.getColumn_name() , col.getColumn_type());
-
-                        }
-                    }
+//                    while (currentScope != null)//set type for left hand of join
+//                    {
+//                        found = currentScope.getTableMap().containsKey(selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQuery().getTableName().getName());
+//                        if(found)
+//                        {
+//                            break;
+//                        }
+//                        currentScope = currentScope.getParent();
+//                    }
+//                    if(found){
+//                        Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQuery().getTableName().getName());
+//                        Iterator<Column> columns = table.getColumnMap().values().iterator();
+//                        while (columns.hasNext())
+//                        {
+//
+//                            Column col = columns.next();
+//                            typeName =  typeName.concat("_"+col.getColumn_name()) ;
+//                            type.addColumns(col.getColumn_name() , col.getColumn_type());
+//
+//                        }
+//                    }
                     // set type for right hand of join
                     for (TableOrSubQuery tableOrSubQuery:selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQueryList()
                          ) {
