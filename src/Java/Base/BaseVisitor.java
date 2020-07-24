@@ -735,7 +735,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
 
     @Override
     public Select_Core visitSelect_core(SQLParser.Select_coreContext ctx) {
-        boolean test1 =false ;
+        boolean test1 = false;
         System.out.println("visitSelect_core");
         Select_Core select_core = new Select_Core();
         if (ctx.table_or_subquery() != null) {
@@ -744,8 +744,10 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 tableOrSubQueryList.add(visitTable_or_subquery(ctx.table_or_subquery(i)));
             }
             select_core.setTableOrSubQueryList(tableOrSubQueryList);
+            System.out.println(" table list we ahve "+select_core.getTableOrSubQueryList().size());
             if (ctx.where_expr() != null) {
                 select_core.setWhereExpr(visitWhere_expr(ctx.where_expr()));
+              //  System.out.println(" try to solve the null pointer " + select_core.getWhereExpr().getExpr().getLeft());
                     if(select_core.getWhereExpr().getExpr().getLeft().getTableName()!=null ) {
                         if (!seminticCheckForUsingTable(select_core.getWhereExpr().getExpr().getLeft().getTableName())){
                             System.out.println("------------------------------------------------------------------------------------------------------------------");
@@ -763,6 +765,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
 //                                    var columnname = 5;
 //
                                 }
+
                             }
 
                         }
@@ -781,14 +784,13 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
            else if(ctx.where_with_in_for_select()!=null){
                 select_core.setWhereWithInForSelect(visitWhere_with_in_for_select(ctx.where_with_in_for_select()));
                 if(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName()!=null ) {
-                    if (!seminticCheckForUsingTable(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName())){
+                    if (!seminticCheckForUsingTable(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName())) {
                         System.out.println("------------------------------------------------------------------------------------------------------------------");
                     } else {
-                        if (select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName() != null ) {
+                        if (select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName() != null) {
                             if (!sementicCheckForExistedColumn(select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getColumnName(), select_core.getWhereWithInForSelect().getWhereExpr().getExpr().getTableName())) {
                                 System.out.println("------------------------------------------------------------------------------------------------------------------");
-                            }
-                            else{
+                            } else {
                                 test1 = true;
                             }
                         }
@@ -882,15 +884,14 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                                 System.out.println("------------------------------------------------------------------------------------------------");
                         }
                     } else {
-                        if (!semnticCheakforExstingColumnFromTableOrSub_Qurey(select_core.getTableOrSubQueryList(), reslult_cloumnList.get(i).getExpr().getColumnName())) {
-                            System.out.println("------------------------------------------------------------------------------------------------");
-                        }
-
-                    }
+                 if (!semnticCheakforExstingColumnFromTableOrSub_Qurey(select_core.getTableOrSubQueryList(), reslult_cloumnList.get(i).getExpr().getColumnName())) {
+                  System.out.println("------------------------------------------------------------------------------------------------");
+                 }
 
                 }
-                select_core.setReslult_cloumnList(reslult_cloumnList);
-            }
+                }
+                 select_core.setReslult_cloumnList(reslult_cloumnList);
+                }
 
 
             if (ctx.join_clause() != null) {
@@ -967,6 +968,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
             select_core.setExprList_Group(group_expr_arrayList);
 
         }
+
 
 
         return select_core;
@@ -1345,7 +1347,10 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         System.out.println("visitExpr");
         Expr expr = new Expr();
         if (ctx.literal_value() != null) {
+
             expr.setLiteral_value(visitLiteral_value(ctx.literal_value()));
+           // System.out.println(" print what we store "+expr.getLiteral_value().getReturnType().toString());
+            System.out.println(" the returning in the visite "+visitLiteral_value(ctx.literal_value()).toString());
         }
         if (ctx.database_name() != null) {
             expr.setDataBaseName(visitDatabase_name(ctx.database_name()));
@@ -1353,20 +1358,41 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         if (ctx.table_name() != null)
         {
             expr.setTableName(visitTable_name(ctx.table_name()));
+            System.out.println("testing it "+expr.getTableName().getName());
+
         }
         if (ctx.column_name() != null)
         {
             expr.setColumnName(visitColumn_name(ctx.column_name()));
+            System.out.println(" testign t as well"+expr.getColumnName().getName().toString());
         }
         if (ctx.unary_operator() != null && ctx.expr() != null) {
             System.out.println("hy");
         }
         if (ctx.commn_expr_opreator() != null) {
             System.out.println("have expr opreator fill left and right");
-            expr.setLeft(visitExpr(ctx.expr(0)));
-            System.out.println("fill left");
-            (expr).setRight(visitExpr(ctx.expr(1)));
-            System.out.println("fill right");
+            if (ctx.commn_expr_opreator().K_IN() == null) {
+                expr.setLeft(visitExpr(ctx.expr(0)));
+                System.out.println("fill left");
+                (expr).setRight(visitExpr(ctx.expr(1)));
+                System.out.println("fill right");
+                System.out.println(" the right side of expre " + ctx.expr(1));
+                //System.out.println(" we are here .....   ");
+            }
+            //System.out.println(" what we store in the right side " + expr.getRight());}
+            if (ctx.commn_expr_opreator().K_IN() != null) {
+
+                expr.setLeft(visitExpr(ctx.expr(0)));
+                for (int i = 0; i < ctx.expr(1).expr().size(); i++) {
+                    //expr.add_to_list(ctx.expr(1).expr().get(i).getText());
+                    //System.out.println(" the list is" + ctx.expr(1).expr().get(i).getText());
+                    expr.getArray_list_od_right_side().add(ctx.expr(1).expr().get(i).getText());
+                }
+            }
+        }
+
+        for (int i = 0; i < expr.getArray_list_od_right_side().size(); i++) {
+            System.out.println(" the right side of expretion will be " + expr.getArray_list_od_right_side().get(i));
         }
         if(ctx.function_name()!=null){
             System.out.println("visit the function name ");
@@ -1379,8 +1405,33 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         else if(ctx.OPEN_PAR() != null && ctx.expr()!= null){
             expr = visitExpr(ctx.expr(0));
         }
+        if(ctx.commn_expr_opreator()!=null)
+            expr.setOp(ctx.commn_expr_opreator().getText());
+        if(ctx.K_AND()!=null ||ctx.AMP()!=null ||ctx.K_OR()!=null||ctx.PIPE2()!=null)
+        {
+            //System.out.println(" the right side of logic operator "+ctx.expr(1).getText());
+            expr.setLeft(visitExpr(ctx.expr(0)));
+
+         expr.setRight(visitExpr(ctx.expr(1)));
+         if(ctx.K_AND()!=null)
+         expr.setOp(ctx.K_AND().toString());
+         if(ctx.AMP()!=null)
+             expr.setOp(ctx.AMP().toString());
+         if(ctx.K_OR()!=null)
+         {
+             expr.setOp(ctx.K_OR().toString());
+         }
+         if(ctx.PIPE2()!=null)
+         {
+             expr.setOp(ctx.PIPE2().toString());
+         }
+           // System.out.println("check if we store the value in the right way"+expr.getRight().getOp());
+            //System.out.println("check if we store the value in the right way"+expr.getRight().getLeft().getColumnName().getName());
+            //System.out.println("check if we store the value in the right way"+expr.getRight().getRight().getLiteral_value().getReturnType().toString());
+        }
 
         return expr;
+
     }
 
 
@@ -1402,8 +1453,22 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         } else if (ctx.K_CURRENT_TIMESTAMP() != null) {
             literal_value.setReturnType(ctx.K_CURRENT_TIMESTAMP().getText());
         } else if (ctx.STRING_LITERAL() != null) {
+
             literal_value.setReturnType(ctx.STRING_LITERAL().getText());
         }
+        else if (ctx.IDENTIFIER()!=null)
+        {
+            literal_value.setReturnType(ctx.IDENTIFIER().getSymbol().getText());
+        }
+        else if(ctx.K_TRUE()!=null)
+        {
+            literal_value.setReturnType(ctx.K_TRUE().getSymbol().getText());
+        }
+        else if (ctx.K_FALSE()!=null)
+        {
+            literal_value.setReturnType(ctx.K_FALSE().getSymbol().getText());
+        }
+        System.out.println(" the value of it "+literal_value.getReturnType().toString());
         return literal_value;
     }
 

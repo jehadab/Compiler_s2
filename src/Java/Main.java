@@ -6,6 +6,7 @@ import Files_code_Json_csv.json_testing;
 import Java.AST.Parse;
 import Java.Base.BaseVisitor;
 import Java.JarFiles.Sum;
+//import Java.SqlGenerated.TableClasses.SqlMain;
 import Java.SymbolTable.*;
 import generated.SQLLexer;
 import generated.SQLParser;
@@ -20,6 +21,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import static org.antlr.v4.runtime.CharStreams.fromFileName;
 
@@ -37,10 +42,12 @@ public class Main  {
             ParseTree tree = parser.parse();
             Parse p = (Parse) new BaseVisitor().visit(tree);
             p.accept(new Java.Visitor.BaseAst_Visitor());
-
             CodeGeneration codeGeneration = new CodeGeneration();
-            codeGeneration.run( p);
-
+          // codeGeneration.run( p);
+            codeGeneration.where_function(p);
+            csv_testing t = new csv_testing();
+           // t.get_data_from_csv("C://Users//Dell//Desktop//Sql_compiler//src//Files_code_Json_csv//csv_testing.csv");
+            testing_json_file();
 //            try {
 //                double count = (double) Max(new ArrayList<>(Arrays.asList(1, 2, 3)));
 //                System.out.println("Count is: " + count);

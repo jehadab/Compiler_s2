@@ -347,3 +347,10 @@ select h from g;
 testing the teacher symboles :
 symbole 12 is working fro flat function
 symbole 8 is not working we should check it
+----------------------------------------
+create aggregation function sum ("src/AggregationFunctions.jar",CommonAggregations,SUM,double,[number])
+Create table students(id double , name String , mark double) type="json"  path="E:/compiler/students.json";
+Func(){
+var x = select sum(id) from students;
+Print(x);
+}

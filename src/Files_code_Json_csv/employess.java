@@ -2,8 +2,9 @@ package Files_code_Json_csv;
 
 public class employess {
 
- int id ;
- String name ;
+    public int id;
+   // int id ;
+ public  String name ;
  int age;
  twon c ;
 city cc ;
