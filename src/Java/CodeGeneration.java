@@ -36,18 +36,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.lang.ClassLoader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
-import java.util.Arrays;
+
 import Java.AST.Parse;
 import Java.AST.creating.gneralcreating;
 import org.stringtemplate.v4.STWriter;
 import sun.plugin.javascript.navig.Array;
-import java.util.HashSet;
-import java.util.Set;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -104,6 +102,7 @@ public class CodeGeneration {
                             String classPath = returnTablePath(typ);
                             String classExtension = returnTableExtension(typ);
                             createClassType(className,columnList,classPath,classExtension,generalcreate);
+
 
                         }
 //                        if(obj instanceof Print){
@@ -279,7 +278,7 @@ public class CodeGeneration {
         ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
         ArrayList<Column> columns = new ArrayList<>();
         ArrayList<Table> tables = new ArrayList<>();
-        ArrayList<AggrAndColums>aggrAndColumsArrayList = new ArrayList<>();
+        List<AggrAndColums>aggrAndColumsArrayList = new ArrayList<>();
         ArrayList<TablesInQuery> tablesInQueryArrayList = new ArrayList<>();
         ArrayList<WhereFullExpr>whereFullExprArrayList = new ArrayList<>();
         for (Column col:columnArrayList
@@ -290,6 +289,11 @@ public class CodeGeneration {
                 AggrAndColums aggrAndColums = new AggrAndColums();
                 aggregationFunctionArrayList.add((AggregationFunction) col.getColumn_type());
                 aggrAndColums.aggregationFunction =(AggregationFunction) col.getColumn_type();
+                if(((AggregationFunction)  col.getColumn_type()).getAggregationFunctionName().equals("COUNT")) {
+                    aggrAndColums.isCount = true;
+                }
+
+
 //                System.err.println("fffffffffffffffffffffffffff  "+(((AggregationFunction) col.getColumn_type()).getAggregationFunctionName()));
 
 //                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
@@ -318,11 +322,12 @@ public class CodeGeneration {
                     {
 
                         joinClause.leftTableName = select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getLeft().getTableName().getName();
-
+                        System.out.println(select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getLeft().getTableName().getName());
                     }
                     if(select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getLeft().getColumnName() !=null)
                     {
                         joinClause.leftColumnName = select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getLeft().getColumnName().getName();
+                        System.out.println(select_core.getJoin_clause().getJoin_constrain().get(i).getExpr().getLeft().getColumnName().getName());
 
 
                     }
@@ -353,7 +358,7 @@ public class CodeGeneration {
                 {
                     if(!aggrAndColumsArrayList.isEmpty()){
 
-                        AggrAndColums aggrAndColums = aggrAndColumsArrayList.get(i);
+                        AggrAndColums aggrAndColums = aggrAndColumsArrayList.get(aggrAndColumsArrayList.size() - i -1 );
                         aggrAndColums.columnName =  select_core.getReslult_cloumnList().get(i).getExpr().getColumnName().getName();
                         if(select_core.getReslult_cloumnList().get(i).getExpr().getTableName() != null)
                         {
@@ -399,6 +404,7 @@ public class CodeGeneration {
 
         ST loadFunction = stGroup.getInstanceOf("loadFunction");
         loadFunction.add("aggList",aggregationFunctionArrayList);
+//        System.out.println("aggList " + aggrAndColumsArrayList);
         loadFunction.add("tablePath",tablePath);
         loadFunction.add("className",className);
         ArrayList<TableAndColumn> tableAndColumnArrayList = splitColomNames(columns);
@@ -406,6 +412,8 @@ public class CodeGeneration {
 //        System.out.println(joinClauseArrayList);
         loadFunction.add("joinClause",joinClauseArrayList);
         loadFunction.add("aggrAndColums",aggrAndColumsArrayList);
+//        System.out.println("aggrAndColums " + aggrAndColumsArrayList);
+
         loadFunction.add("tablesInQuery",tablesInQueryArrayList);
         loadFunction.add("whereFullExpr",whereFullExprArrayList);
 //        loadFunction.add("tables",splitColomNames(columns));
@@ -639,15 +647,15 @@ public class CodeGeneration {
                 "import com.google.gson.stream.JsonReader; <\\n>" +
                 "import java.io.FileNotFoundException; <\\n>" +
                 "import java.io.FileReader; <\\n>" +
-                "import java.io.File;\n" +
-                "import java.lang.reflect.InvocationTargetException;\n" +
+                "import java.io.File;<\\n>" +
+                "import java.lang.reflect.InvocationTargetException;<\\n>" +
                 "import java.lang.reflect.Method;\n" +
-                "import java.net.MalformedURLException;\n" +
-                "import java.net.URL;\n" +
-                "import java.net.URLClassLoader;\n" +
-                "import java.util.ArrayList;\n" +
-                "import java.util.Arrays;\n" +
-                "import java.util.List;\n" +
+                "import java.net.MalformedURLException;<\\n>" +
+                "import java.net.URL;<\\n>" +
+                "import java.net.URLClassLoader;<\\n>" +
+                "import java.util.ArrayList;<\\n>" +
+                "import java.util.Arrays;<\\n>" +
+                "import java.util.*;<\\n>" +
                 "import Java.SymbolTable.Column;<\\n>" +
                 "import Java.SymbolTable.Type; <\\n>" +
                 "import java.util.HashSet;<\\n>" +
@@ -867,17 +875,15 @@ public class CodeGeneration {
            public String operator;
            public String tableName ;
            public String columnName;
-           public InExpr inExpr;
+           public WhereInExpr WhereInExpr;
        }
        class InExpr {
-            ArrayList<String> strings;
+            ArrayList<?> strings;
        }
 
 
 
        String loadContent= ("statics ::= [\n" +
-               "  \"\": false,\n" +
-               "  \"0\": false,\n" +
                "  \".equals(\": true,\n" +
                "  default: false\n" +
                "]" +
@@ -890,7 +896,12 @@ public class CodeGeneration {
                " !(<whereExpr.leftWhereExpr.tableName>s.<whereExpr.leftWhereExpr.columnName> <whereExpr.leftWhereExpr.operator> <whereExpr.leftWhereExpr.rightExpr>) <if(statics.(whereExpr.leftWhereExpr.operator))> ) <endif>" +
                "<whereExpr.operator>  !(<whereExpr.leftWhereExpr.tableName>s.<whereExpr.rightWhereExpr.columnName> <whereExpr.rightWhereExpr.operator> <whereExpr.rightWhereExpr.rightExpr>) <if(statics.(whereExpr.rightWhereExpr.operator))> ) <endif>) ;" +
                "<else> " +
-                " <\\t>  <whereExpr.leftWhereExpr.tableName>List.removeIf(<whereExpr.leftWhereExpr.tableName>s -> !(<whereExpr.leftWhereExpr.tableName>s.<whereExpr.leftWhereExpr.columnName> <whereExpr.leftWhereExpr.operator> <whereExpr.leftWhereExpr.rightExpr>)) <if(statics.(whereExpr.leftWhereExpr.operator))> ) <endif> ; <\\n>" +
+                " <\\t>  <whereExpr.leftWhereExpr.tableName>List.removeIf(" + "<whereExpr.leftWhereExpr.tableName>s -> !" +
+                        "<if(whereExpr.leftWhereExpr.whereInExpr)> " +
+                        " <whereExpr.leftWhereExpr.operator> <whereExpr.leftWhereExpr.tableName>s.<whereExpr.leftWhereExpr.columnName> , <whereExpr.leftWhereExpr.whereInExpr.inExpr1> ) && !<whereExpr.leftWhereExpr.operator> <whereExpr.leftWhereExpr.tableName>s.<whereExpr.leftWhereExpr.columnName> , <whereExpr.leftWhereExpr.whereInExpr.inExpr2> ) ) ;" +
+                        "<else>" +
+                        "<whereExpr.leftWhereExpr.tableName>s.<whereExpr.leftWhereExpr.columnName> <whereExpr.leftWhereExpr.operator> <whereExpr.leftWhereExpr.rightExpr>)) <if(statics.(whereExpr.leftWhereExpr.operator))> ) <endif> ; <\\n>" +
+                        "<endif>" +
                "<endif>  <\\n> " +
                 "<\\t><\\t> <\\n>" +
                 " }>" +
@@ -907,10 +918,16 @@ public class CodeGeneration {
                 "<\\t><\\t><\\t> c.printStackTrace();<\\n>" +
                 "<\\t> }<\\n>"+
                 "<\\n>"+
-                "<\\t><\\t> <aggrAndColums :{ agg |  List\\<<agg.aggregationFunction.returnType>\\> <agg.aggregationFunction.returnType>s = new ArrayList\\<>() ;<\\n>" +
-                "<\\t><\\t> <agg.tableName>.entityObject.forEach(fafa -> <agg.aggregationFunction.returnType>s.add(fafa.<agg.columnName>));<\\n>" +
+                "<\\t><\\t> <aggrAndColums :{ agg |" +
+               "<if(agg.isCount)>" +
+               "List\\<<agg.tableName>\\> <agg.aggregationFunction.returnType>s = new ArrayList\\<>() ;<\\n>" +
+                "<\\t><\\t> <agg.tableName>.entityObject.forEach(fafa -> <agg.aggregationFunction.returnType>s.add(fafa));<\\n>" +
+               "<else>" +
+                "<\\t><\\t> List\\<<agg.aggregationFunction.returnType>\\> <agg.aggregationFunction.returnType>s = new ArrayList\\<>() ;<\\n>" +
+                "<\\t><\\t> <agg.tableName>.entityObject.forEach(fofo -> <agg.aggregationFunction.returnType>s.add(fofo.<agg.columnName>));<\\n>" +
+               "<endif>" +
                 "<\\t><\\t> _AGG<agg.aggregationFunction.MethodName> = <agg.aggregationFunction.MethodName>(<agg.aggregationFunction.returnType>s);<\\n>" +
-                "<\\t><\\t> System.out.println(_AGG<agg.aggregationFunction.MethodName>); }>" +
+                "<\\t><\\t> System.out.println(_AGG<agg.aggregationFunction.MethodName>); <\\n> }>" +
                 " <columns:{ col| \\} }>"  +
 //                "<\\n><\\t>Field tableField[] ="+tableName+".getClass().getFields();" +
 //                String  leftTableName;
@@ -986,6 +1003,7 @@ public class CodeGeneration {
         public AggregationFunction aggregationFunction;
         public String columnName;
         public String tableName;
+        public boolean isCount = false;
     }
     class WhereFullExpr{
         public WhereExpr rightWhereExpr ;
@@ -997,12 +1015,13 @@ public class CodeGeneration {
         public String operator;
         public String tableName ;
         public String columnName;
-        public InExpr inExpr;
+        public WhereInExpr whereInExpr;
     }
-    class InExpr {
+    class WhereInExpr {
 //        public String firstExpr;
 //        public String secondExpr;
-        ArrayList<String> strings;
+        public Object inExpr1;
+        public Object inExpr2;
 
 
     }
@@ -1120,7 +1139,7 @@ public class CodeGeneration {
                                         }
                                         if (select_core.getWhereExpr().getExpr().getOp() != null) {
                                             operator = select_core.getWhereExpr().getExpr().getOp();
-                                            whereExpr.operator = convertOperatorToJava(operator); ;
+                                            whereExpr.operator = convertOperatorToJava(operator);
 
 
 //                                            System.out.println("the operatore is ---"+operator);
@@ -1147,25 +1166,32 @@ public class CodeGeneration {
                                                 whereExpr.rightExpr =  select_core.getWhereExpr().getExpr().getRight().getLiteral_value().getReturnType() ;
 
                                             }
-                                            else if(select_core.getWhereExpr().getExpr().getArray_list_od_right_side()!=null) {
-//                                                    System.err.println("XxX");
-                                                if(select_core.getWhereExpr().getExpr().getArray_list_od_right_side().size()!=0){
-                                                }
 
-                                                    //in
-                                                    //   System.out.println(" here we are !!!!");
-//                                                    get_where_result_for_complixity_right_side(left_side,select_core.getWhereExpr().getExpr().getArray_list_od_right_side(),operator,e,select_value_we_have);
-                                            }
                                              if (select_core.getWhereExpr().getExpr().getLeft().getLeft() != null){
                                                 right_one =  select_core.getWhereExpr().getExpr().getRight();
 
                                                return  expression_with_logic(left_one, right_one,operator ,select_core);
                                             }
+                                        }
+                                            if(select_core.getWhereExpr().getExpr().getArray_list_od_right_side()!=null) {
+                                                if(operator.equals("in")||operator.equals("IN"))
+    //                                                    System.err.println("XxX");
+                                                    if(!select_core.getWhereExpr().getExpr().getArray_list_od_right_side().isEmpty()){
+                                                        WhereInExpr whereInExpr = new WhereInExpr();
+                                                        whereInExpr.inExpr1 = (select_core.getWhereExpr().getExpr().getArray_list_od_right_side().get(0));
+                                                        whereInExpr.inExpr2 = (select_core.getWhereExpr().getExpr().getArray_list_od_right_side().get(1));
+
+                                                        whereExpr.whereInExpr = whereInExpr;
+
+                                                    }
+
+                                                //in
+    //                                            System.out.println(" here we are !!!!" + select_core.getWhereExpr().getExpr().getArray_list_od_right_side());
+    //                                                    get_where_result_for_complixity_right_side(left_side,select_core.getWhereExpr().getExpr().getArray_list_od_right_side(),operator,e,select_value_we_have);
+                                            }
                                             whereFullExpr.leftWhereExpr = whereExpr;
                                             whereExprArrayList.add(whereFullExpr);
 
-
-                                        }
                                         // System.out.println("the right side here will be "+righ_side);
 
                                     }
@@ -1188,7 +1214,7 @@ public class CodeGeneration {
          else if(operator.equals("like")||operator.equals("LIKE"))
              return ".equals(";
          else if(operator.equals("IN ") ||operator.equals("in"))
-             return "IN";
+             return "Objects.equals(";
          else return operator;
 
     }

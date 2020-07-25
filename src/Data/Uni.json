@@ -1,0 +1,52 @@
+{
+    "Faculties": [
+        {
+            "id": 1,
+            "name": "Damascus University",
+            "Address": {
+                "Country": "Syria",
+                "City": "Damascus"
+            }
+        },
+        {
+            "id": 2,
+            "name": "Aleppo University",
+            "Address": {
+                "Country": "Syria",
+                "City": "Aleppo"
+            }
+        },
+        {
+            "id": 3,
+            "name": "AlBath University",
+            "Address": {
+                "Country": "Syria",
+                "City": "Homs"
+            }
+        },
+        {
+            "id": 4,
+            "name": "Oxford",
+            "Address": {
+                "Country": "England",
+                "City": "Oxford"
+            }
+        },
+        {
+            "id": 5,
+            "name": "Cambridge",
+            "Address": {
+                "Country": "United Kingdom",
+                "City": "Cambridge"
+            }
+        },
+        {
+            "id": 6,
+            "name": "Cairo University",
+            "Address": {
+                "Country": "Egypt",
+                "City": "Cairo"
+            }
+        }
+    ]
+}

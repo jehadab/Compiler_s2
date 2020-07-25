@@ -1353,16 +1353,16 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
            // System.out.println(" print what we store "+expr.getLiteral_value().getReturnType().toString());
             System.out.println("the returning in the visit "+visitLiteral_value(ctx.literal_value()).toString());
         }
-        else if (ctx.database_name() != null) {
+         if (ctx.database_name() != null) {
             expr.setDataBaseName(visitDatabase_name(ctx.database_name()));
         }
-        else if (ctx.table_name() != null)
+         if (ctx.table_name() != null)
         {
             expr.setTableName(visitTable_name(ctx.table_name()));
             System.out.println("testing it "+expr.getTableName().getName());
 
         }
-        else if (ctx.column_name() != null)
+         if (ctx.column_name() != null)
         {
             expr.setColumnName(visitColumn_name(ctx.column_name()));
             System.out.println("testign t as well"+expr.getColumnName().getName());
@@ -1398,7 +1398,12 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         if(ctx.function_name()!=null){
             System.out.println("visit the function name ");
             expr.setFunction_name(ctx.function_name().use_random_name().getText());
-            if(ctx.expr(0).column_name()!=null){
+            if(ctx.STAR() != null){
+                ColumnName columnName = new ColumnName() ;
+                columnName.setName(ctx.STAR().getText());
+                expr.setColumnName(columnName);
+            }
+            else if(ctx.expr(0).column_name()!=null){
                 expr.setColumnName(visitColumn_name(ctx.expr(0).column_name()));
             }
           if(Error_UNdeclared_aggregation_Function(ctx.function_name().use_random_name().getText()))
@@ -3641,6 +3646,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                         typeName = typeName.concat("_AGG"+ selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getFunction_name());
                         String aggFuncName= selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getFunction_name();
                         AggregationFunction aggregationFunction = new AggregationFunction();
+//                            System.err.println(Main.symbolTable.getAgg().size());
                         for (int k = 0; k <Main.symbolTable.getAgg().size() ; k++) {
                             if(Main.symbolTable.getAgg().get(k).getAggregationFunctionName().equals(aggFuncName)){
                                 aggregationFunction = Main.symbolTable.getAgg().get(k);

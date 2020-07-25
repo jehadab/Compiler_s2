@@ -1,11 +1,18 @@
-create aggregation function SUM ("src/AggregationFunctions.jar",CommonAggregations,SUM,Double,[Double])
-create aggregation function COUNT ("src/AggregationFunctions.jar",CommonAggregations,COUNT,Integer,[Double])
-create table colors(id double, color String, value String) type= "json" path= "src/Colors.json";
-create table colors1(id1 double, color1 String, value1 String) type= "json" path= "src/Colors1.json";
+create table songs(initials String,track_id String, artist_name String, title String, loudness double, tempo double, time_signature double, key double,mode double,duration double, year double) type= "csv", path= "src/Data/songs.csv";
+create table colors(id double, color String, value String) type="json" , path= "src/Data/colors.json";
+
+create table countries(id double, name String, code String, post_code String, region String) type="json" , path= "src/Data/countries.json";
+
+create aggregation function MAX("src/AggregationFunctions.jar",CommonAggregations,MAX,Double,[Double]);
+create aggregation function AVG("src/AggregationFunctions.jar",CommonAggregations,AVG,Double,[Double]);
+create aggregation function COUNT("src/AggregationFunctions.jar",CommonAggregations,COUNT,Integer,[Double]);
+
+
 Func(){
 
-var y =select  id from colors  join colors1 on colors.id = colors1.id1 ;
-print(y);
+
+    var y = select COUNT(*),MAX(id) from colors where 2 > id;
+
 
 
 }

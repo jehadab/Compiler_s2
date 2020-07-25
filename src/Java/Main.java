@@ -59,8 +59,6 @@ public class Main  {
 
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 //        Runtime.getRuntime().exec("java -cp Sum.jar Java.JarFiles.Sum");
         //testing_json_file();

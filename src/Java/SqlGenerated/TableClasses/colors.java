@@ -22,7 +22,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import Java.SymbolTable.Column;
 import Java.SymbolTable.Type; 
 import java.util.HashSet;
@@ -49,7 +49,7 @@ import java.util.Set;
  	 public String getvalue(){
  	return value ;   
  	}    
- 	String tablePath = "src/Colors.json";
+ 	String tablePath = "src/Data/colors.json";
 	String tableType = "json"; 
 	static List<colors> entityObject  = new ArrayList<>();
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{ 
@@ -95,7 +95,7 @@ import java.util.Set;
 	List<colors> result = new ArrayList<>(); 
 	BufferedReader csvReader = null;
 	String[] data = new String[0];
-	File csvFile = new File("src/Colors.json");
+	File csvFile = new File("src/Data/colors.json");
 	csvReader = new BufferedReader(new FileReader(csvFile));
 	if(csvFile.isFile())
 	{
