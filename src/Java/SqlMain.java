@@ -1,5 +1,5 @@
 package Java;
- import Java.SqlGenerated.TableClasses.colors; import Java.SqlGenerated.TableClasses.clubs;   
+ import Java.SqlGenerated.TableClasses.clubs_id_name_city; import Java.SqlGenerated.TableClasses.clubs;   
  
 import java.util.List;
 import org.apache.commons.csv.CSVFormat;
@@ -33,7 +33,7 @@ import java.util.Set;
  	 clubs tableclubs = new clubs(); 
 	 tableclubs.load();  Func(); }
   private static void Func()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{
-  colors y = new colors();
+  clubs_id_name_city y = new clubs_id_name_city();
   y.load();
         
  	}

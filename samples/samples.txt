@@ -3,6 +3,6 @@ create type country(id double, name String, region region);
 create type city(id double, name String, country country);
 create table clubs(id double , name String , city city) type= "json" path= "C:/Users/Dell/Desktop/Final02/02/clubs.json";
 Func(){
-var y = select  *  from colors ;
+var y = select  *  from clubs ;
 }
 

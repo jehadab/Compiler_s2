@@ -42,11 +42,11 @@ public class json_testing {
                         c.setT(get_types(nested_one.get(ii).getAsJsonObject().get("street").deepCopy()));
                     }
 
-                    if(nested_one.get(ii).getAsJsonObject().get("city").getAsJsonArray()!=null)
+                   }
+                        if(nested_one.get(ii).getAsJsonObject().get("city").getAsJsonArray()!=null)
                     {
 
-                    }
-                    emplo.setCc(c);
+                 emplo.setCc(c);
 
                 }*/
                 }

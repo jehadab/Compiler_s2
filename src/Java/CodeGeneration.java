@@ -288,6 +288,7 @@ public class CodeGeneration {
 
         ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
         ArrayList<Column> columns = new ArrayList<>();
+        ArrayList<Column> flatColumn = new ArrayList<>();
         ArrayList<Table> tables = new ArrayList<>();
         for (Column col:columnArrayList)
         {
@@ -300,45 +301,24 @@ public class CodeGeneration {
 //                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
 
             }
-//            else {
-//
-//                if(col.getColumn_type().getName().equals(Type.NUMBER_CONST)){
-//                    col.setTypeNumber("true");
-//                    columns.add(col);
-//                }else if(col.getColumn_type().getName().equals(Type.STRING_CONST)){
-//                    col.setTypeString("true");
-//                    columns.add(col);
-//                }else if(col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
-//                    col.setTypeboolean("true");
-//                    columns.add(col);
-//                }
-//                else if(col.getTypeNumber()==null&&col.getTypeboolean()==null&&col.getTypeString()==null){
-//                    col.setTypeObject("true");
-//                    Type  nestypeclass = returnSpecificType(col.getColumn_type().getName());
-//                    columns.add(col);
-//                    ArrayList<Column> columnArrayList1  = returnTableColumn(nestypeclass);
-//                    for(Column nescol : columnArrayList1)
-//                    {
-//                        nescol.setParentTable(col.getColumn_name());
-//                        if(nescol.getColumn_type().getName().equals(Type.NUMBER_CONST)){
-//                            nescol.setTypeNumber("true");
-//                        }else if(nescol.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
-//                            nescol.setTypeboolean("true");
-//                        }
-//                        else if(nescol.getColumn_type().getName().equals(Type.STRING_CONST)){
-//                            nescol.setTypeString("true");
-//                        }
-//
-//                        columns.add(nescol);
-//                    }
-//                }
-//
-//            }
+            else {
+                if(col.getColumn_type().getName().equals(Type.NUMBER_CONST)){
+                    col.setTypeNumber("true");
+                }else if(col.getColumn_type().getName().equals(Type.STRING_CONST)){
+                    col.setTypeString("true");
+                }else if(col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
+                    col.setTypeboolean("true");
+                }
+                else if(col.getTypeNumber()==null&&col.getTypeboolean()==null&&col.getTypeString()==null){
+                    col.setTypeObject("true");
+                }
+                columns.add(col);
+            }
         }
         Type typeClass = returnSpecificType(className);
-        columns = returnTableFlatColumn(typeClass);
+        flatColumn = returnTableFlatColumn(typeClass);
         System.out.println("***************************************************************************************");
-        for(Column coll:columns){
+        for(Column coll:flatColumn){
             System.out.println(coll.getColumn_name()+"            "+coll.getParentTable()+"            "+coll.getColumn_type().getName()+"            "+coll.getTypeString()+"            "+coll.getTypeboolean()+"            "+coll.getTypeNumber()+"            grandParant1 : "+ coll.getGrandParant1()+"            grandParant2 : "+ coll.getGrandParant2());
         }
         System.out.println("***************************************************************************************");
@@ -380,6 +360,7 @@ public class CodeGeneration {
         readJsonFile.add("className",className);
         readJsonFile.add("columns",columns);
         readJsonFile.add("tablePath",tablePath);
+        readJsonFile.add("flatcolumns",flatColumn);
 
         ST readCsvFile =stGroup.getInstanceOf("readCsvFile");
         readCsvFile.add("className",className);
@@ -402,7 +383,10 @@ public class CodeGeneration {
         printContent.add("columns",columns);
 
         ST getTypeFunction = stGroup.getInstanceOf("getTypeFunction");
-            getTypeFunction.add("columns",columns);
+        getTypeFunction.add("flatcolumns",flatColumn);
+//        ST jsonObjectParts = stGroup.getInstanceOf("jsonObjectParts");
+//        jsonObjectParts.add("columns",columns);
+//        jsonObjectParts.add("flatColumns",flatColumn);
 //        ST getTableFunction = stGroup.getInstanceOf("getTableFunction");
 //        getTableFunction.add("columns",columns);
         ST EOF = stGroup.getInstanceOf("EOF");
@@ -433,10 +417,12 @@ public class CodeGeneration {
             bufferedWriter.write(staticList.render());
             bufferedWriter.write(loadFunction.render());
             bufferedWriter.write(readJsonFile.render());
+//            bufferedWriter.write(jsonObjectParts.render());
             bufferedWriter.write(readCsvFile.render());
             bufferedWriter.write(printContent.render());
 //            bufferedWriter.write(getTableFunction.render());
             bufferedWriter.write(getTypeFunction.render());
+
 //            bufferedWriter.write(returnSpecificType.render());
 //            bufferedWriter.write(returnListOfColumn.render());
             bufferedWriter.write(EOF.render());
@@ -519,12 +505,6 @@ public class CodeGeneration {
             columnList.add(column);
             l--;
         }
-//        System.out.println(typeclass.getName()+"  (((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((");
-//        System.out.println("the columnList size is : "+ columnList.size());
-//        for(Column column:columnList){
-//            System.out.println(column.getColumn_name());
-//        }
-//        System.out.println(typeclass.getName()+"  (((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((");
         return columnList;
     }
 
@@ -771,7 +751,7 @@ public class CodeGeneration {
     }
 
     public String getTypeElementFunction(){
-        String str = "getTypeFunction(columns)::=<<" +
+        String str = "getTypeFunction(flatcolumns)::=<<" +
                 "public \\<T> T get_types(JsonElement object)<\\n><\\t>" +
                 "{<\\n>" +
 
@@ -820,7 +800,7 @@ public class CodeGeneration {
 //    }
 
     public  String readFileJsonFunction() {
-    String str  = "readJsonFile(className,columns,tablePath)::=<<" +
+    String str  = "readJsonFile(className,columns,tablePath,flatcolumns)::=<<" +
             "<\\n><\\t> public List\\<<className>\\> readJsonFile(){<\\n><\\t>" +
             "<if(tablePath)>" +
             "List\\<<className>\\> result = new ArrayList\\<>();<\\n><\\t>" +
@@ -838,26 +818,56 @@ public class CodeGeneration {
             "for (int i = 0 ; i \\< j.size() ; i++ )" +
             " {<\\n><\\t>" +
             "<className> tableName = new <className>();<\\n><\\t>" +
-            "<columns:{col | if(j.get(i).getAsJsonObject().get(\"<col.column_name>\") != null);<\\n><\\t>" +
-            "{<\\n><\\t>" +
+            "<columns:{col |" +
             "<if(col.TypeNumber)>" +
+            "if(j.get(i).getAsJsonObject().get(\"<col.column_name>\") != null);<\\n><\\t>" +
+            "{<\\n><\\t>" +
             "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsDouble());<\\n><\\t>" +
+            "\\}<\\n><\\t>" +
             "<endif>"+
             "<if(col.TypeString)>" +
+            "if(j.get(i).getAsJsonObject().get(\"<col.column_name>\") != null);<\\n><\\t>" +
+            "{<\\n><\\t>" +
             "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsString());<\\n><\\t>" +
+            "\\}<\\n><\\t>" +
             "<endif>"+
             "<if(col.Typeboolean)>" +
+            "if(j.get(i).getAsJsonObject().get(\"<col.column_name>\") != null);<\\n><\\t>" +
+            "{<\\n><\\t>" +
             "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsBoolean());<\\n><\\t>" +
+            "\\}<\\n><\\t>" +
             "<endif>" +
 
             "<if(col.TypeObject)>" +
             "if (j.get(i).getAsJsonObject().get(\"<col.column_name>\").isJsonObject() == true)<\\n><\\t>" +
             "{<\\n><\\t>" +
-//            "<col.column_type> t_<col.column_name> = new <col.column_type>();" +
-            "\\}<\\n><\\t>"+
+//            "<col.column_type.name> <col.column_name> = new <col.column_type.name>();" +
+            "<flatcolumns:{flcol |" +
+            "<if(flcol.ParentTable)>" +
+            "<if(flcol.grandParant1)>" +
+            " " +
+            "<else>" +
+            "<if(flcol.TypeObject)>" +
+            "<else>" +
+            "<flcol.ParentTable>.set<flcol.column_name>(j.get(i).getAsJsonObject().get(\"<flcol.ParentTable>\").getAsJsonObject().get(\"<flcol.column_name>\")." +
+            "<if(flcol.TypeNumber)>" +
+            "getAsDouble()" +
             "<endif>"+
+            "<if(flcol.TypeString)>" +
+            "getAsString()" +
+            "<endif>"+
+            "<if(flcol.Typeboolean)>" +
+            "getAsBoolean()"+
+            "<endif>"+
+            ");<\\n><\\t>" +
+            "<endif>"+
+            "<endif>" +
+            "<endif>" +
+            "}>"+
             "\\}<\\n><\\t>" +
+            "<endif>" +
             " }>" +
+
             "result.add(tableName);<\\n><\\t>" +
             "}<\\n><\\t>" +
             "return result;" +
@@ -867,6 +877,9 @@ public class CodeGeneration {
             "<\\n><\\t> }>>" ;
             return str;
    }
+
+
+
    private String loadContent(gneralcreating generalcreate) {
 
 
@@ -916,14 +929,15 @@ public class CodeGeneration {
         return joinString;
     }
 
-    public  String jsonObjectPart(){
-        String str ="if (j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsJsonArray() != null) <\\n><\\t> " +
-                "{<\\n><\\t>" +
-                "JsonArray nested_one = j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsJsonArray()<\\n><\\t>" +
-                "set<col.column_name>(get_table(nested_one));<\\n><\\t>" +
-                "\\}<\\n><\\t>" ;
-        return str;
-    }
+//    public  String jsonObjectPart(){
+//        String str =("jsonObjectParts(columns,flatColumns)::=<<" +
+//                "<columns:{col |" +
+//
+//                "}>" +
+//                "" +
+//                ">>");
+//        return str;
+//    }
     public Type returnSpecificType(String typeName){
         Type type =  new Type();
         for(Type typ :Main.symbolTable.getDeclaredTypes()){
