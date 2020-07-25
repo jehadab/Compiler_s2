@@ -9,10 +9,19 @@ public class Column {
     private String LastColumn ;
     private String FirstColumn ;
     private String TypeObject;
+    private String ParentTable;
+
+    public String getParentTable() {
+        return ParentTable;
+    }
+
+    public void setParentTable(String parentTable) {
+        ParentTable = parentTable;
+    }
+
     public String getFirstColumn() {
         return FirstColumn;
     }
-
 
     public String getTypeObject() {
         return TypeObject;

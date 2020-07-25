@@ -1,4 +1,5 @@
-package Java;
+package Files_code_Json_csv;
+import Java.Main;
 import Java.SymbolTable.AggregationFunction;
 import Java.SymbolTable.Scope;
 import Java.SymbolTable.*;
@@ -32,11 +33,11 @@ import Java.AST.creating.gneralcreating;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CodeGeneration {
+class CodeGenerationCopy {
     Parse parse ;
-//        private volatile boolean compiled = false;
+    //        private volatile boolean compiled = false;
     public  void run(Parse p ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
-        for (Type typ :Main.symbolTable.getDeclaredTypes()) {
+        for (Type typ : Main.symbolTable.getDeclaredTypes()) {
 //           the type is table and have path and typeExtension
             String typeName = typ.getName();
 //            if(typeName.contains("_")){
@@ -66,7 +67,7 @@ public class CodeGeneration {
             if(p.getFunctions().get(0) != null ){//make sure there is function
                 if(p.getFunctions().get(0).getBody().getInstructions() != null){//make sure there is instructions
                     for (Object obj:p.getFunctions().get(0).getBody().getInstructions()
-                            ) {
+                    ) {
                         if(obj instanceof gneralcreating)//what is to cast
                         {
                             gneralcreating generalcreate =(gneralcreating) obj;
@@ -74,7 +75,9 @@ public class CodeGeneration {
                             ArrayList<Column> columnList = returnTableColumn(typ);
                             String classPath = returnTablePath(typ);
                             String classExtension = returnTableExtension(typ);
+//                            int sizeColumnsSizeTable = returnSizeOfColumnsFlatTable(columnList);
                             createClassType(className,columnList,classPath,classExtension,generalcreate);
+
                         }
 //                        if(obj instanceof Print){
 //                            Print print = (Print) obj;
@@ -86,11 +89,11 @@ public class CodeGeneration {
 //                                    }
 //                                }
 //                            }
-                        }
                     }
                 }
-                //compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
-                //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
+            }
+            //compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
+            //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
 
 
 
@@ -101,8 +104,8 @@ public class CodeGeneration {
 ////                runIt(className);
 //            }A
         }
-            createMainClass(p.getFunctions());
-            // compileClasses("SqlMain","src/Java/SqlGenerated/TableClasses/");
+        createMainClass(p.getFunctions());
+        // compileClasses("SqlMain","src/Java/SqlGenerated/TableClasses/");
 //            if(compiled){
 //                Class compiledClass= loadClasses("SqlMain","src/Java/SqlGenerated/TableClasses/","src.Java.SqlGenerated.TableClasses");
 //                invokeMethod("Main",compiledClass);
@@ -145,7 +148,7 @@ public class CodeGeneration {
         if(functionDeclaration.get(0) != null ){//make sure there is function
             if(functionDeclaration.get(0).getBody().getInstructions() != null){//make sure there is instructions
                 for (Object obj:functionDeclaration.get(0).getBody().getInstructions()
-                     ) {
+                ) {
                     if(obj instanceof gneralcreating)//what is to cast
                     {
                         gneralcreating generalcreate =(gneralcreating) obj;
@@ -167,7 +170,7 @@ public class CodeGeneration {
             }
         }
         for (Type type :Main.symbolTable.getDeclaredTypes()
-             ) {
+        ) {
             if(type.getName().contains("_") || type.getName().contains("_AGG"))
                 continue;
             else  {
@@ -188,17 +191,17 @@ public class CodeGeneration {
 
         String stringTemplate = (
                 "header(className,packagePath,imports,createTables)::=<<package <packagePath>;<addImports(imports,createTables)> <\\n> "+importJarLoader()+" public class <className> { >>" +
-                "addImports(imports,createTables)::=<< <imports:{import |<\\n>import Java.SqlGenerated.TableClasses.<import.typeName>; }>" +
+                        "addImports(imports,createTables)::=<< <imports:{import |<\\n>import Java.SqlGenerated.TableClasses.<import.typeName>; }>" +
                         "<createTables:{  createTable| import Java.SqlGenerated.TableClasses.<createTable>; }> >>" +
-                "mainFunction(functionCall,createTables)::= << <\\n><\\t>public static void main(String[] args) "+throwException()+" { <createTables:{createTable |<\\n> <\\t> <createTable> table<createTable> = new <createTable>(); <\\n><\\t> table<createTable>.load(); }> " +
+                        "mainFunction(functionCall,createTables)::= << <\\n><\\t>public static void main(String[] args) "+throwException()+" { <createTables:{createTable |<\\n> <\\t> <createTable> table<createTable> = new <createTable>(); <\\n><\\t> table<createTable>.load(); }> " +
                         "<functionCall.header.name>(); }<\\n> >>" +
-                "addFunctions(functions , nameAndType)::=<< <functions:{ function|private static void <function.header.name>()"+throwException()+"{<\\n>" +
+                        "addFunctions(functions , nameAndType)::=<< <functions:{ function|private static void <function.header.name>()"+throwException()+"{<\\n>" +
                         "<bodyCodeSorce(nameAndType)>" +
                         "   }> >>" +
                         "bodyCodeSorce(nameAndType ) ::=<< <nameAndType:{namesTypes | <namesTypes.typeName> <namesTypes.varName> = new <namesTypes.typeName>();<\\n>" +
                         "<namesTypes.varName>.load();<\\n> }> >>" +
-                "EOF()::=<< <\\n> <\\t>}<\\n> }>>"
-                );
+                        "EOF()::=<< <\\n> <\\t>}<\\n> }>>"
+        );
         STGroup stGroup = new STGroupString(stringTemplate);
 
         ST header = stGroup.getInstanceOf("header");
@@ -243,41 +246,42 @@ public class CodeGeneration {
 
     }
 
-//    public int returnSizeOfColumnsFlatTable(ArrayList<Column> columnArrayList){
-//        ArrayList<Column> columns = new ArrayList<>();
-//        columns = columnArrayList;
-//        int result =0;
-//        for (Column col:columnArrayList){
-//            if(col.getColumn_type().getName().equals(Type.NUMBER_CONST)){
-//                col.setTypeNumber("true");
-//                columns.add(col);
-//                result++;
-//            }else if(col.getColumn_type().getName().equals(Type.STRING_CONST)){
-//                col.setTypeString("true");
-//                columns.add(col);
-//                result++;
-//            }else if(col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
-//                col.setTypeboolean("true");
-//                columns.add(col);
-//                result++;
-//            }
-//            else if(col.getTypeNumber()==null&&col.getTypeboolean()==null&&col.getTypeString()==null){
-//                col.setTypeObject("true");
-//                Type  nestypeclass = returnSpecificType(col.getColumn_type().getName());
-//                columns.add(col);
-//                ArrayList<Column> columnArrayList1  = returnTableColumn(nestypeclass);
-//                for(Column nescol : columnArrayList1)
-//                {
-//                    columns.add(nescol);
-//                    result++;
-//                }
-//            }
-//        }
-//        return result;
-//    }
+    public int returnSizeOfColumnsFlatTable(ArrayList<Column> columnArrayList){
+        ArrayList<Column> columns = new ArrayList<>();
+        columns = columnArrayList;
+        int result =0;
+        for (Column col:columnArrayList){
+            if(col.getColumn_type().getName().equals(Type.NUMBER_CONST)){
+                col.setTypeNumber("true");
+                columns.add(col);
+                result++;
+            }else if(col.getColumn_type().getName().equals(Type.STRING_CONST)){
+                col.setTypeString("true");
+                columns.add(col);
+                result++;
+            }else if(col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
+                col.setTypeboolean("true");
+                columns.add(col);
+                result++;
+            }
+            else if(col.getTypeNumber()==null&&col.getTypeboolean()==null&&col.getTypeString()==null){
+                col.setTypeObject("true");
+                Type  nestypeclass = returnSpecificType(col.getColumn_type().getName());
+                columns.add(col);
+                ArrayList<Column> columnArrayList1  = returnTableColumn(nestypeclass);
+                for(Column nescol : columnArrayList1)
+                {
+                    columns.add(nescol);
+                    result++;
+                }
+            }
+        }
+        System.out.println("result is : ***********************************"+result);
+        return result;
+    }
 
     private  void createClassType(String className ,
-                                           List<Column> columnArrayList, String tablePath
+                                  List<Column> columnArrayList, String tablePath
             , String tableType,gneralcreating generalcreating ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
         ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
@@ -393,10 +397,10 @@ public class CodeGeneration {
         printContent.add("className",className);
         printContent.add("columns",columns);
 
-//        ST getTypeFunction = stGroup.getInstanceOf("getTypeFunction");
-//            getTypeFunction.add("columns",columns);
-        ST getTableFunction = stGroup.getInstanceOf("getTableFunction");
-        getTableFunction.add("columns",columns);
+        ST getTypeFunction = stGroup.getInstanceOf("getTypeFunction");
+        getTypeFunction.add("columns",columns);
+//        ST getTableFunction = stGroup.getInstanceOf("getTableFunction");
+//        getTableFunction.add("columns",columns);
         ST EOF = stGroup.getInstanceOf("EOF");
 
 
@@ -427,8 +431,8 @@ public class CodeGeneration {
             bufferedWriter.write(readJsonFile.render());
             bufferedWriter.write(readCsvFile.render());
             bufferedWriter.write(printContent.render());
-//            bufferedWriter.write(getTypeFunction.render());
-            bufferedWriter.write(getTableFunction.render());
+            bufferedWriter.write(getTypeFunction.render());
+//            bufferedWriter.write(getTableFunction.render());
 //            bufferedWriter.write(getTypeFunction.render());
 //            bufferedWriter.write(returnSpecificType.render());
 //            bufferedWriter.write(returnListOfColumn.render());
@@ -471,16 +475,16 @@ public class CodeGeneration {
 
     private Class loadClasses(String className ,String classPath ,String relativePath) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
 
-            File f = new File("C:\\Users\\Jehad\\IdeaProjects\\Compailer_S2\\src\\Java\\SqlGenerated\\TableClasses\\Java\\SqlGenerated\\TableClasses\\"+className);
-            File sourceFile = new File(classPath+className+".java");
-            File parentDirectory = f.getParentFile();
-            URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{sourceFile.toURI().toURL()});
+        File f = new File("C:\\Users\\Jehad\\IdeaProjects\\Compailer_S2\\src\\Java\\SqlGenerated\\TableClasses\\Java\\SqlGenerated\\TableClasses\\"+className);
+        File sourceFile = new File(classPath+className+".java");
+        File parentDirectory = f.getParentFile();
+        URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{sourceFile.toURI().toURL()});
 //            ClassLoader.getSystemClassLoader().loadClass(relativePath+"."+className);
 //            Class<?> compiledClass1 =ClassLoader.getSystemClassLoader().loadClass(className+className);
 //            URLClassLoader classLoader =new URLClassLoader(new URL[] {parentDirectory.toURI().toURL() });
-            Class<?> compiledClass = Class.forName("Java.SqlGenerated.TableClasses.SqlMain",true,urlClassLoader);
-            compiledClass.newInstance();
-            return compiledClass;
+        Class<?> compiledClass = Class.forName("Java.SqlGenerated.TableClasses.SqlMain",true,urlClassLoader);
+        compiledClass.newInstance();
+        return compiledClass;
 //            Class<?> compiledClass = Class.forName(relativePath+"."+className,true , classLoader);
 
 
@@ -582,7 +586,7 @@ public class CodeGeneration {
     private  Type getVariableType(String variableName,String scopeName) {
         Scope currentScope ;
         for (Scope scope:Main.symbolTable.getScopes()
-             ) {
+        ) {
             if(scope.getId().equals(scopeName))
             {
                 currentScope = scope;
@@ -606,17 +610,17 @@ public class CodeGeneration {
     private String loadAggClassToSelect(){
         String stringTEmplate =(
                 " <\\t><\\n>String JarPath = <agg.jar_path>;<\\n>" +
-                "<\\t>String JarName = \"<agg.AggregationFunctionName>.jar\";<\\n>" +
-                "<\\t>String ClassName = \"<agg.ClassName>\";<\\n>" +
-                "<\\t>String MethodName = \"<agg.MethodName>\";<\\n>" +
-                "<\\t>ArrayList\\<Double> myNumbers = new ArrayList\\<>(Arrays.asList(1.0, 2.0, 3.0, 12.0));<\\n>" +
-                "<\\t>URLClassLoader myClassLoader = new URLClassLoader(" +
-                "<\\t>new URL[]{new File(JarPath ).toURI().toURL()\\},Main.class.getClassLoader()); <\\n>" +
-                "<\\t>Class\\<?> myClass = Class.forName(ClassName, true, myClassLoader);<\\n>" +
-                "<\\t>Method mySingeltonGetterMethod = myClass.getMethod(\"get\" + ClassName,null);<\\n>" +
-                "<\\t>Object myObject = mySingeltonGetterMethod.invoke(null);<\\n>" +
-                "<\\t>Object myValue = myObject.getClass().getDeclaredMethod(MethodName, List.class).invoke(myObject, myNumbers);<\\n>" +
-                "<\\t>System.out.println(myValue);<\\n>"
+                        "<\\t>String JarName = \"<agg.AggregationFunctionName>.jar\";<\\n>" +
+                        "<\\t>String ClassName = \"<agg.ClassName>\";<\\n>" +
+                        "<\\t>String MethodName = \"<agg.MethodName>\";<\\n>" +
+                        "<\\t>ArrayList\\<Double> myNumbers = new ArrayList\\<>(Arrays.asList(1.0, 2.0, 3.0, 12.0));<\\n>" +
+                        "<\\t>URLClassLoader myClassLoader = new URLClassLoader(" +
+                        "<\\t>new URL[]{new File(JarPath ).toURI().toURL()\\},Main.class.getClassLoader()); <\\n>" +
+                        "<\\t>Class\\<?> myClass = Class.forName(ClassName, true, myClassLoader);<\\n>" +
+                        "<\\t>Method mySingeltonGetterMethod = myClass.getMethod(\"get\" + ClassName,null);<\\n>" +
+                        "<\\t>Object myObject = mySingeltonGetterMethod.invoke(null);<\\n>" +
+                        "<\\t>Object myValue = myObject.getClass().getDeclaredMethod(MethodName, List.class).invoke(myObject, myNumbers);<\\n>" +
+                        "<\\t>System.out.println(myValue);<\\n>"
 
         );
 
@@ -629,33 +633,33 @@ public class CodeGeneration {
     {
         String stringTEmplate = (
                 "<\\n>import java.util.List;<\\n>" +
-                "import org.apache.commons.csv.CSVFormat;<\\n>" +
-                "import org.apache.commons.csv.CSVParser;<\\n>" +
-                "import org.apache.commons.csv.CSVRecord;<\\n>" +
-                " import Java.Main;<\\n>" +
-                "import java.io.BufferedReader; <\\n>" +
-                "import java.io.*; <\\n>" +
-                "import com.google.gson.Gson; <\\n>" +
-                "import com.google.gson.JsonArray; <\\n>" +
-                "import com.google.gson.JsonElement; <\\n>" +
-                "import com.google.gson.JsonObject; <\\n>" +
-                "import com.google.gson.stream.JsonReader; <\\n>" +
-                "import java.io.FileNotFoundException; <\\n>" +
-                "import java.io.FileReader; <\\n>" +
-                "import java.io.File;\n" +
-                "import java.lang.reflect.InvocationTargetException;\n" +
-                "import java.lang.reflect.Method;\n" +
-                "import java.net.MalformedURLException;\n" +
-                "import java.net.URL;\n" +
-                "import java.net.URLClassLoader;\n" +
-                "import java.util.ArrayList;\n" +
-                "import java.util.Arrays;\n" +
-                "import java.util.List;\n" +
-                "import Java.SymbolTable.Column;<\\n>" +
-                "import Java.SymbolTable.Type; <\\n>" +
-                "import java.util.HashSet;<\\n>" +
-                "import java.util.Set;<\\n>"
-                );
+                        "import org.apache.commons.csv.CSVFormat;<\\n>" +
+                        "import org.apache.commons.csv.CSVParser;<\\n>" +
+                        "import org.apache.commons.csv.CSVRecord;<\\n>" +
+                        " import Java.Main;<\\n>" +
+                        "import java.io.BufferedReader; <\\n>" +
+                        "import java.io.*; <\\n>" +
+                        "import com.google.gson.Gson; <\\n>" +
+                        "import com.google.gson.JsonArray; <\\n>" +
+                        "import com.google.gson.JsonElement; <\\n>" +
+                        "import com.google.gson.JsonObject; <\\n>" +
+                        "import com.google.gson.stream.JsonReader; <\\n>" +
+                        "import java.io.FileNotFoundException; <\\n>" +
+                        "import java.io.FileReader; <\\n>" +
+                        "import java.io.File;\n" +
+                        "import java.lang.reflect.InvocationTargetException;\n" +
+                        "import java.lang.reflect.Method;\n" +
+                        "import java.net.MalformedURLException;\n" +
+                        "import java.net.URL;\n" +
+                        "import java.net.URLClassLoader;\n" +
+                        "import java.util.ArrayList;\n" +
+                        "import java.util.Arrays;\n" +
+                        "import java.util.List;\n" +
+                        "import Java.SymbolTable.Column;<\\n>" +
+                        "import Java.SymbolTable.Type; <\\n>" +
+                        "import java.util.HashSet;<\\n>" +
+                        "import java.util.Set;<\\n>"
+        );
 
         return stringTEmplate;
     }
@@ -668,76 +672,76 @@ public class CodeGeneration {
     public  String StringForCreateCurrentType(gneralcreating gneralcreating){
         String  stringTemplate =
                 (
-                "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
-                        importJarLoader()+
-                        " public class <name> implements Cloneable {>>" +
-                        "attribute(columns) ::=<<  <columns:{col |<\\n><\\t>public <col.column_type.name>    <col.column_name> ;}> >>" +
-                        "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> _AGG<aggFun.AggregationFunctionName> ; }>  >>" +
-                        "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
-                        "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
-                        "staticList(className,tablePath)::=<< <\\n><\\t>static List\\<<className>\\> entityObject  = new ArrayList\\<>();<\\n> >>" +
-                        "loadFunction(aggList,tablePath,isType,className,columns)::= <<<\\t>public void load() " +throwException()+
-                        "{ <\\n><\\t>" +
-                        "<if(tablePath)>" +
-                        "if(tableType == \"json\")<\\n><\\t>" +
-                        "{<\\n><\\t>" +
-                        "entityObject = readJsonFile();" +
-                        "<\\n><\\t>" +
-                        "}<\\n><\\t>" +
-                        "else <\\n><\\t>" +
-                        "{<\\n><\\t>" +
-                        "entityObject = readCsvFile();<\\n><\\t>" +
-                        "}<\\n><\\t>" +
-                        "<else>" +
-                        "<loadContent(className,columns)>" +
-                        "<endif>" +
-                        "}<\\n> <if(aggList)> <loadAggFuncs(aggList)> <endif> >>  " +
-                        "loadAggFuncs(aggList) ::= << " +
-                        "<aggList :{ agg|<\\n><\\t> public static void <agg.AggregationFunctionName>() "+throwException()+
-                        "{<\\n><\\t>"+
-                        loadAggClassToSelect()+
-                        "<\\n><\\t> \\}" +
-                        "}> >>" +
-                        readFileJsonFunction()+
-                        setterAndGetterFunction()+
+                        "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
+                                importJarLoader()+
+                                " public class <name> implements Cloneable {>>" +
+                                "attribute(columns) ::=<<  <columns:{col |<\\n><\\t>public <col.column_type.name>    <col.column_name> ;}> >>" +
+                                "aggFunctions(aggList) ::=<< <aggList:{ aggFun |<\\n><\\t> <aggFun.returnType> _AGG<aggFun.AggregationFunctionName> ; }>  >>" +
+                                "tableAttribute(tablePath,tableType) ::=<< <if(tablePath)> <\\n><\\t>String tablePath = <tablePath>;<\\n><endif>" +
+                                "<if(tableType)><\\t>String tableType = <tableType>;<endif> >>" +
+                                "staticList(className,tablePath)::=<< <\\n><\\t>static List\\<<className>\\> entityObject  = new ArrayList\\<>();<\\n> >>" +
+                                "loadFunction(aggList,tablePath,isType,className,columns)::= <<<\\t>public void load() " +throwException()+
+                                "{ <\\n><\\t>" +
+                                "<if(tablePath)>" +
+                                "if(tableType == \"json\")<\\n><\\t>" +
+                                "{<\\n><\\t>" +
+                                "entityObject = readJsonFile();" +
+                                "<\\n><\\t>" +
+                                "}<\\n><\\t>" +
+                                "else <\\n><\\t>" +
+                                "{<\\n><\\t>" +
+                                "entityObject = readCsvFile();<\\n><\\t>" +
+                                "}<\\n><\\t>" +
+                                "<else>" +
+                                "<loadContent(className,columns)>" +
+                                "<endif>" +
+                                "}<\\n> <if(aggList)> <loadAggFuncs(aggList)> <endif> >>  " +
+                                "loadAggFuncs(aggList) ::= << " +
+                                "<aggList :{ agg|<\\n><\\t> public static void <agg.AggregationFunctionName>() "+throwException()+
+                                "{<\\n><\\t>"+
+                                loadAggClassToSelect()+
+                                "<\\n><\\t> \\}" +
+                                "}> >>" +
+                                readFileJsonFunction()+
+                                setterAndGetterFunction()+
 //                        "<if(!tablePath)>"+
-                        printContentFunction()+
+                                printContentFunction()+
 //                        "<endif>"+
-                        readFileCsvFunction()+
-                        loadContent(gneralcreating)+
+                                readFileCsvFunction()+
+                                loadContent(gneralcreating)+
 //                        "<if(tablePath)>"+
-                        getTableElementFunction()+
-//                        getTypeElementFunction()+
+//                        getTableElementFunction()+
+                                getTypeElementFunction()+
 //                        "<endif>"+
-                        "EOF()::=<< <\\n> " +
-                        "}>>"
-        );
+                                "EOF()::=<< <\\n> " +
+                                "}>>"
+                );
 
         return  stringTemplate;
     }
 
     public  String setterAndGetterFunction() {
-    String str =  "setterAttribute(columns,aggList) ::=<< " +
-            "<columns:{col |<\\n><\\t> public void set<col.column_name>(<col.column_type.name> value){<\\n><\\t>" +
-            "this.<col.column_name>  = value ; <\\n><\\t>" +
-            "\\}" +
-            " } > " +
-            "<aggList:{ agg|<\\n><\\t> public void set_AGG<agg.AggregationFunctionName> (<agg.returnType> value){<\\n><\\t>" +
-            "this._AGG<agg.AggregationFunctionName> = value; <\\n><\\t> " +
-            "\\} }> " +
-            ">>" +
+        String str =  "setterAttribute(columns,aggList) ::=<< " +
+                "<columns:{col |<\\n><\\t> public void set<col.column_name>(<col.column_type.name> value){<\\n><\\t>" +
+                "this.<col.column_name>  = value ; <\\n><\\t>" +
+                "\\}" +
+                " } > " +
+                "<aggList:{ agg|<\\n><\\t> public void set_AGG<agg.AggregationFunctionName> (<agg.returnType> value){<\\n><\\t>" +
+                "this._AGG<agg.AggregationFunctionName> = value; <\\n><\\t> " +
+                "\\} }> " +
+                ">>" +
 
 
-            "getterAttribute(columns,aggList) ::=<< " +
-            "<columns:{col |<\\n><\\t> public <col.column_type.name> get<col.column_name>(){<\\n><\\t>" +
-            "return <col.column_name> ;   <\\n><\\t>" +
-            "\\}" +
-            " } >" +
-            "<aggList:{ agg|<\\n><\\t> public <agg.returnType> get_AGG<agg.AggregationFunctionName>(){<\\n><\\t>" +
-            "return this._AGG<agg.AggregationFunctionName>; <\\n><\\t>  \\}" +
-            "}>"+
-            " >>";
-            return str;
+                "getterAttribute(columns,aggList) ::=<< " +
+                "<columns:{col |<\\n><\\t> public <col.column_type.name> get<col.column_name>(){<\\n><\\t>" +
+                "return <col.column_name> ;   <\\n><\\t>" +
+                "\\}" +
+                " } >" +
+                "<aggList:{ agg|<\\n><\\t> public <agg.returnType> get_AGG<agg.AggregationFunctionName>(){<\\n><\\t>" +
+                "return this._AGG<agg.AggregationFunctionName>; <\\n><\\t>  \\}" +
+                "}>"+
+                " >>";
+        return str;
     }
 
     public String readFileCsvFunction(){
@@ -810,46 +814,32 @@ public class CodeGeneration {
         return str;
     }
 
-//    public String getTypeElementFunction(){
-//        String str = "getTypeFunction(columns)::=<<" +
-//                "public \\<T> T get_types(JsonElement object)<\\n><\\t>" +
-//                "{<\\n>" +
-//
-//              "}" +
-//                ">>";
-//        return str;
-//    }
-
-    public String getTableElementFunction(){
-        String str = "getTableFunction(columns)::=<<" +
-                "public \\<T> T get_table(JsonArray array)<\\n><\\t>" +
+    public String getTypeElementFunction(){
+        String str = "getTypeFunction(columns)::=<<" +
+                "public \\<T> T get_types(JsonElement object)<\\n><\\t>" +
                 "{<\\n>" +
-                "<columns:{col | " +
+                "<columns:{col |" +
                 "<if(col.TypeObject)>" +
                 "<col.column_type.name> t_<col.column_name> = new <col.column_type.name>();<\\n>" +
-                "<endif>"+
-                "}>" +
-                "for (int ii = 0; ii \\< array.size(); ii++)<\\n><\\t>" +
-                "{<\\n><\\t>" +
+                "<endif>" +
                 "<columns:{col |" +
                 "<if(col.ParentTable)>" +
-                "if (array.get(ii).getAsJsonObject().get(\"<col.column_name>\") != null)<\\n>" +
-                "{<\\n><\\t>" +
+                "if (object.getAsJsonObject().get(\"<col.column_name>\") != null)" +
+                "{<\\n>" +
                 "<if(col.TypeNumber)>" +
-                "t_<col.ParentTable>.set<col.column_name>(array.get(ii).getAsJsonObject().get(\"<col.column_name>\").getAsDouble());<\\n><\\t>" +
+                "t_<col.ParentTable>.set<col.column_name>(object.getAsJsonObject().get(\"<col.column_name>\").getAsDouble());<\\n>" +
                 "<endif>" +
                 "<if(col.TypeString)>" +
-                "t_<col.ParentTable>.set<col.column_name>(array.get(ii).getAsJsonObject().get(\"<col.column_name>\").getAsString());<\\n><\\t>" +
+                "t_<col.ParentTable>.set<col.column_name>(object.getAsJsonObject().get(\"<col.column_name>\").getAsString());<\\n>" +
                 "<endif>" +
                 "<if(col.Typeboolean)>" +
-                "t_<col.ParentTable>.set<col.column_name>(array.get(ii).getAsJsonObject().get(\"<col.column_name>\").getAsBoolean());<\\n><\\t>" +
+                "t_<col.ParentTable>.set<col.column_name>(object.getAsJsonObject().get(\"<col.column_name>\").getAsBoolean());<\\n>" +
                 "<endif>" +
-                "\\}<\\n><\\t>" +
+                "\\}" +
                 "<endif>" +
                 "}>" +
-                "}<\\n><\\t>" +
-                "return (T)" +
-                "<columns:{col | " +
+                "return (T) " +
+                "<columns:{col |" +
                 "<if(col.TypeObject)>" +
                 "t_<col.column_name>;<\\n>" +
                 "<endif>" +
@@ -859,55 +849,94 @@ public class CodeGeneration {
         return str;
     }
 
-    public  String readFileJsonFunction() {
-    String str  = "readJsonFile(className,columns,tablePath)::=<<" +
-            "<\\n><\\t> public List\\<<className>\\> readJsonFile(){<\\n><\\t>" +
-            "<if(tablePath)>" +
-            "List\\<<className>\\> result = new ArrayList\\<>();<\\n><\\t>" +
-            "FileReader fr = null;" +
-            "Gson json = new Gson();<\\n><\\t>" +
-            "try {<\\n><\\t>" +
-            "fr=new FileReader(tablePath);" +
-            "<\\n><\\t>}" +
-            "catch(FileNotFoundException e) {<\\n><\\t>" +
-            "e.printStackTrace();}<\\n><\\t>" +
-            "JsonReader reader = new JsonReader(fr);<\\n><\\t>" +
-            "JsonObject testing = json.fromJson(fr, JsonObject.class);<\\n><\\t>" +
-            "JsonElement json_ele = testing.get(\"<className>\");<\\n><\\t>" +
-            "JsonArray j = json_ele.getAsJsonArray();<\\n><\\t>" +
-            "for (int i = 0 ; i \\< j.size() ; i++ )" +
-            " {<\\n><\\t>" +
-            "<className> tableName = new <className>();<\\n><\\t>" +
-            "<columns:{col | if(j.get(i).getAsJsonObject().get(\"<col.column_name>\") != null);<\\n><\\t>" +
-            "{<\\n><\\t>" +
-            "<if(col.TypeNumber)>" +
-            "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsDouble());<\\n><\\t>" +
-            "<endif>"+
-            "<if(col.TypeString)>" +
-            "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsString());<\\n><\\t>" +
-            "<endif>"+
-            "<if(col.Typeboolean)>" +
-            "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsBoolean());<\\n><\\t>" +
-            "<endif>" +
+//    public String getTableElementFunction(){
+//        String str = "getTableFunction(columns)::=<<" +
+//                "public \\<T> T get_table(JsonArray array)<\\n><\\t>" +
+//                "{<\\n>" +
+//                "<columns:{col | " +
+//                "<if(col.TypeObject)>" +
+//                "<col.column_type.name> t_<col.column_name> = new <col.column_type.name>();<\\n>" +
+//                "<endif>"+
+//                "}>" +
+//                "for (int ii = 0; ii \\< array.size(); ii++)<\\n><\\t>" +
+//                "{<\\n><\\t>" +
+//                "<columns:{col |" +
+//                "<if(col.ParentTable)>" +
+//                "if (array.get(ii).getAsJsonObject().get(\"<col.column_name>\") != null)<\\n>" +
+//                "{<\\n><\\t>" +
+//                "<if(col.TypeNumber)>" +
+//                "t_<col.ParentTable>.set<col.column_name>(array.get(ii).getAsJsonObject().get(\"<col.column_name>\").getAsDouble());<\\n><\\t>" +
+//                "<endif>" +
+//                "<if(col.TypeString)>" +
+//                "t_<col.ParentTable>.set<col.column_name>(array.get(ii).getAsJsonObject().get(\"<col.column_name>\").getAsString());<\\n><\\t>" +
+//                "<endif>" +
+//                "<if(col.Typeboolean)>" +
+//                "t_<col.ParentTable>.set<col.column_name>(array.get(ii).getAsJsonObject().get(\"<col.column_name>\").getAsBoolean());<\\n><\\t>" +
+//                "<endif>" +
+//                "\\}<\\n><\\t>" +
+//                "<endif>" +
+//                "}>" +
+//                "}<\\n><\\t>" +
+//                "return (T)" +
+//                "<columns:{col | " +
+//                "<if(col.TypeObject)>" +
+//                "t_<col.column_name>;<\\n>" +
+//                "<endif>" +
+//                "}>" +
+//                "}" +
+//                ">>";
+//        return str;
+//    }
 
-            "<if(col.TypeObject)>" +
-            "if (j.get(i).getAsJsonObject().get(\"<col.column_name>\").isJsonObject() == true)<\\n><\\t>" +
-            "{<\\n><\\t>" +
-//            "<col.column_type> t_<col.column_name> = new <col.column_type>();" +
-            "\\}<\\n><\\t>"+
-            "<endif>"+
-            "\\}<\\n><\\t>" +
-            " }>" +
-            "result.add(tableName);<\\n><\\t>" +
-            "}<\\n><\\t>" +
-            "return result;" +
-            "<else>"+
-            "return null;<\\n><\\t>"+
-            "<endif>"+
-            "<\\n><\\t> }>>" ;
-            return str;
-   }
-   private String loadContent(gneralcreating generalcreate) {
+    public  String readFileJsonFunction() {
+        String str  = "readJsonFile(className,columns,tablePath)::=<<" +
+                "<\\n><\\t> public List\\<<className>\\> readJsonFile(){<\\n><\\t>" +
+                "<if(tablePath)>" +
+                "List\\<<className>\\> result = new ArrayList\\<>();<\\n><\\t>" +
+                "FileReader fr = null;" +
+                "Gson json = new Gson();<\\n><\\t>" +
+                "try {<\\n><\\t>" +
+                "fr=new FileReader(tablePath);" +
+                "<\\n><\\t>}" +
+                "catch(FileNotFoundException e) {<\\n><\\t>" +
+                "e.printStackTrace();}<\\n><\\t>" +
+                "JsonReader reader = new JsonReader(fr);<\\n><\\t>" +
+                "JsonObject testing = json.fromJson(fr, JsonObject.class);<\\n><\\t>" +
+                "JsonElement json_ele = testing.get(\"<className>\");<\\n><\\t>" +
+                "JsonArray j = json_ele.getAsJsonArray();<\\n><\\t>" +
+                "for (int i = 0 ; i \\< j.size() ; i++ )" +
+                " {<\\n><\\t>" +
+                "<className> tableName = new <className>();<\\n><\\t>" +
+                "<columns:{col | if(j.get(i).getAsJsonObject().get(\"<col.column_name>\") != null);<\\n><\\t>" +
+                "{<\\n><\\t>" +
+                "<if(col.TypeNumber)>" +
+                "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsDouble());<\\n><\\t>" +
+                "<endif>"+
+                "<if(col.TypeString)>" +
+                "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsString());<\\n><\\t>" +
+                "<endif>"+
+                "<if(col.Typeboolean)>" +
+                "tableName.set<col.column_name>(j.get(i).getAsJsonObject().get(\"<col.column_name>\").getAsBoolean());<\\n><\\t>" +
+                "<endif>" +
+
+                "<if(col.TypeObject)>" +
+                "if (j.get(i).getAsJsonObject().get(\"<col.column_name>\").isJsonObject() == true)<\\n><\\t>" +
+                "{<\\n><\\t>" +
+
+                "\\}<\\n><\\t>"+
+                "<endif>"+
+                "\\}<\\n><\\t>" +
+                " }>" +
+                "result.add(tableName);<\\n><\\t>" +
+                "}<\\n><\\t>" +
+                "return result;" +
+                "<else>"+
+                "return null;<\\n><\\t>"+
+                "<endif>"+
+                "<\\n><\\t> }>>" ;
+        return str;
+    }
+    private String loadContent(gneralcreating generalcreate) {
 
 
 //       Set<Field> fields = new HashSet<>(Arrays.asList(field)) ;
@@ -942,12 +971,12 @@ public class CodeGeneration {
 //                "<\\n><\\t>}" +
 //                "<\\n><\\t>System.out.println( field[0].getAnnotatedType().getType().getTypeName());" +
 //                "<\\n><\\t>System.out.println(field[0].getName());" +
-                        " >>"
+                " >>"
 
-                );
+        );
 
         return loadContent ;
-   }
+    }
     private String joinTemplate(){
         String joinString = ("joinTemplate()::=<< " +
                 "" +
@@ -980,58 +1009,58 @@ public class CodeGeneration {
         public String tableName;
     }
     class TableAndColumn {
-       public String tableName;
-       public ArrayList<Columns> columns = new ArrayList<>();
+        public String tableName;
+        public ArrayList<Columns> columns = new ArrayList<>();
 
     }
-     private  ArrayList<TableAndColumn> splitColomNames (ArrayList<Column> columns){
+    private  ArrayList<TableAndColumn> splitColomNames (ArrayList<Column> columns){
 
 
-         ArrayList<TableAndColumn> tableAndColumnArrayList = new ArrayList<>();
+        ArrayList<TableAndColumn> tableAndColumnArrayList = new ArrayList<>();
 
-             for (Column col:columns
-                  ) {
+        for (Column col:columns
+        ) {
 //                 System.err.println(col.getColumn_name());
-                 String[] names ;
-                 TableAndColumn tableAndColumn = new TableAndColumn();
-                 Columns columnsInTable = new Columns();
+            String[] names ;
+            TableAndColumn tableAndColumn = new TableAndColumn();
+            Columns columnsInTable = new Columns();
 
-                 if(col.getColumn_name().contains("$")){
-                    names = col.getColumn_name().substring(1).split("_");
-                    columnsInTable.tableName = names[0];
-                     boolean found = false;
-                     columnsInTable.thisColumn = col;
-                     columnsInTable.columnName = names[1];
-                     tableAndColumn.columns.add(columnsInTable);
+            if(col.getColumn_name().contains("$")){
+                names = col.getColumn_name().substring(1).split("_");
+                columnsInTable.tableName = names[0];
+                boolean found = false;
+                columnsInTable.thisColumn = col;
+                columnsInTable.columnName = names[1];
+                tableAndColumn.columns.add(columnsInTable);
 
-                     if(!tableAndColumnArrayList.isEmpty()){
+                if(!tableAndColumnArrayList.isEmpty()){
 
-                         for (TableAndColumn table:tableAndColumnArrayList
-                              ) {
-                             if(table.tableName != null)
-                             {
-                                 if(table.tableName.equals(names[0]))
-                                 {
-                                     found = false;
-                                     tableAndColumnArrayList.get(tableAndColumnArrayList.indexOf(table)).columns.add(columnsInTable);
+                    for (TableAndColumn table:tableAndColumnArrayList
+                    ) {
+                        if(table.tableName != null)
+                        {
+                            if(table.tableName.equals(names[0]))
+                            {
+                                found = false;
+                                tableAndColumnArrayList.get(tableAndColumnArrayList.indexOf(table)).columns.add(columnsInTable);
 
-                                    break;
-                                 }else {
-                                     found = true;
-                                 }
-                             }
-                         }
-                     }else found =true;
+                                break;
+                            }else {
+                                found = true;
+                            }
+                        }
+                    }
+                }else found =true;
 
-                     if(found){
-                         tableAndColumn.tableName = names[0];
-                         tableAndColumnArrayList.add(tableAndColumn);
-                     }
-             }
-         }
+                if(found){
+                    tableAndColumn.tableName = names[0];
+                    tableAndColumnArrayList.add(tableAndColumn);
+                }
+            }
+        }
 //         tableAndColumnArrayList.forEach(tableAndColumn1 -> System.err.println(tableAndColumn1.Columns));
-         return tableAndColumnArrayList;
-     }
+        return tableAndColumnArrayList;
+    }
 
 }
 //             case the colunmn all is Table or Type

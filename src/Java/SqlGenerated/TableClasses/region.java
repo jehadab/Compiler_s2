@@ -27,57 +27,49 @@ import Java.SymbolTable.Column;
 import Java.SymbolTable.Type; 
 import java.util.HashSet;
 import java.util.Set;
- public class Street implements Cloneable {
-  	public String    streetName ;
-  	public double    streetId ;   
- 	 public void setstreetName(String value){
- 	this.streetName  = value ; 
- 	} 
- 	 public void setstreetId(double value){
- 	this.streetId  = value ; 
+ public class region implements Cloneable {
+  	public String    name ;   
+ 	 public void setname(String value){
+ 	this.name  = value ; 
  	}   
- 	 public String getstreetName(){
- 	return streetName ;   
- 	} 
- 	 public double getstreetId(){
- 	return streetId ;   
+ 	 public String getname(){
+ 	return name ;   
  	}   
-	static List<Street> entityObject  = new ArrayList<>();
+	static List<region> entityObject  = new ArrayList<>();
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{ 
 	
-	 Street objStreet = new Street();
+	 region objregion = new region();
 	 try{
-		entityObject.add((Street)objStreet.clone()); 
+		entityObject.add((region)objregion.clone()); 
  } 
 catch (CloneNotSupportedException c){
 			 c.printStackTrace();
 	 }
   }
   
-	 public List<Street> readJsonFile(){
+	 public List<region> readJsonFile(){
 	return null;
 	
-	 }public List<Street> readCsvFile() throws IOException{
+	 }public List<region> readCsvFile() throws IOException{
 	return null;
 	}
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf(" %10s    %20s  " ,  "streetName" ,  "streetId" ) ;	System.out.println();
+	System.out.printf(" %10s   " ,  "name" ) ;	System.out.println();
 
 	System.out.println("-----------------------------------------------------------------------------");
 	
-	for(Street obj:entityObject)
+	for(region obj:entityObject)
 	{
-	System.out.format("  %5s    %20s  " ,  obj.getstreetName(),obj.getstreetId() );
+	System.out.format("  %5s  " , obj.getname() );
 	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
-	}public <T> T get_types(JsonElement object)
+	}public <T> T get_table(JsonArray array)
 	{
-return null;
-}public <T> T get_table(JsonArray array)
+for (int ii = 0; ii < array.size(); ii++)
 	{
-return null;
-}
+	}
+	return (T)}
  }

@@ -1,7 +1,7 @@
-create aggregation function SUM ("src/AggregationFunctions.jar",CommonAggregations,SUM,double,[number])
-create type Street(streetId double  ,streetName String);
-create table Address(id double , streetInfo Street) type= "json" path= "C:/Users/Dell/Desktop/Final/Data/Colors.json";
-create table colors(id double, color String, value String , address Address ) type= "json" path= "C:/Users/Dell/Desktop/Final/Data/Colors.json";
+create type region(name String);
+create type country(id double, name String, region region);
+create type city(id double, name String, country country);
+create table colors(id double, color String, value String , ci city ) type= "json" path= "C:/Users/Dell/Desktop/Final/Data/Colors.json";
 Func(){
 var y = select  *  from colors ;
 }
