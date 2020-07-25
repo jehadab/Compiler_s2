@@ -30,19 +30,19 @@ import java.util.Set;
  public class country implements Cloneable {
   	public String    name ;
   	public double    id ;
-  	public region    region ;
-  	public String    name ;   
+  	public String    name ;
+  	public region    region ;   
  	 public void setname(String value){
  	this.name  = value ; 
  	} 
  	 public void setid(double value){
  	this.id  = value ; 
  	} 
- 	 public void setregion(region value){
- 	this.region  = value ; 
- 	} 
  	 public void setname(String value){
  	this.name  = value ; 
+ 	} 
+ 	 public void setregion(region value){
+ 	this.region  = value ; 
  	}   
  	 public String getname(){
  	return name ;   
@@ -50,11 +50,11 @@ import java.util.Set;
  	 public double getid(){
  	return id ;   
  	} 
- 	 public region getregion(){
- 	return region ;   
- 	} 
  	 public String getname(){
  	return name ;   
+ 	} 
+ 	 public region getregion(){
+ 	return region ;   
  	}   
 	static List<country> entityObject  = new ArrayList<>();
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{ 
@@ -77,13 +77,13 @@ catch (CloneNotSupportedException c){
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf(" %10s    %20s   %20s   %10s   " ,  "name" ,  "id" ,  "region"  "name" ) ;	System.out.println();
+	System.out.printf(" %10s    %20s   %10s    %20s  " ,  "name" ,  "id" ,  "name"  "region" ) ;	System.out.println();
 
 	System.out.println("-----------------------------------------------------------------------------");
 	
 	for(country obj:entityObject)
 	{
-	System.out.format("  %5s    %20s    %20s    %5s  " ,  obj.getname(), obj.getid(),obj.getregion() obj.getname() );
+	System.out.format("  %5s    %20s    %5s    %20s  " ,  obj.getname(), obj.getid(),obj.getname() obj.getregion() );
 	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");

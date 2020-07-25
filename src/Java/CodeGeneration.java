@@ -167,7 +167,8 @@ public class CodeGeneration {
             }
         }
         for (Type type :Main.symbolTable.getDeclaredTypes()
-             ) {
+             )
+        {
             if(type.getName().contains("_") || type.getName().contains("_AGG"))
                 continue;
             else  {
@@ -231,50 +232,55 @@ public class CodeGeneration {
             fileWriter.write(eof.render());
             fileWriter.flush();
             fileWriter.close();
-
 //            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
 //            Class c = classLoader.loadClass(relativePath+"."+className);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-
     }
 
-//    public int returnSizeOfColumnsFlatTable(ArrayList<Column> columnArrayList){
-//        ArrayList<Column> columns = new ArrayList<>();
-//        columns = columnArrayList;
-//        int result =0;
-//        for (Column col:columnArrayList){
-//            if(col.getColumn_type().getName().equals(Type.NUMBER_CONST)){
-//                col.setTypeNumber("true");
-//                columns.add(col);
-//                result++;
-//            }else if(col.getColumn_type().getName().equals(Type.STRING_CONST)){
-//                col.setTypeString("true");
-//                columns.add(col);
-//                result++;
-//            }else if(col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
-//                col.setTypeboolean("true");
-//                columns.add(col);
-//                result++;
-//            }
-//            else if(col.getTypeNumber()==null&&col.getTypeboolean()==null&&col.getTypeString()==null){
-//                col.setTypeObject("true");
-//                Type  nestypeclass = returnSpecificType(col.getColumn_type().getName());
-//                columns.add(col);
-//                ArrayList<Column> columnArrayList1  = returnTableColumn(nestypeclass);
-//                for(Column nescol : columnArrayList1)
-//                {
-//                    columns.add(nescol);
-//                    result++;
-//                }
-//            }
-//        }
-//        return result;
-//    }
+    public ArrayList<Column> returnTableFlatColumn(Type typeclass){
+        ArrayList<Column> columnList = new ArrayList<>();
+        int l =  typeclass.getColumns().keySet().toArray().length;
+        for (Object col:typeclass.getColumns().keySet().toArray() ) {
+            Column column = new Column();
+            column.setColumn_name(col.toString());
+            column.setColumn_type(typeclass.getColumns().get(col.toString()));
+            if(l == 1){
+                column.setLastColumn("true");
+            }
+            if(l==typeclass.getColumns().keySet().toArray().length){
+                column.setFirstColumn("true");
+            }
+            if(column.getColumn_type().getName().equals(Type.NUMBER_CONST)){
+                column.setTypeNumber("true");
+            }else if(column.getColumn_type().getName().equals(Type.STRING_CONST)){
+                column.setTypeString("true");
+            }else if(column.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
+                column.setTypeboolean("true");
+            }
+            else if(column.getTypeNumber()==null&&column.getTypeboolean()==null&&column.getTypeString()==null){
+                column.setTypeObject("true");
+                Type  nestypeclass = returnSpecificType(column.getColumn_type().getName());
+                ArrayList<Column> columnArrayList1  = returnTableFlatColumn(nestypeclass);
+                for(Column nescol : columnArrayList1)
+                {
+                    if(nescol.getGrandParant1()!=null){
+                        nescol.setGrandParant2(nescol.getGrandParant1());
+                    }
+                    if(nescol.getParentTable()!=null){
+                        nescol.setGrandParant1(nescol.getParentTable());
+                    }
+
+                    nescol.setParentTable(column.getColumn_name());
+                    columnList.add(nescol);
+                }
+            }
+            columnList.add(column);
+            l--;
+        }
+        return columnList;
+    }
 
     private  void createClassType(String className ,
                                            List<Column> columnArrayList, String tablePath
@@ -294,44 +300,46 @@ public class CodeGeneration {
 //                System.err.println("ggggggggggggggggggggggggg "+Main.symbolTable.getAgg().size());
 
             }
-            else {
-
-                if(col.getColumn_type().getName().equals(Type.NUMBER_CONST)){
-                    col.setTypeNumber("true");
-                    columns.add(col);
-                }else if(col.getColumn_type().getName().equals(Type.STRING_CONST)){
-                    col.setTypeString("true");
-                    columns.add(col);
-                }else if(col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
-                    col.setTypeboolean("true");
-                    columns.add(col);
-                }
-                else if(col.getTypeNumber()==null&&col.getTypeboolean()==null&&col.getTypeString()==null){
-                    col.setTypeObject("true");
-                    Type  nestypeclass = returnSpecificType(col.getColumn_type().getName());
-                    columns.add(col);
-                    ArrayList<Column> columnArrayList1  = returnTableColumn(nestypeclass);
-                    for(Column nescol : columnArrayList1)
-                    {
-                        nescol.setParentTable(col.getColumn_name());
-                        if(nescol.getColumn_type().getName().equals(Type.NUMBER_CONST)){
-                            nescol.setTypeNumber("true");
-                        }else if(nescol.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
-                            nescol.setTypeboolean("true");
-                        }
-                        else if(nescol.getColumn_type().getName().equals(Type.STRING_CONST)){
-                            nescol.setTypeString("true");
-                        }
-                        columns.add(nescol);
-                    }
-                }
-
-            }
+//            else {
+//
+//                if(col.getColumn_type().getName().equals(Type.NUMBER_CONST)){
+//                    col.setTypeNumber("true");
+//                    columns.add(col);
+//                }else if(col.getColumn_type().getName().equals(Type.STRING_CONST)){
+//                    col.setTypeString("true");
+//                    columns.add(col);
+//                }else if(col.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
+//                    col.setTypeboolean("true");
+//                    columns.add(col);
+//                }
+//                else if(col.getTypeNumber()==null&&col.getTypeboolean()==null&&col.getTypeString()==null){
+//                    col.setTypeObject("true");
+//                    Type  nestypeclass = returnSpecificType(col.getColumn_type().getName());
+//                    columns.add(col);
+//                    ArrayList<Column> columnArrayList1  = returnTableColumn(nestypeclass);
+//                    for(Column nescol : columnArrayList1)
+//                    {
+//                        nescol.setParentTable(col.getColumn_name());
+//                        if(nescol.getColumn_type().getName().equals(Type.NUMBER_CONST)){
+//                            nescol.setTypeNumber("true");
+//                        }else if(nescol.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
+//                            nescol.setTypeboolean("true");
+//                        }
+//                        else if(nescol.getColumn_type().getName().equals(Type.STRING_CONST)){
+//                            nescol.setTypeString("true");
+//                        }
+//
+//                        columns.add(nescol);
+//                    }
+//                }
+//
+//            }
         }
-
+        Type typeClass = returnSpecificType(className);
+        columns = returnTableFlatColumn(typeClass);
         System.out.println("***************************************************************************************");
         for(Column coll:columns){
-            System.out.println(coll.getColumn_name()+"            "+coll.getParentTable()+"            "+coll.getColumn_type().getName()+"            "+coll.getTypeString()+"            "+coll.getTypeboolean()+"            "+coll.getTypeNumber());
+            System.out.println(coll.getColumn_name()+"            "+coll.getParentTable()+"            "+coll.getColumn_type().getName()+"            "+coll.getTypeString()+"            "+coll.getTypeboolean()+"            "+coll.getTypeNumber()+"            grandParant1 : "+ coll.getGrandParant1()+"            grandParant2 : "+ coll.getGrandParant2());
         }
         System.out.println("***************************************************************************************");
 
@@ -521,54 +529,7 @@ public class CodeGeneration {
         return columnList;
     }
 
-//    public ArrayList<Column> returnTableFlatColumn(Type typeclass){
-//        ArrayList<Column> columnList = new ArrayList<>();
-//        int l =  typeclass.getColumns().keySet().toArray().length;
-//        for (Object col:typeclass.getColumns().keySet().toArray() ) {
-//            Column column = new Column();
-//            column.setColumn_name(col.toString());
-//            column.setColumn_type(typeclass.getColumns().get(col.toString()));
-//            if(l == 1){
-//                column.setLastColumn("true");
-//            }
-//            if(l==typeclass.getColumns().keySet().toArray().length){
-//                column.setFirstColumn("true");
-//            }
-//            if(column.getColumn_type().getName().equals(Type.NUMBER_CONST)){
-//                column.setTypeNumber("true");
-//                columnList.add(column);
-//            }else if(column.getColumn_type().getName().equals(Type.STRING_CONST)){
-//                column.setTypeString("true");
-//                columnList.add(column);
-//            }else if(column.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
-//                column.setTypeboolean("true");
-//                columnList.add(column);
-//            }
-//            else if (column.getTypeNumber()==null&&column.getTypeboolean()==null&&column.getTypeString()==null){
-//                column.setTypeObject("true");
-//                Type  nestypeclass = returnSpecificType(column.getColumn_name());
-//                for(Object nescol : nestypeclass.getColumns().keySet().toArray())
-//                {
-//                    Column column2 = new Column();
-//                    column2.setColumn_name(nescol.toString());
-//                    column2.setColumn_type(nestypeclass.getColumns().get(nescol.toString()));
-//                    if(column2.getColumn_type().getName().equals(Type.NUMBER_CONST)){
-//                        column2.setTypeNumber("true");
-//                    }else if(column2.getColumn_type().getName().equals(Type.STRING_CONST)){
-//                        column2.setTypeString("true");
-//                    }else if(column2.getColumn_type().getName().equals(Type.BOOLEAN_CONST)){
-//                        column2.setTypeboolean("true");
-//                    }
-//                    column2.setParentTable(column2.getColumn_name());
-//                    columnList.add(column2);
-//                }
-//                columnList.add(column);
-//            }
-//
-//            l--;
-//        }
-//        return null;
-//    }
+
 
     private   String returnTablePath(Type typeclass){
         String result =  typeclass.getPath_of_table();

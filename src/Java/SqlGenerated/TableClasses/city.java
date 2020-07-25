@@ -28,12 +28,25 @@ import Java.SymbolTable.Type;
 import java.util.HashSet;
 import java.util.Set;
  public class city implements Cloneable {
-  	public country    country ;
   	public String    name ;
   	public double    id ;
+  	public String    name ;
   	public region    region ;
+  	public country    country ;
   	public String    name ;
   	public double    id ;   
+ 	 public void setname(String value){
+ 	this.name  = value ; 
+ 	} 
+ 	 public void setid(double value){
+ 	this.id  = value ; 
+ 	} 
+ 	 public void setname(String value){
+ 	this.name  = value ; 
+ 	} 
+ 	 public void setregion(region value){
+ 	this.region  = value ; 
+ 	} 
  	 public void setcountry(country value){
  	this.country  = value ; 
  	} 
@@ -42,27 +55,21 @@ import java.util.Set;
  	} 
  	 public void setid(double value){
  	this.id  = value ; 
- 	} 
- 	 public void setregion(region value){
- 	this.region  = value ; 
- 	} 
- 	 public void setname(String value){
- 	this.name  = value ; 
- 	} 
- 	 public void setid(double value){
- 	this.id  = value ; 
  	}   
- 	 public country getcountry(){
- 	return country ;   
- 	} 
  	 public String getname(){
  	return name ;   
  	} 
  	 public double getid(){
  	return id ;   
  	} 
+ 	 public String getname(){
+ 	return name ;   
+ 	} 
  	 public region getregion(){
  	return region ;   
+ 	} 
+ 	 public country getcountry(){
+ 	return country ;   
  	} 
  	 public String getname(){
  	return name ;   
@@ -91,18 +98,19 @@ catch (CloneNotSupportedException c){
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf(" %10s    %10s    %20s   %20s   %20s   %20s  " ,  "country" ,  "name" ,  "id" ,  "region"  "name" ,  "id" ) ;	System.out.println();
+	System.out.printf(" %10s    %20s   %10s    %20s   %10s    %20s   %20s  " ,  "name" ,  "id" ,  "name"  "region"  "country" ,  "name" ,  "id" ) ;	System.out.println();
 
 	System.out.println("-----------------------------------------------------------------------------");
 	
 	for(city obj:entityObject)
 	{
-	System.out.format("  %5s    %5s    %20s    %20s    %20s    %20s  " ,  obj.getcountry(), obj.getname(), obj.getid(),obj.getregion()  obj.getname(),obj.getid() );
+	System.out.format("  %5s    %20s    %5s    %20s    %5s    %20s    %20s  " ,  obj.getname(), obj.getid(),obj.getname() obj.getregion()  obj.getcountry(), obj.getname(),obj.getid() );
 	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
 	}public <T> T get_table(JsonArray array)
 	{
+region t_region = new region();
 country t_country = new country();
 for (int ii = 0; ii < array.size(); ii++)
 	{
@@ -114,10 +122,15 @@ for (int ii = 0; ii < array.size(); ii++)
 {
 	t_country.setid(array.get(ii).getAsJsonObject().get("id").getAsDouble());
 	}
+	if (array.get(ii).getAsJsonObject().get("name") != null)
+{
+	t_country.setname(array.get(ii).getAsJsonObject().get("name").getAsString());
+	}
 	if (array.get(ii).getAsJsonObject().get("region") != null)
 {
 	}
 	}
-	return (T)t_country;
+	return (T)t_region;
+t_country;
 }
  }

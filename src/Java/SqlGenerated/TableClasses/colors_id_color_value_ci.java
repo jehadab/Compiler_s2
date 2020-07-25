@@ -29,17 +29,30 @@ import java.util.HashSet;
 import java.util.Set;
  public class colors_id_color_value_ci implements Cloneable {
   	public double    $colors_id ;
-  	public city    $colors_ci ;
+  	public String    name ;
+  	public double    id ;
+  	public String    name ;
+  	public region    region ;
   	public country    country ;
   	public String    name ;
   	public double    id ;
+  	public city    $colors_ci ;
   	public String    $colors_value ;
   	public String    $colors_color ;   
  	 public void set$colors_id(double value){
  	this.$colors_id  = value ; 
  	} 
- 	 public void set$colors_ci(city value){
- 	this.$colors_ci  = value ; 
+ 	 public void setname(String value){
+ 	this.name  = value ; 
+ 	} 
+ 	 public void setid(double value){
+ 	this.id  = value ; 
+ 	} 
+ 	 public void setname(String value){
+ 	this.name  = value ; 
+ 	} 
+ 	 public void setregion(region value){
+ 	this.region  = value ; 
  	} 
  	 public void setcountry(country value){
  	this.country  = value ; 
@@ -50,6 +63,9 @@ import java.util.Set;
  	 public void setid(double value){
  	this.id  = value ; 
  	} 
+ 	 public void set$colors_ci(city value){
+ 	this.$colors_ci  = value ; 
+ 	} 
  	 public void set$colors_value(String value){
  	this.$colors_value  = value ; 
  	} 
@@ -59,8 +75,17 @@ import java.util.Set;
  	 public double get$colors_id(){
  	return $colors_id ;   
  	} 
- 	 public city get$colors_ci(){
- 	return $colors_ci ;   
+ 	 public String getname(){
+ 	return name ;   
+ 	} 
+ 	 public double getid(){
+ 	return id ;   
+ 	} 
+ 	 public String getname(){
+ 	return name ;   
+ 	} 
+ 	 public region getregion(){
+ 	return region ;   
  	} 
  	 public country getcountry(){
  	return country ;   
@@ -70,6 +95,9 @@ import java.util.Set;
  	} 
  	 public double getid(){
  	return id ;   
+ 	} 
+ 	 public city get$colors_ci(){
+ 	return $colors_ci ;   
  	} 
  	 public String get$colors_value(){
  	return $colors_value ;   
@@ -104,21 +132,38 @@ catch (CloneNotSupportedException c){
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf(" %10s    %20s   %10s    %20s   %20s   %20s   %20s  " ,  "$colors_id" ,  "$colors_ci" ,  "country" ,  "name" ,  "id"  "$colors_value" ,  "$colors_color" ) ;	System.out.println();
+	System.out.printf(" %10s    %10s    %20s   %10s    %20s   %10s    %20s   %20s   %20s   %20s   %20s  " ,  "$colors_id" ,  "name" ,  "id" ,  "name"  "region"  "country" ,  "name" ,  "id"  "$colors_ci" ,  "$colors_value" ,  "$colors_color" ) ;	System.out.println();
 
 	System.out.println("-----------------------------------------------------------------------------");
 	
 	for(colors_id_color_value_ci obj:entityObject)
 	{
-	System.out.format("  %5s    %20s    %5s    %20s    %20s    %20s    %20s  " ,  obj.get$colors_id(), obj.get$colors_ci(), obj.getcountry(), obj.getname(),obj.getid()  obj.get$colors_value(),obj.get$colors_color() );
+	System.out.format("  %5s    %5s    %20s    %5s    %20s    %5s    %20s    %20s    %20s    %20s    %20s  " ,  obj.get$colors_id(), obj.getname(), obj.getid(),obj.getname() obj.getregion()  obj.getcountry(), obj.getname(),obj.getid()  obj.get$colors_ci(), obj.get$colors_value(),obj.get$colors_color() );
 	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
 	}public <T> T get_table(JsonArray array)
 	{
+region t_region = new region();
+country t_country = new country();
 city t_$colors_ci = new city();
 for (int ii = 0; ii < array.size(); ii++)
 	{
+	if (array.get(ii).getAsJsonObject().get("name") != null)
+{
+	t_$colors_ci.setname(array.get(ii).getAsJsonObject().get("name").getAsString());
+	}
+	if (array.get(ii).getAsJsonObject().get("id") != null)
+{
+	t_$colors_ci.setid(array.get(ii).getAsJsonObject().get("id").getAsDouble());
+	}
+	if (array.get(ii).getAsJsonObject().get("name") != null)
+{
+	t_$colors_ci.setname(array.get(ii).getAsJsonObject().get("name").getAsString());
+	}
+	if (array.get(ii).getAsJsonObject().get("region") != null)
+{
+	}
 	if (array.get(ii).getAsJsonObject().get("country") != null)
 {
 	}
@@ -131,6 +176,8 @@ for (int ii = 0; ii < array.size(); ii++)
 	t_$colors_ci.setid(array.get(ii).getAsJsonObject().get("id").getAsDouble());
 	}
 	}
-	return (T)t_$colors_ci;
+	return (T)t_region;
+t_country;
+t_$colors_ci;
 }
  }
