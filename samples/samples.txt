@@ -4,7 +4,7 @@ create table colors(id double, color String, value String) type= "json" path= "s
 create table colors1(id1 double, color1 String, value1 String) type= "json" path= "src/Colors1.json";
 Func(){
 
-var y = select  id from colors where id > 2;
+var y =select  id from colors  join colors1 on colors.id = colors1.id1 ;
 print(y);
 
 

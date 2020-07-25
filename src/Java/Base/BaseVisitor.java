@@ -1351,23 +1351,23 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
 
             expr.setLiteral_value(visitLiteral_value(ctx.literal_value()));
            // System.out.println(" print what we store "+expr.getLiteral_value().getReturnType().toString());
-            System.out.println(" the returning in the visite "+visitLiteral_value(ctx.literal_value()).toString());
+            System.out.println("the returning in the visit "+visitLiteral_value(ctx.literal_value()).toString());
         }
-        if (ctx.database_name() != null) {
+        else if (ctx.database_name() != null) {
             expr.setDataBaseName(visitDatabase_name(ctx.database_name()));
         }
-        if (ctx.table_name() != null)
+        else if (ctx.table_name() != null)
         {
             expr.setTableName(visitTable_name(ctx.table_name()));
             System.out.println("testing it "+expr.getTableName().getName());
 
         }
-        if (ctx.column_name() != null)
+        else if (ctx.column_name() != null)
         {
             expr.setColumnName(visitColumn_name(ctx.column_name()));
-            System.out.println(" testign t as well"+expr.getColumnName().getName().toString());
+            System.out.println("testign t as well"+expr.getColumnName().getName());
         }
-        if (ctx.unary_operator() != null && ctx.expr() != null) {
+        else if (ctx.unary_operator() != null && ctx.expr() != null) {
             System.out.println("hy");
         }
         if (ctx.commn_expr_opreator() != null) {
@@ -1377,7 +1377,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
                 System.out.println("fill left");
                 (expr).setRight(visitExpr(ctx.expr(1)));
                 System.out.println("fill right");
-                System.out.println(" the right side of expre " + ctx.expr(1));
+                System.out.println("the right side of expre " + ctx.expr(1));
                 //System.out.println(" we are here .....   ");
             }
             //System.out.println(" what we store in the right side " + expr.getRight());}
@@ -1393,7 +1393,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         }
 
         for (int i = 0; i < expr.getArray_list_od_right_side().size(); i++) {
-            System.out.println(" the right side of expretion will be " + expr.getArray_list_od_right_side().get(i));
+            System.out.println("the right side of expretion will be " + expr.getArray_list_od_right_side().get(i));
         }
         if(ctx.function_name()!=null){
             System.out.println("visit the function name ");
