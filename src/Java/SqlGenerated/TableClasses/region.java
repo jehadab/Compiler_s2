@@ -66,10 +66,7 @@ catch (CloneNotSupportedException c){
 	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
-	}public <T> T get_table(JsonArray array)
+	}public <T> T get_types(JsonElement object)
 	{
-for (int ii = 0; ii < array.size(); ii++)
-	{
-	}
-	return (T)}
+}
  }

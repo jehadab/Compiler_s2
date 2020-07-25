@@ -1,7 +1,8 @@
 create type region(name String);
 create type country(id double, name String, region region);
 create type city(id double, name String, country country);
-create table colors(id double, color String, value String , ci city ) type= "json" path= "C:/Users/Dell/Desktop/Final/Data/Colors.json";
+create table clubs(id double , name String , city city) type= "json" path= "C:/Users/Dell/Desktop/Final02/02/clubs.json";
 Func(){
 var y = select  *  from colors ;
 }
+

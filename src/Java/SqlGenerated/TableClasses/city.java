@@ -108,29 +108,7 @@ catch (CloneNotSupportedException c){
 	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
-	}public <T> T get_table(JsonArray array)
+	}public <T> T get_types(JsonElement object)
 	{
-region t_region = new region();
-country t_country = new country();
-for (int ii = 0; ii < array.size(); ii++)
-	{
-	if (array.get(ii).getAsJsonObject().get("name") != null)
-{
-	t_country.setname(array.get(ii).getAsJsonObject().get("name").getAsString());
-	}
-	if (array.get(ii).getAsJsonObject().get("id") != null)
-{
-	t_country.setid(array.get(ii).getAsJsonObject().get("id").getAsDouble());
-	}
-	if (array.get(ii).getAsJsonObject().get("name") != null)
-{
-	t_country.setname(array.get(ii).getAsJsonObject().get("name").getAsString());
-	}
-	if (array.get(ii).getAsJsonObject().get("region") != null)
-{
-	}
-	}
-	return (T)t_region;
-t_country;
 }
  }

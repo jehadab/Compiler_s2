@@ -27,263 +27,39 @@ import Java.SymbolTable.Column;
 import Java.SymbolTable.Type; 
 import java.util.HashSet;
 import java.util.Set;
- public class colors implements Cloneable {
-  	public String    color ;
-  	public String    name ;
-  	public double    id ;
-  	public String    name ;
-  	public region    region ;
-  	public country    country ;
-  	public String    name ;
-  	public double    id ;
-  	public city    ci ;
-  	public double    id ;
-  	public String    value ;   
- 	 public void setcolor(String value){
- 	this.color  = value ; 
- 	} 
- 	 public void setname(String value){
- 	this.name  = value ; 
- 	} 
- 	 public void setid(double value){
- 	this.id  = value ; 
- 	} 
- 	 public void setname(String value){
- 	this.name  = value ; 
- 	} 
- 	 public void setregion(region value){
- 	this.region  = value ; 
- 	} 
- 	 public void setcountry(country value){
- 	this.country  = value ; 
- 	} 
- 	 public void setname(String value){
- 	this.name  = value ; 
- 	} 
- 	 public void setid(double value){
- 	this.id  = value ; 
- 	} 
- 	 public void setci(city value){
- 	this.ci  = value ; 
- 	} 
- 	 public void setid(double value){
- 	this.id  = value ; 
- 	} 
- 	 public void setvalue(String value){
- 	this.value  = value ; 
- 	}   
- 	 public String getcolor(){
- 	return color ;   
- 	} 
- 	 public String getname(){
- 	return name ;   
- 	} 
- 	 public double getid(){
- 	return id ;   
- 	} 
- 	 public String getname(){
- 	return name ;   
- 	} 
- 	 public region getregion(){
- 	return region ;   
- 	} 
- 	 public country getcountry(){
- 	return country ;   
- 	} 
- 	 public String getname(){
- 	return name ;   
- 	} 
- 	 public double getid(){
- 	return id ;   
- 	} 
- 	 public city getci(){
- 	return ci ;   
- 	} 
- 	 public double getid(){
- 	return id ;   
- 	} 
- 	 public String getvalue(){
- 	return value ;   
- 	}    
- 	String tablePath = "C:/Users/Dell/Desktop/Final/Data/Colors.json";
-	String tableType = "json"; 
+ public class colors implements Cloneable {       
 	static List<colors> entityObject  = new ArrayList<>();
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{ 
-	if(tableType == "json")
-	{
-	entityObject = readJsonFile();
-	}
-	else 
-	{
-	entityObject = readCsvFile();
-	}
-	}
+	
+	 colors objcolors = new colors();
+	 try{
+		entityObject.add((colors)objcolors.clone()); 
+ } 
+catch (CloneNotSupportedException c){
+			 c.printStackTrace();
+	 }
+  }
   
 	 public List<colors> readJsonFile(){
-	List<colors> result = new ArrayList<>();
-	FileReader fr = null;Gson json = new Gson();
-	try {
-	fr=new FileReader(tablePath);
-	}catch(FileNotFoundException e) {
-	e.printStackTrace();}
-	JsonReader reader = new JsonReader(fr);
-	JsonObject testing = json.fromJson(fr, JsonObject.class);
-	JsonElement json_ele = testing.get("colors");
-	JsonArray j = json_ele.getAsJsonArray();
-	for (int i = 0 ; i < j.size() ; i++ ) {
-	colors tableName = new colors();
-	if(j.get(i).getAsJsonObject().get("color") != null);
-	{
-	tableName.setcolor(j.get(i).getAsJsonObject().get("color").getAsString());
-	}
-	 if(j.get(i).getAsJsonObject().get("name") != null);
-	{
-	tableName.setname(j.get(i).getAsJsonObject().get("name").getAsString());
-	}
-	 if(j.get(i).getAsJsonObject().get("id") != null);
-	{
-	tableName.setid(j.get(i).getAsJsonObject().get("id").getAsDouble());
-	}
-	 if(j.get(i).getAsJsonObject().get("name") != null);
-	{
-	tableName.setname(j.get(i).getAsJsonObject().get("name").getAsString());
-	}
-	 if(j.get(i).getAsJsonObject().get("region") != null);
-	{
-	if (j.get(i).getAsJsonObject().get("region").isJsonObject() == true)
-	{
-	}
-	}
-	 if(j.get(i).getAsJsonObject().get("country") != null);
-	{
-	if (j.get(i).getAsJsonObject().get("country").isJsonObject() == true)
-	{
-	}
-	}
-	 if(j.get(i).getAsJsonObject().get("name") != null);
-	{
-	tableName.setname(j.get(i).getAsJsonObject().get("name").getAsString());
-	}
-	 if(j.get(i).getAsJsonObject().get("id") != null);
-	{
-	tableName.setid(j.get(i).getAsJsonObject().get("id").getAsDouble());
-	}
-	 if(j.get(i).getAsJsonObject().get("ci") != null);
-	{
-	if (j.get(i).getAsJsonObject().get("ci").isJsonObject() == true)
-	{
-	}
-	}
-	 if(j.get(i).getAsJsonObject().get("id") != null);
-	{
-	tableName.setid(j.get(i).getAsJsonObject().get("id").getAsDouble());
-	}
-	 if(j.get(i).getAsJsonObject().get("value") != null);
-	{
-	tableName.setvalue(j.get(i).getAsJsonObject().get("value").getAsString());
-	}
-	 result.add(tableName);
-	}
-	return result;
+	return null;
+	
 	 }public List<colors> readCsvFile() throws IOException{
-	List<colors> result = new ArrayList<>(); 
-	BufferedReader csvReader = null;
-	String[] data = new String[0];
-	File csvFile = new File("C:/Users/Dell/Desktop/Final/Data/Colors.json");
-	csvReader = new BufferedReader(new FileReader(csvFile));
-	if(csvFile.isFile())
-	{
-	 String row; 
-	colors classname = new colors();
-	CSVParser csvParser = new CSVParser(csvReader, CSVFormat.DEFAULT.withHeader( "color",    "name",    "id",    "name"    "region"    "country",    "name",    "id"    "ci",    "id",    "value"   ).withIgnoreHeaderCase().withTrim());
-	 for (CSVRecord csvRecord: csvParser)
-	{
-	if(csvRecord.get("color") != null){
-	classname.setcolor(csvRecord.get("color"));
+	return null;
 	}
-	if(csvRecord.get("name") != null){
-	classname.setname(csvRecord.get("name"));
-	}
-	if(csvRecord.get("id") != null){
-	classname.setid(Double.parseDouble(csvRecord.get("id")));
-	}
-	if(csvRecord.get("name") != null){
-	classname.setname(csvRecord.get("name"));
-	}
-	if(csvRecord.get("region") != null){
-	classname.setregion(new Object());
-	}
-	if(csvRecord.get("country") != null){
-	classname.setcountry(new Object());
-	}
-	if(csvRecord.get("name") != null){
-	classname.setname(csvRecord.get("name"));
-	}
-	if(csvRecord.get("id") != null){
-	classname.setid(Double.parseDouble(csvRecord.get("id")));
-	}
-	if(csvRecord.get("ci") != null){
-	classname.setci(new Object());
-	}
-	if(csvRecord.get("id") != null){
-	classname.setid(Double.parseDouble(csvRecord.get("id")));
-	}
-	if(csvRecord.get("value") != null){
-	classname.setvalue(csvRecord.get("value"));
-	}
-	}
-	 result.add(classname);
-	}
-	return result;}
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf(" %10s    %10s    %20s   %10s    %20s   %10s    %20s   %20s   %20s   %20s   %20s  " ,  "color" ,  "name" ,  "id" ,  "name"  "region"  "country" ,  "name" ,  "id"  "ci" ,  "id" ,  "value" ) ;	System.out.println();
+	System.out.printf("" , ) ;	System.out.println();
 
 	System.out.println("-----------------------------------------------------------------------------");
 	
 	for(colors obj:entityObject)
 	{
-	System.out.format("  %5s    %5s    %20s    %5s    %20s    %5s    %20s    %20s    %20s    %20s    %20s  " ,  obj.getcolor(), obj.getname(), obj.getid(),obj.getname() obj.getregion()  obj.getcountry(), obj.getname(),obj.getid()  obj.getci(), obj.getid(),obj.getvalue() );
+	System.out.format("" , );
 	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
-	}public <T> T get_table(JsonArray array)
+	}public <T> T get_types(JsonElement object)
 	{
-region t_region = new region();
-country t_country = new country();
-city t_ci = new city();
-for (int ii = 0; ii < array.size(); ii++)
-	{
-	if (array.get(ii).getAsJsonObject().get("name") != null)
-{
-	t_ci.setname(array.get(ii).getAsJsonObject().get("name").getAsString());
-	}
-	if (array.get(ii).getAsJsonObject().get("id") != null)
-{
-	t_ci.setid(array.get(ii).getAsJsonObject().get("id").getAsDouble());
-	}
-	if (array.get(ii).getAsJsonObject().get("name") != null)
-{
-	t_ci.setname(array.get(ii).getAsJsonObject().get("name").getAsString());
-	}
-	if (array.get(ii).getAsJsonObject().get("region") != null)
-{
-	}
-	if (array.get(ii).getAsJsonObject().get("country") != null)
-{
-	}
-	if (array.get(ii).getAsJsonObject().get("name") != null)
-{
-	t_ci.setname(array.get(ii).getAsJsonObject().get("name").getAsString());
-	}
-	if (array.get(ii).getAsJsonObject().get("id") != null)
-{
-	t_ci.setid(array.get(ii).getAsJsonObject().get("id").getAsDouble());
-	}
-	}
-	return (T)t_region;
-t_country;
-t_ci;
 }
  }
