@@ -4,5 +4,5 @@ create type city(id double, name String, country country);
 create table clubs(id double , name String , city city) type= "json" path= "src/Data/clubs.json";
 create aggregation function MAX("src/AggregationFunctions.jar",CommonAggregations,MAX,Double,[Double]);
 Func(){
-var y = select  MAX(id) from clubs ;
-}
+   var c = select MAX(id) from clubs where city.country.region in ("Asia","Africa");
+    print(c);}

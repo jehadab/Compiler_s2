@@ -81,7 +81,7 @@ import java.util.Set;
 	city city = new city();    city.setcountry(get_types(j.get(i).getAsJsonObject().get("city").getAsJsonObject().get("country").deepCopy()));
 	city.setname(j.get(i).getAsJsonObject().get("city").getAsJsonObject().get("name").getAsString());
 	city.setid(j.get(i).getAsJsonObject().get("city").getAsJsonObject().get("id").getAsDouble());
-	 this.city = city ;}
+	 tableName.city = city ;}
 	 if(j.get(i).getAsJsonObject().get("name") != null);
 	{
 	tableName.setname(j.get(i).getAsJsonObject().get("name").getAsString());

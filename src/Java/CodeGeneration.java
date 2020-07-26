@@ -1119,7 +1119,7 @@ public class CodeGeneration {
             "<endif>"+
             "<endif>" +
             "<endif>" +
-            "}> this.<col.column_name> = <col.column_name> ;"+
+            "}> tableName.<col.column_name> = <col.column_name> ;"+
             "\\}<\\n><\\t>" +
             "<endif>" +
             " }>" +
@@ -1149,25 +1149,6 @@ public class CodeGeneration {
 //               }
 //           }
 //       }
-
-
-       class WhereFullExpr{
-           public WhereExpr leftWhereExpr ;
-           public WhereExpr rightWhereExpr ;
-           public String operator;
-       }
-       class WhereExpr{
-           public String rightExpr;
-           public String operator;
-           public String tableName ;
-           public String columnName;
-           public WhereInExpr WhereInExpr;
-       }
-       class InExpr {
-            ArrayList<?> strings;
-       }
-
-
 
        String loadContent= ("statics ::= [\n" +
                "  \".equals(\": true,\n" +
@@ -1407,26 +1388,39 @@ public class CodeGeneration {
                                     if (select_core.getWhereExpr() != null) {
 
                                         if (select_core.getWhereExpr().getExpr().getLeft() != null) {
-                                             if(select_core.getWhereExpr().getExpr().getLeft().getTableName()!=null)
-                                            {
-                                                whereExpr.tableName = select_core.getWhereExpr().getExpr().getLeft().getTableName().getName() ;
+                                            if(select_core.getWhereExpr().getExpr().getLeft().getDataBaseName() != null){
+                                                whereExpr.tableName =  select_core.getTableOrSubQueryList().get(0).getTableName().getName();
+                                                String columnName = select_core.getWhereExpr().getExpr().getLeft().getDataBaseName().getName();
+                                                columnName =columnName.concat("." + select_core.getWhereExpr().getExpr().getLeft().getTableName().getName()) ;
+                                                columnName =columnName.concat("." + select_core.getWhereExpr().getExpr().getLeft().getColumnName().getName()) ;
+                                                columnName =columnName.concat(".region_name" ) ;
+                                                whereExpr.columnName = columnName ;
 
-                                            }else {
-                                                 whereExpr.tableName = select_core.getTableOrSubQueryList().get(0).getTableName().getName();
-                                             }
-                                            if (select_core.getWhereExpr().getExpr().getLeft().getColumnName() != null) {
-                                                whereExpr.columnName = select_core.getWhereExpr().getExpr().getLeft().getColumnName().getName() ;
-                                                left_side = select_core.getWhereExpr().getExpr().getLeft().getColumnName().getName();
-                                                //  System.out.println(" the left side will -----"+left_side);
                                             }
-                                            else if(select_core.getWhereExpr().getExpr().getLeft().getLiteral_value()!=null)
-                                            {
+                                            else {
+                                                if(select_core.getWhereExpr().getExpr().getLeft().getTableName()!=null)
+                                                {
+                                                    whereExpr.tableName = select_core.getWhereExpr().getExpr().getLeft().getTableName().getName() ;
+
+                                                }else {
+                                                    whereExpr.tableName = select_core.getTableOrSubQueryList().get(0).getTableName().getName();
+                                                }
+                                                if (select_core.getWhereExpr().getExpr().getLeft().getColumnName() != null) {
+                                                    whereExpr.columnName = select_core.getWhereExpr().getExpr().getLeft().getColumnName().getName() ;
+                                                    left_side = select_core.getWhereExpr().getExpr().getLeft().getColumnName().getName();
+
+                                                    //  System.out.println(" the left side will -----"+left_side);
+                                                }
+                                                else if(select_core.getWhereExpr().getExpr().getLeft().getLiteral_value()!=null)
+                                                {
 //                                                whereExpr.columnName = select_core.getWhereExpr().getExpr().getLeft().getColumnName().getName() ;
 
-                                                left_side=select_core.getWhereExpr().getExpr().getLeft().getLiteral_value().getReturnType();
+                                                    left_side=select_core.getWhereExpr().getExpr().getLeft().getLiteral_value().getReturnType();
 
+                                                }
+                                                else {  left_one= select_core.getWhereExpr().getExpr().getLeft();}
                                             }
-                                            else {  left_one= select_core.getWhereExpr().getExpr().getLeft();}
+
                                         }
                                         if (select_core.getWhereExpr().getExpr().getOp() != null) {
                                             operator = select_core.getWhereExpr().getExpr().getOp();

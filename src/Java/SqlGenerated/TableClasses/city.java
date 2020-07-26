@@ -55,7 +55,10 @@ import java.util.Set;
 	 city objcity = new city();
 	  List<clubs> clubsList = clubs.entityObject ;
   
-	 
+	  
+	   	  clubsList.removeIf(clubss -> !  Objects.equals( clubss.city.country.region.region_name , "Asia" ) && !Objects.equals( clubss.city.country.region.region_name , "Africa" ) ) ;  
+ 		 
+ 
 	for(int clubscounter = 0 ; clubscounter < clubsList.size(); clubscounter++){ 
 	 try{
 		 

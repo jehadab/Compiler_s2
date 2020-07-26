@@ -33,8 +33,8 @@ import java.util.Set;
  	 clubs tableclubs = new clubs(); 
 	 tableclubs.load();  Func(); }
   private static void Func()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{
-  clubs_AGGMAX y = new clubs_AGGMAX();
-  y.load();
+  clubs_AGGMAX c = new clubs_AGGMAX();
+  c.load();
         
  	}
  }
