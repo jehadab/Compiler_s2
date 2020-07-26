@@ -42,11 +42,11 @@ public class json_testing {
                         c.setT(get_types(nested_one.get(ii).getAsJsonObject().get("street").deepCopy()));
                     }
 
-                    if(nested_one.get(ii).getAsJsonObject().get("city").getAsJsonArray()!=null)
+                   }
+                        if(nested_one.get(ii).getAsJsonObject().get("city").getAsJsonArray()!=null)
                     {
 
-                    }
-                    emplo.setCc(c);
+                 emplo.setCc(c);
 
                 }*/
                 }
@@ -57,7 +57,6 @@ public class json_testing {
                     t.setT(get_types(j.get(i).getAsJsonObject().get("twon").getAsJsonObject().get("street").deepCopy()));
                     System.out.println("we ahould refinde it here "+j.get(i).getAsJsonObject().get("twon").getAsJsonObject().get("street"));
                     emplo.setC(t);
-
                 }
             if(j.get(i).getAsJsonObject().get("id")!=null)
                 emplo.setId(j.get(i).getAsJsonObject().get("id").getAsInt());

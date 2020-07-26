@@ -8,9 +8,45 @@ public class Column {
     private String Typeboolean ;
     private String LastColumn ;
     private String FirstColumn ;
+    private String TypeObject;
+    private String ParentTable;
+    private String grandParant1;
+    private String grandParant2;
+
+    public String getGrandParant1() {
+        return grandParant1;
+    }
+
+    public void setGrandParant1(String grandParant1) {
+        this.grandParant1 = grandParant1;
+    }
+
+    public String getGrandParant2() {
+        return grandParant2;
+    }
+
+    public void setGrandParant2(String grandParant2) {
+        this.grandParant2 = grandParant2;
+    }
+
+    public String getParentTable() {
+        return ParentTable;
+    }
+
+    public void setParentTable(String parentTable) {
+        ParentTable = parentTable;
+    }
 
     public String getFirstColumn() {
         return FirstColumn;
+    }
+
+    public String getTypeObject() {
+        return TypeObject;
+    }
+
+    public void setTypeObject(String typeObject) {
+        TypeObject = typeObject;
     }
 
     public void setFirstColumn(String firstColumn) {
