@@ -1560,7 +1560,7 @@ K_INTO : I N T O;
 K_IS : I S;
 K_ISNULL : I S N U L L;
 K_JOIN : J O I N;
-K_KEY : K E Y;
+//K_KEY : K E Y;
 K_LEFT : L E F T;
 K_LIKE : L I K E;
 K_LIMIT : L I M I T;

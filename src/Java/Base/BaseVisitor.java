@@ -3638,7 +3638,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                             {
                                 Column col = columns.next();
                                 typeName =  typeName.concat("_"+col.getColumn_name()) ;
-                                type.addColumns("$"+table.getTable_name()+"_"+col.getColumn_name(),col.getColumn_type());
+                                type.addColumns("$"+table.getTable_name()+"_COLL"+col.getColumn_name(),col.getColumn_type());
                             }
                         }
                     }
@@ -3689,7 +3689,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                                 if(table.getColumnMap().containsKey(colName) && resaultTableName.equals(table.getTable_name())){
                                     Column col =  table.getColumnMap().get(colName);
                                     typeName = typeName.concat("_"+ selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(j).getExpr().getColumnName().getName());
-                                    type.addColumns("$"+table.getTable_name()+"_"+col.getColumn_name(),col.getColumn_type());
+                                    type.addColumns("$"+table.getTable_name()+"_COLL"+col.getColumn_name(),col.getColumn_type());
                                 }
                             }
                         }
@@ -3745,10 +3745,24 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
                             {
                                 Column col = columns.next();
                                 typeName =  typeName.concat("_"+col.getColumn_name()) ;
-                                type.addColumns("$"+table.getTable_name() + "_"+col.getColumn_name(),col.getColumn_type());
+                                type.addColumns("$"+table.getTable_name() + "_COLL"+col.getColumn_name(),col.getColumn_type());
                             }
                         }
                     }
+
+                }
+                else if(selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr().getFunction_name() != null){
+                    typeName = typeName.concat("_AGG"+ selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr().getFunction_name());
+                    String aggFuncName= selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr().getFunction_name();
+                    AggregationFunction aggregationFunction = new AggregationFunction();
+//                            System.err.println(Main.symbolTable.getAgg().size());
+                    for (int k = 0; k <Main.symbolTable.getAgg().size() ; k++) {
+                        if(Main.symbolTable.getAgg().get(k).getAggregationFunctionName().equals(aggFuncName)){
+                            aggregationFunction = Main.symbolTable.getAgg().get(k);
+                            break;
+                        }
+                    }
+                    type.addColumns(aggFuncName,aggregationFunction);
 
                 }
                 else if (selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr() != null){
@@ -3804,7 +3818,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
 //                        Table table = currentScope.getTableMap().get(selectFactoredStmt.getSelect_core().getJoin_clause().getTableOrSubQueryList().get(indexOfTable).getTableName().getName());
                         String colName = selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr().getColumnName().getName();
                         String resaultTableName = table.getTable_name();
-//                        System.err.println(table.getTable_name());
+                        System.err.println("hiiiiiii: "+table.getTable_name());
 //                        System.err.println(colName);
 //                        System.err.println(indexOfTable);
                         if(selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr().getTableName() != null){
@@ -3813,7 +3827,7 @@ public boolean  Check_From_ShortCut_Type(Shortcut_Statments short_cut ){
 
                         if(table.getColumnMap().containsKey(colName) ){
                             Column col =  table.getColumnMap().get(colName);
-                            type.addColumns("$"+table.getTable_name() + "_"+col.getColumn_name(),col.getColumn_type());
+                            type.addColumns("$"+table.getTable_name() + "_COLL"+col.getColumn_name(),col.getColumn_type());
                             typeName = typeName.concat("$"+table.getTable_name());
                             typeName= typeName.concat("_"+selectFactoredStmt.getSelect_core().getReslult_cloumnList().get(i).getExpr().getColumnName().getName());
 

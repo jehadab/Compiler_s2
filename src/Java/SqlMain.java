@@ -1,5 +1,5 @@
 package Java;
- import Java.SqlGenerated.TableClasses.colors_AGGCOUNT_AGGMAX; import Java.SqlGenerated.TableClasses.songs; import Java.SqlGenerated.TableClasses.countries; import Java.SqlGenerated.TableClasses.colors;   
+ import Java.SqlGenerated.TableClasses._AGGMAX; import Java.SqlGenerated.TableClasses.songs; import Java.SqlGenerated.TableClasses.clubs; import Java.SqlGenerated.TableClasses.colors1; import Java.SqlGenerated.TableClasses.countries; import Java.SqlGenerated.TableClasses.colors;   
  
 import java.util.List;
 import org.apache.commons.csv.CSVFormat;
@@ -32,13 +32,17 @@ import java.util.Set;
 	public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException { 
  	 songs tablesongs = new songs(); 
 	 tablesongs.load(); 
+ 	 clubs tableclubs = new clubs(); 
+	 tableclubs.load(); 
+ 	 colors1 tablecolors1 = new colors1(); 
+	 tablecolors1.load(); 
  	 countries tablecountries = new countries(); 
 	 tablecountries.load(); 
  	 colors tablecolors = new colors(); 
 	 tablecolors.load();  Func(); }
   private static void Func()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{
-  colors_AGGCOUNT_AGGMAX y = new colors_AGGCOUNT_AGGMAX();
-  y.load();
+  _AGGMAX cl = new _AGGMAX();
+  cl.load();
         
  	}
  }

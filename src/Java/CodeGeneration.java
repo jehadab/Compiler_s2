@@ -62,7 +62,7 @@ import java.nio.file.FileSystem;
 public class CodeGeneration {
     Parse parse ;
 //        private volatile boolean compiled = false;
-    public  void run(Parse p ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
+    public void run(Parse p ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException, URISyntaxException, NoSuchMethodException, InvocationTargetException {
         for (Type typ :Main.symbolTable.getDeclaredTypes()) {
 //           the type is table and have path and typeExtension
             String typeName = typ.getName();
@@ -88,20 +88,15 @@ public class CodeGeneration {
 //                    compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
 //                }
 //            }
+
             this.parse = p ;
 
-            if(p.getFunctions().get(0) != null ){//make sure there is function
-                if(p.getFunctions().get(0).getBody().getInstructions() != null){//make sure there is instructions
-                    for (Object obj:p.getFunctions().get(0).getBody().getInstructions()
-                            ) {
-                        if(obj instanceof gneralcreating)//what is to cast
-                        {
-                            gneralcreating generalcreate =(gneralcreating) obj;
+
                             String className  = returnTableName(typ);
                             ArrayList<Column> columnList = returnTableColumn(typ);
                             String classPath = returnTablePath(typ);
                             String classExtension = returnTableExtension(typ);
-                            createClassType(className,columnList,classPath,classExtension,generalcreate);
+                            createClassType(className,columnList,classPath,classExtension);
 
 
                         }
@@ -115,9 +110,9 @@ public class CodeGeneration {
 //                                    }
 //                                }
 //                            }
-                        }
-                    }
-                }
+
+
+
                 //compiled = compileClasses(className,"src/Java/SqlGenerated/TableClasses/");
                 //loadClasses(className,"SqlGenerated/TableClasses/","Java.SqlGenerated.TableClasses");
 
@@ -129,9 +124,9 @@ public class CodeGeneration {
 //            if( == 0){
 ////                runIt(className);
 //            }A
-        }
+
             createMainClass(p.getFunctions());
-            // compileClasses("SqlMain","src/Java/SqlGenerated/TableClasses/");
+//             compileClasses("SqlMain","src/Java/SqlGenerated/TableClasses/");
 //            if(compiled){
 //                Class compiledClass= loadClasses("SqlMain","src/Java/SqlGenerated/TableClasses/","src.Java.SqlGenerated.TableClasses");
 //                invokeMethod("Main",compiledClass);
@@ -273,7 +268,7 @@ public class CodeGeneration {
     }
     private  void createClassType(String className ,
                                            List<Column> columnArrayList, String tablePath
-            , String tableType,gneralcreating generalcreating) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
+            , String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
         ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
         ArrayList<Column> columns = new ArrayList<>();
@@ -281,6 +276,8 @@ public class CodeGeneration {
         List<AggrAndColums>aggrAndColumsArrayList = new ArrayList<>();
         ArrayList<TablesInQuery> tablesInQueryArrayList = new ArrayList<>();
         ArrayList<WhereFullExpr>whereFullExprArrayList = new ArrayList<>();
+        ArrayList<JoinClause> joinClauseArrayList = new ArrayList<>();
+
         for (Column col:columnArrayList
              ) {
 //            System.err.println("sssssssssssssssssssssssssssss "+col.getColumn_name());
@@ -311,8 +308,15 @@ public class CodeGeneration {
                 columns.add(col);
             }
         }
-        Select_Core select_core =  generalcreating.getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core();
-        ArrayList<JoinClause> joinClauseArrayList = new ArrayList<>();
+
+        if(parse.getFunctions().get(0) != null ){//make sure there is function
+            if(parse.getFunctions().get(0).getBody().getInstructions() != null){//make sure there is instructions
+                for (Object obj:parse.getFunctions().get(0).getBody().getInstructions()
+                        ) {
+                    if(obj instanceof gneralcreating)//what is to cast
+                    {
+        Select_Core select_core =  ((gneralcreating)obj).getWithassign().getVar_wiht_assign().getVar().getFactored().getSelect_core();
+//                      getVariableType  (((gneralcreating)obj).getWithassign().getVar_wiht_assign().getVar().getVariable_with_opretor().get(0).getVariable_name(),functionDeclaration.get(0).getHeader().getName()+"_0");
         if(select_core.getJoin_clause() != null ){
             for (int i = 0; i < select_core.getJoin_clause().getJoin_opreatorList().size(); i++) {
                 JoinClause joinClause = new JoinClause();
@@ -343,11 +347,31 @@ public class CodeGeneration {
 
                     }
                 }
+
                 joinClauseArrayList.add(joinClause);
 
             }
             for (int i = 0; i <select_core.getJoin_clause().getTableOrSubQueryList().size() ; i++) {
                 tablesInQueryArrayList.add(getTableColumns(select_core.getJoin_clause().getTableOrSubQueryList().get(i).getTableName().getName()));
+            }
+            for (int i = 0; i < select_core.getReslult_cloumnList().size(); i++)
+                if(select_core.getReslult_cloumnList().get(i).getExpr() != null)
+            {
+                if(select_core.getReslult_cloumnList().get(i).getExpr().getFunction_name() != null)
+                {
+                    if(!aggrAndColumsArrayList.isEmpty()){
+
+                        AggrAndColums aggrAndColums = aggrAndColumsArrayList.get(aggrAndColumsArrayList.size() - i -1 );
+                        aggrAndColums.columnName =  select_core.getReslult_cloumnList().get(i).getExpr().getColumnName().getName();
+                        if(select_core.getReslult_cloumnList().get(i).getExpr().getTableName() != null)
+                        {
+                            aggrAndColums.tableName =  select_core.getReslult_cloumnList().get(i).getExpr().getTableName().getName();
+                        }else {
+                            aggrAndColums.tableName=  select_core.getJoin_clause().getTableOrSubQuery().getTableName().getName();
+                        }
+                    }
+
+                }
             }
 //            System.out.println(tablesInQueryArrayList);
         }
@@ -376,12 +400,12 @@ public class CodeGeneration {
                     tablesInQueryArrayList.add(getTableColumns(select_core.getTableOrSubQueryList().get(i).getTableName().getName()));
                 }
             }
-        }
+        }}}}}
         whereFullExprArrayList =  where_function(parse);
 
 
         String packagePath = "Java.SqlGenerated.TableClasses";
-        String stringTemplate = StringForCreateCurrentType(generalcreating);
+        String stringTemplate = StringForCreateCurrentType();
 
         STGroup stGroup = new STGroupString(stringTemplate);
         ST header = stGroup.getInstanceOf("header");
@@ -670,7 +694,7 @@ public class CodeGeneration {
         return stringTemplate;
     }
 
-    public  String StringForCreateCurrentType(gneralcreating gneralcreating){
+    public  String StringForCreateCurrentType(){
         String  stringTemplate =
                 (
                 "header(name,packagePath)  ::=<< package <packagePath>; <\\n>" +
@@ -707,7 +731,7 @@ public class CodeGeneration {
                         setterAndGetterFunction()+
                         printContentFunction() +
                         readFileCsvFunction()+
-                        loadContent(gneralcreating)+
+                        loadContent()+
                         "EOF()::=<< <\\n> " +
                         "}>>"
         );
@@ -847,7 +871,7 @@ public class CodeGeneration {
             "<\\n><\\t> }>>" ;
             return str;
    }
-   private String loadContent(gneralcreating generalcreate) {
+   private String loadContent() {
 
 //       if(generalcreate.getWithassign() !=null)//create with assign
 //       {
@@ -900,16 +924,18 @@ public class CodeGeneration {
                         "<if(whereExpr.leftWhereExpr.whereInExpr)> " +
                         " <whereExpr.leftWhereExpr.operator> <whereExpr.leftWhereExpr.tableName>s.<whereExpr.leftWhereExpr.columnName> , <whereExpr.leftWhereExpr.whereInExpr.inExpr1> ) && !<whereExpr.leftWhereExpr.operator> <whereExpr.leftWhereExpr.tableName>s.<whereExpr.leftWhereExpr.columnName> , <whereExpr.leftWhereExpr.whereInExpr.inExpr2> ) ) ;" +
                         "<else>" +
-                        "<whereExpr.leftWhereExpr.tableName>s.<whereExpr.leftWhereExpr.columnName> <whereExpr.leftWhereExpr.operator> <whereExpr.leftWhereExpr.rightExpr>)) <if(statics.(whereExpr.leftWhereExpr.operator))> ) <endif> ; <\\n>" +
+                        "(<whereExpr.leftWhereExpr.tableName>s.<whereExpr.leftWhereExpr.columnName> <whereExpr.leftWhereExpr.operator> <whereExpr.leftWhereExpr.rightExpr>)) <if(statics.(whereExpr.leftWhereExpr.operator))> ) <endif> ; <\\n>" +
                         "<endif>" +
                "<endif>  <\\n> " +
                 "<\\t><\\t> <\\n>" +
                 " }>" +
+                "<tablesInQuery:{ tableInQ| " +
+                "<\\n><\\t>for(int <tableInQ.tableName>counter = 0 ; <tableInQ.tableName>counter \\< <tableInQ.tableName>List.size(); <tableInQ.tableName>counter++){" +
+                "}>" +
                 "<columns:{ col| " +
-                "<\\n><\\t>for(int <col.tableName>counter = 0 ; <col.tableName>counter \\< <col.tableName>List.size(); <col.tableName>counter++){" +
                 "<col.columns:{innerCol| <\\n><\\t><\\t> obj<className>.<innerCol.thisColumn.column_name> = <innerCol.tableName>List.get(<col.tableName>counter).<innerCol.columnName>; }>" +
                 "<\\n><\\t><\\t>"+
-                "}>" +
+                "}> " +
                 "<\\n><\\t> try{" +
                 "<\\n><\\t><\\t><joinClause:{ joinCondition | if(  <joinCondition.leftTableName>List.get(<joinCondition.leftTableName>counter).<joinCondition.leftColumnName>" +
                 "== <joinCondition.rightTableName>List.get(<joinCondition.rightTableName>counter).<joinCondition.rightColumnName>  ) }> <\\n>" +
@@ -918,6 +944,7 @@ public class CodeGeneration {
                 "<\\t><\\t><\\t> c.printStackTrace();<\\n>" +
                 "<\\t> }<\\n>"+
                 "<\\n>"+
+                " <tablesInQuery:{ col| \\} }>"  +
                 "<\\t><\\t> <aggrAndColums :{ agg |" +
                "<if(agg.isCount)>" +
                "List\\<<agg.tableName>\\> <agg.aggregationFunction.returnType>s = new ArrayList\\<>() ;<\\n>" +
@@ -928,7 +955,6 @@ public class CodeGeneration {
                "<endif>" +
                 "<\\t><\\t> _AGG<agg.aggregationFunction.MethodName> = <agg.aggregationFunction.MethodName>(<agg.aggregationFunction.returnType>s);<\\n>" +
                 "<\\t><\\t> System.out.println(_AGG<agg.aggregationFunction.MethodName>); <\\n> }>" +
-                " <columns:{ col| \\} }>"  +
 //                "<\\n><\\t>Field tableField[] ="+tableName+".getClass().getFields();" +
 //                String  leftTableName;
 //       String LeftColumnName;
@@ -1043,7 +1069,7 @@ public class CodeGeneration {
                  Columns columnsInTable = new Columns();
 
                  if(col.getColumn_name().contains("$")){
-                    names = col.getColumn_name().substring(1).split("_");
+                    names = col.getColumn_name().substring(1).split("_COLL");
                     columnsInTable.tableName = names[0];
                      boolean found = false;
                      columnsInTable.thisColumn = col;
