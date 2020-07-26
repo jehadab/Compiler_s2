@@ -1,0 +1,44 @@
+{
+    "colors1": [
+        {
+            "id1": 1,
+            "color1": "red",
+            "value1": "#f00"
+        },
+        {
+            "id1": 2,
+            "color1": "green",
+            "value1": "#0f0"
+        },
+        {
+            "id1": 3,
+            "color1": "blue",
+            "value1": "#00f"
+        },
+        {
+            "id1": 4,
+            "color1": "cyan",
+            "value1": "#0ff"
+        },
+        {
+            "id1": 5,
+            "color1": "magenta",
+            "value1": "#f0f"
+        },
+        {
+            "id1": 6,
+            "color1": "yellow",
+            "value1": "#ff0"
+        },
+        {
+            "id1": 7,
+            "color1": "black",
+            "value1": "#000"
+        },
+        {
+            "id1": 2008,
+            "color1": "white",
+            "value1": "#fff"
+        }
+    ]
+}
