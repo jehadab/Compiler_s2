@@ -101,9 +101,18 @@ import java.util.Set;
 	{
 	 String row; 
 	colors classname = new colors();
-	CSVParser csvParser = new CSVParser(csvReader, CSVFormat.DEFAULT.withHeader().withIgnoreHeaderCase().withTrim());
+	CSVParser csvParser = new CSVParser(csvReader, CSVFormat.DEFAULT.withHeader( "color",    "id",    "value"   ).withIgnoreHeaderCase().withTrim());
 	 for (CSVRecord csvRecord: csvParser)
 	{
+	if(csvRecord.get("color") != null){
+	classname.setcolor(csvRecord.get("color"));
+	}
+	if(csvRecord.get("id") != null){
+	classname.setid(Double.parseDouble(csvRecord.get("id")));
+	}
+	if(csvRecord.get("value") != null){
+	classname.setvalue(csvRecord.get("value"));
+	}
 	}
 	 result.add(classname);
 	}
@@ -119,5 +128,8 @@ import java.util.Set;
 	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
-	}
+	}public <T> T get_types(JsonElement object)
+	{
+return null;
+}
  }

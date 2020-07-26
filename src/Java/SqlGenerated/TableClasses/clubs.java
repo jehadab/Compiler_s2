@@ -22,7 +22,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import Java.SymbolTable.Column;
 import Java.SymbolTable.Type; 
 import java.util.HashSet;
@@ -49,7 +49,7 @@ import java.util.Set;
  	 public double getid(){
  	return id ;   
  	}    
- 	String tablePath = "C:/Users/Dell/Desktop/Final02/02/clubs.json";
+ 	String tablePath = "src/Data/clubs.json";
 	String tableType = "json"; 
 	static List<clubs> entityObject  = new ArrayList<>();
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{ 
@@ -78,10 +78,10 @@ import java.util.Set;
 	clubs tableName = new clubs();
 	if (j.get(i).getAsJsonObject().get("city").isJsonObject() == true)
 	{
-	    city.setcountry(get_types(j.get(i).getAsJsonObject().get("city").getAsJsonObject().get("country").deepCopy()));
+	city city = new city();    city.setcountry(get_types(j.get(i).getAsJsonObject().get("city").getAsJsonObject().get("country").deepCopy()));
 	city.setname(j.get(i).getAsJsonObject().get("city").getAsJsonObject().get("name").getAsString());
 	city.setid(j.get(i).getAsJsonObject().get("city").getAsJsonObject().get("id").getAsDouble());
-	}
+	 this.city = city ;}
 	 if(j.get(i).getAsJsonObject().get("name") != null);
 	{
 	tableName.setname(j.get(i).getAsJsonObject().get("name").getAsString());
@@ -97,7 +97,7 @@ import java.util.Set;
 	List<clubs> result = new ArrayList<>(); 
 	BufferedReader csvReader = null;
 	String[] data = new String[0];
-	File csvFile = new File("C:/Users/Dell/Desktop/Final02/02/clubs.json");
+	File csvFile = new File("src/Data/clubs.json");
 	csvReader = new BufferedReader(new FileReader(csvFile));
 	if(csvFile.isFile())
 	{
@@ -122,33 +122,12 @@ import java.util.Set;
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf("%10s " ,"name");
-System.out.printf("%10s " ,"id");
-System.out.printf("%10s " ,"name");
-System.out.printf("%10s " ,"region");
-System.out.printf("%10s " ,"country");
-System.out.printf("%10s " ,"name");
-System.out.printf("%10s " ,"id");
-System.out.printf("%10s " ,"city");
-System.out.printf("%10s " ,"name");
-System.out.printf("%10s " ,"id");
-	System.out.println();
+	System.out.printf("%30s %30s %30s " ,  "city" ,  "name" ,  "id" ) ;	System.out.println();
 
-	System.out.println("-----------------------------------------------------------------------------");
-	
 	for(clubs obj:entityObject)
 	{
-	System.out.format(" %10s " , obj.getname());
-	 System.out.format(" %10s " , obj.getid());
-	 System.out.format(" %10s " , obj.getname());
-//	 System.out.format(" %10s " , obj.getregion());
-//	 System.out.format(" %10s " , obj.getcountry());
-	 System.out.format(" %10s " , obj.getname());
-	 System.out.format(" %10s " , obj.getid());
-	 System.out.format(" %10s " , obj.getcity());
-	 System.out.format(" %10s " , obj.getname());
-	 System.out.format(" %10s " , obj.getid());
-	 System.out.println();
+	System.out.format("%30s %30s %30s " , obj.getcity(),obj.getname(),obj.getid());
+	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
 	}public <T> T get_types(JsonElement object)
@@ -170,10 +149,10 @@ if (object.getAsJsonObject().get("region") != null){
 country.setregion(get_types(object.getAsJsonObject().get("region").deepCopy()));
 fill_country_region = true ; 
 }
-boolean fill_region_name = false ; 
-if (object.getAsJsonObject().get("name") != null){
-region.setname(object.getAsJsonObject().get("name").getAsString());
-fill_region_name = true ; 
+boolean fill_region_region_name = false ; 
+if (object.getAsJsonObject().get("region_name") != null){
+region.setregion_name(object.getAsJsonObject().get("region_name").getAsString());
+fill_region_region_name = true ; 
 }
 if(fill_country_name)
 return (T) country;
@@ -181,7 +160,7 @@ if(fill_country_id)
 return (T) country;
 if(fill_country_region)
 return (T) country;
-if(fill_region_name)
+if(fill_region_region_name)
 return (T) region;
 return null;
 }

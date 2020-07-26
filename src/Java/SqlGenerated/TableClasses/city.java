@@ -22,7 +22,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import Java.SymbolTable.Column;
 import Java.SymbolTable.Type; 
 import java.util.HashSet;
@@ -53,13 +53,20 @@ import java.util.Set;
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{ 
 	
 	 city objcity = new city();
+	  List<clubs> clubsList = clubs.entityObject ;
+  
+	 
+	for(int clubscounter = 0 ; clubscounter < clubsList.size(); clubscounter++){ 
 	 try{
-		entityObject.add((city)objcity.clone()); 
+		 
+
+			entityObject.add((city)objcity.clone()); 
  } 
 catch (CloneNotSupportedException c){
 			 c.printStackTrace();
 	 }
-  }
+
+ } 		  }
   
 	 public List<city> readJsonFile(){
 	return null;
@@ -70,38 +77,23 @@ catch (CloneNotSupportedException c){
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf("%10s " ,"name");
-System.out.printf("%10s " ,"id");
-System.out.printf("%10s " ,"name");
-System.out.printf("%10s " ,"region");
-System.out.printf("%10s " ,"country");
-System.out.printf("%10s " ,"name");
-System.out.printf("%10s " ,"id");
-	System.out.println();
+	System.out.printf("%30s %30s %30s " ,  "country" ,  "name" ,  "id" ) ;	System.out.println();
 
-	System.out.println("-----------------------------------------------------------------------------");
-	
 	for(city obj:entityObject)
 	{
-	System.out.format(" %10s " , obj.getname());
-	 System.out.format(" %10s " , obj.getid());
-	 System.out.format(" %10s " , obj.getname());
-	 System.out.format(" %10s " , obj.getregion());
-	 System.out.format(" %10s " , obj.getcountry());
-	 System.out.format(" %10s " , obj.getname());
-	 System.out.format(" %10s " , obj.getid());
-	 System.out.println();
+	System.out.format("%30s %30s %30s " , obj.getcountry(),obj.getname(),obj.getid());
+	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
 	}public <T> T get_types(JsonElement object)
 	{
 region region = new region();
-	boolean fill_region_name = false ; 
-if (object.getAsJsonObject().get("name") != null){
-region.setname(object.getAsJsonObject().get("name").getAsString());
-fill_region_name = true ; 
+	boolean fill_region_region_name = false ; 
+if (object.getAsJsonObject().get("region_name") != null){
+region.setregion_name(object.getAsJsonObject().get("region_name").getAsString());
+fill_region_region_name = true ; 
 }
-if(fill_region_name)
+if(fill_region_region_name)
 return (T) region;
 return null;
 }

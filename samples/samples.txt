@@ -1,24 +1,8 @@
-create table songs(initials String,track_id String, artist_name String, title String, loudness double, tempo double, time_signature double, key double,mode double,duration double, year double) type= "csv" path= "src/Data/songs.csv";
-create table colors(id double, color String, value String) type="json"  path= "src/Data/colors.json";
-create table colors1(id1 double, color1 String, value1 String) type="json"  path= "src/Data/colors1.json";
-
-
-
-
-create table clubs (id double,name String) type='json' path='src/Data/clubs.json';
-
-create table countries(id double, name String, code String, post_code String, region String) type="json" , path= "src/Data/countries.json";
-
+create type region(region_name String);
+create type country(id double, name String, region region);
+create type city(id double, name String, country country);
+create table clubs(id double , name String , city city) type= "json" path= "src/Data/clubs.json";
 create aggregation function MAX("src/AggregationFunctions.jar",CommonAggregations,MAX,Double,[Double]);
-create aggregation function AVG("src/AggregationFunctions.jar",CommonAggregations,AVG,Double,[Double]);
-create aggregation function COUNT("src/AggregationFunctions.jar",CommonAggregations,COUNT,Integer,[Double]);
-
-
-  Func(){
-
-
-    var cl = select MAX(id) from colors inner join colors1 on colors1.id1 = colors.id where colors.id <= 5 ;
-        print(cl);
-
-
+Func(){
+var y = select  MAX(id) from clubs ;
 }

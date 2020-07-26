@@ -10,7 +10,7 @@
 					"id": 1,
 					"name": "Spain",
 					"region": {
-						"name": "Europe"
+						"region_name": "Europe"
 					}
 				}
 			}
@@ -25,7 +25,7 @@
 					"id": 1,
 					"name": "England",
 					"region": {
-						"name": "Europe"
+						"region_name": "Europe"
 					}
 				}
 			}
@@ -40,7 +40,7 @@
 					"id": 1,
 					"name": "England",
 					"region": {
-						"name": "Europe"
+						"region_name": "Europe"
 					}
 				}
 			}
@@ -55,7 +55,7 @@
 					"id": 1,
 					"name": "Syria",
 					"region": {
-						"name": "Asia"
+						"region_name": "Asia"
 					}
 				}
 			}
@@ -70,7 +70,7 @@
 					"id": 1,
 					"name": "Egypt",
 					"region": {
-						"name": "Africa"
+						"region_name": "Africa"
 					}
 				}
 			}
@@ -85,17 +85,10 @@
 					"id": 1,
 					"name": "USA",
 					"region": {
-						"name": "America"
+						"region_name": "America"
 					}
 				}
 			}
-		},
-		{
-			"id": 6,
-			"name": "Spain",
-			"code": "ES",
-			"post_code": "+34",
-			"region": "Europe"
 		}
 	]
 }

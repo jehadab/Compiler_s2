@@ -22,7 +22,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import Java.SymbolTable.Column;
 import Java.SymbolTable.Type; 
 import java.util.HashSet;
@@ -53,13 +53,20 @@ import java.util.Set;
  	public void load() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{ 
 	
 	 country objcountry = new country();
+	  List<clubs> clubsList = clubs.entityObject ;
+  
+	 
+	for(int clubscounter = 0 ; clubscounter < clubsList.size(); clubscounter++){ 
 	 try{
-		entityObject.add((country)objcountry.clone()); 
+		 
+
+			entityObject.add((country)objcountry.clone()); 
  } 
 catch (CloneNotSupportedException c){
 			 c.printStackTrace();
 	 }
-  }
+
+ } 		  }
   
 	 public List<country> readJsonFile(){
 	return null;
@@ -70,21 +77,12 @@ catch (CloneNotSupportedException c){
 	 public void printContentFunction()
 	{
 	System.out.println("-----------------------------------------------------------------------------");
-	System.out.printf("%10s " ,"name");
-System.out.printf("%10s " ,"id");
-System.out.printf("%10s " ,"name");
-System.out.printf("%10s " ,"region");
-	System.out.println();
+	System.out.printf("%30s %30s %30s " ,  "name" ,  "id" ,  "region" ) ;	System.out.println();
 
-	System.out.println("-----------------------------------------------------------------------------");
-	
 	for(country obj:entityObject)
 	{
-	System.out.format(" %10s " , obj.getname());
-	 System.out.format(" %10s " , obj.getid());
-	 System.out.format(" %10s " , obj.getname());
-	 System.out.format(" %10s " , obj.getregion());
-	 System.out.println();
+	System.out.format("%30s %30s %30s " , obj.getname(),obj.getid(),obj.getregion());
+	System.out.println();
 	}
 	System.out.println("-----------------------------------------------------------------------------");
 	}public <T> T get_types(JsonElement object)

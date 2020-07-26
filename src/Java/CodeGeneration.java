@@ -268,6 +268,9 @@ public class CodeGeneration {
 
     public ArrayList<Column> returnTableFlatColumn(Type typeclass){
         ArrayList<Column> columnList = new ArrayList<>();
+        if(typeclass.getName().contains("_AGG")){
+            return columnList;
+        }
         int l =  typeclass.getColumns().keySet().toArray().length;
         for (Object col:typeclass.getColumns().keySet().toArray() ) {
             Column column = new Column();
@@ -310,7 +313,7 @@ public class CodeGeneration {
     }
     private  void createClassType(String className ,
                                            List<Column> columnArrayList, String tablePath
-            , String tableType,gneralcreating generalcreating ) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
+            , String tableType) throws ClassNotFoundException, IllegalAccessException, InstantiationException, MalformedURLException, URISyntaxException {
 
         ArrayList<AggregationFunction> aggregationFunctionArrayList = new ArrayList<>();
         ArrayList<Column> columns = new ArrayList<>();
@@ -522,6 +525,8 @@ public class CodeGeneration {
         ST printContent = stGroup.getInstanceOf("printContent");
         printContent.add("className",className);
         printContent.add("columns",columns);
+        printContent.add("aggrAndColums",aggrAndColumsArrayList);
+
 
         ST getTypeFunction = stGroup.getInstanceOf("getTypeFunction");
         getTypeFunction.add("flatcolumns",flatColumn);
@@ -883,9 +888,10 @@ public class CodeGeneration {
     }
 
     public String printContentFunction(){
-        String str = "printContent(className,columns)::=<<" +
+        String str = "printContent(className,columns,aggrAndColums)::=<<" +
                 "<\\n><\\t> public void printContentFunction()<\\n><\\t>" +
                 "{<\\n><\\t>" +
+                "<if(columns)>" +
                 "System.out.println(\"-----------------------------------------------------------------------------\");<\\n><\\t>" +
                 "System.out.printf(\"<columns:{col | %30s }>\" , <columns:{col |<if(col.LastColumn)> \"<col.column_name>\" <else> \"<col.column_name>\" , <endif>}>) ;" +
                 "<\\t>System.out.println();<\\n>"+
@@ -897,7 +903,11 @@ public class CodeGeneration {
                 "System.out.println();<\\n><\\t>" +
                 "}<\\n><\\t>" +
                 "System.out.println(\"-----------------------------------------------------------------------------\");<\\n><\\t>" +
+                "<else>" +
+                " <aggrAndColums:{ agg | System.out.println(_AGG<agg.aggregationFunction.MethodName>) ; }> " +
+                "<endif>" +
                 "}" +
+                "" +
                 ">>";
         return str;
     }
@@ -1085,7 +1095,7 @@ public class CodeGeneration {
             "<if(col.TypeObject)>" +
             "if (j.get(i).getAsJsonObject().get(\"<col.column_name>\").isJsonObject() == true)<\\n><\\t>" +
             "{<\\n><\\t>" +
-//            "<col.column_type.name> <col.column_name> = new <col.column_type.name>();" +
+            "<col.column_type.name> <col.column_name> = new <col.column_type.name>();" +
             "<flatcolumns:{flcol |" +
             "<if(flcol.ParentTable)>" +
             "<if(flcol.grandParant1)>" +
@@ -1109,7 +1119,7 @@ public class CodeGeneration {
             "<endif>"+
             "<endif>" +
             "<endif>" +
-            "}>"+
+            "}> this.<col.column_name> = <col.column_name> ;"+
             "\\}<\\n><\\t>" +
             "<endif>" +
             " }>" +
