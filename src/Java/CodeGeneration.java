@@ -380,7 +380,7 @@ public class CodeGeneration {
 
         ST printContent = stGroup.getInstanceOf("printContent");
         printContent.add("className",className);
-        printContent.add("columns",columns);
+        printContent.add("flatColumns",flatColumn);
 
         ST getTypeFunction = stGroup.getInstanceOf("getTypeFunction");
         getTypeFunction.add("flatcolumns",flatColumn);
@@ -712,7 +712,7 @@ public class CodeGeneration {
                 "<if(col.TypeString)>" +
                 "csvRecord.get(\"<col.column_name>\"));" +
                 "<endif>" +
-                "<if(col.TypeObject)>new Object());<endif>" +
+                "<if(col.TypeObject)><col.column_name>);<endif>" +
                 "<\\n><\\t>" +
                 "\\}<\\n><\\t>" +
                 "}>" +
@@ -729,19 +729,21 @@ public class CodeGeneration {
     }
 
     public String printContentFunction(){
-        String str = "printContent(className,columns)::=<<" +
+        String str = "printContent(className,flatColumns)::=<<" +
                 "<\\n><\\t> public void printContentFunction()<\\n><\\t>" +
                 "{<\\n><\\t>" +
                 "System.out.println(\"-----------------------------------------------------------------------------\");<\\n><\\t>" +
-                "System.out.printf(\"<columns:{col | <if(col.FirstColumn)> %10s <else> %20s<endif>  }>\" , <columns:{col |<if(col.LastColumn)> \"<col.column_name>\" <else> \"<col.column_name>\" , <endif>}>) ;" +
+                "<flatColumns:{flcol | " +
+                "System.out.printf(\"%10s \" ,\"<flcol.column_name>\");<\\n>" +
+                "}>" +
                 "<\\t>System.out.println();<\\n>"+
                 "<\\n><\\t>System.out.println(\"-----------------------------------------------------------------------------\");" +
                 "<\\n><\\t>"+
                 "<\\n><\\t>for(<className> obj:entityObject)<\\n><\\t>" +
                 "{<\\n><\\t>" +
-                "System.out.format(\"<columns:{col |  <if(col.FirstColumn)> %5s<else> %20s<endif>  }>\" , " +
-                "<columns:{col | <if(col.LastColumn)>obj.get<col.column_name>() <else> obj.get<col.column_name>(),<endif>}>" +
-                ");<\\n><\\t>" +
+                "<flatColumns:{flcol | " +
+                "System.out.format(\" %10s \" , obj.get<flcol.column_name>());<\\n><\\t>" +
+                " }>"+
                 "System.out.println();<\\n><\\t>" +
                 "}<\\n><\\t>" +
                 "System.out.println(\"-----------------------------------------------------------------------------\");<\\n><\\t>" +
@@ -754,7 +756,99 @@ public class CodeGeneration {
         String str = "getTypeFunction(flatcolumns)::=<<" +
                 "public \\<T> T get_types(JsonElement object)<\\n><\\t>" +
                 "{<\\n>" +
+                "<flatcolumns:{flcol |" +
+                "<if(flcol.ParentTable)>" +
+                "<if(flcol.TypeObject)>" +
+                "<flcol.column_type.name> <flcol.column_name> = new <flcol.column_type.name>();<\\n><\\t>" +
+               "<endif>"+
+                "<endif>" +
+                "}>" +
+                "" +
+                "<flatcolumns:{flcol |" +
+                "<if(flcol.grandParant1)>" +
+                "<if(flcol.grandParant2)>" +
+                "<else>" +
+                "boolean fill_<flcol.grandParant1>_<flcol.column_name> = false ; <\\n>" +
+                "<if(flcol.TypeObject)>" +
+                "if (object.getAsJsonObject().get(\"<flcol.column_name>\") != null)" +
+                "{<\\n>" +
+                "<flcol.grandParant1>.set<flcol.column_name>(get_types(object.getAsJsonObject().get(\"<flcol.column_name>\").deepCopy()));<\\n>" +
+                "fill_<flcol.grandParant1>_<flcol.column_name> = true ; <\\n>"+
+                "\\}<\\n>" +
+                "<else>" +
+                "if (object.getAsJsonObject().get(\"<flcol.column_name>\") != null)" +
+                "{<\\n>" +
+                "<flcol.grandParant1>.set<flcol.column_name>(object.getAsJsonObject().get(\"<flcol.column_name>\")." +
+                "<if(flcol.TypeNumber)>" +
+                "getAsDouble()" +
+                "<endif>"+
+                "<if(flcol.TypeString)>" +
+                "getAsString()" +
+                "<endif>"+
+                "<if(flcol.Typeboolean)>" +
+                "getAsBoolean()"+
+                "<endif>"+
+                ");<\\n>" +
+                "fill_<flcol.grandParant1>_<flcol.column_name> = true ; <\\n>" +
+                "\\}<\\n>" +
+                "<endif>" +
+                "<endif>" +
+                "<endif>" +
+                "}>" +
+                "<flatcolumns:{flcol |" +
+                "<if(flcol.grandParant2)>" +
+                "<if(flcol.TypeObject)>" +
+                "<else>" +
+                "boolean fill_<flcol.grandParant2>_<flcol.column_name> = false ; <\\n>" +
+                "if (object.getAsJsonObject().get(\"<flcol.column_name>\") != null)" +
+                "{<\\n>" +
+                "<flcol.grandParant2>.set<flcol.column_name>(object.getAsJsonObject().get(\"<flcol.column_name>\")." +
+                "<if(flcol.TypeNumber)>" +
+                "getAsDouble()" +
+                "<endif>"+
+                "<if(flcol.TypeString)>" +
+                "getAsString()" +
+                "<endif>"+
+                "<if(flcol.Typeboolean)>" +
+                "getAsBoolean()"+
+                "<endif>"+
+                ");<\\n>" +
+                "fill_<flcol.grandParant2>_<flcol.column_name> = true ; <\\n>" +
+                "\\}<\\n>" +
+                "<endif>" +
+                "<endif>" +
+                "}>" +
 
+                "<flatcolumns:{flcol |" +
+                "<if(flcol.grandParant1)>" +
+                "<if(flcol.grandParant2)>" +
+                "<else>" +
+                "if(fill_<flcol.grandParant1>_<flcol.column_name>)<\\n>" +
+                "return (T) <flcol.grandParant1>;<\\n>" +
+                "<endif>" +
+                "<endif>" +
+                "}>" +
+
+                "<flatcolumns:{flcol |" +
+                "<if(flcol.grandParant2)>" +
+                "if(fill_<flcol.grandParant2>_<flcol.column_name>)<\\n>" +
+                "return (T) <flcol.grandParant2>;<\\n>" +
+                "<endif>" +
+                "}>" +
+
+//                "<flatcolumns:{flcol |" +
+//                "<if(flcol.ParentTable)>" +
+//                "<if(flcol.TypeObject)>" +
+//                "" +
+//                "return (T) <flcol.column_name>;" +
+//                "<endif>" +
+//                "<endif>" +
+//                "}>" +
+
+
+
+
+                "return null;<\\n>"+
                 "}" +
                 ">>";
         return str;
@@ -848,6 +942,8 @@ public class CodeGeneration {
             " " +
             "<else>" +
             "<if(flcol.TypeObject)>" +
+            "<flcol.ParentTable>.set<flcol.column_name>(get_types(j.get(i).getAsJsonObject().get(\"<flcol.ParentTable>\").getAsJsonObject().get(\"<flcol.column_name>\").deepCopy()));" +
+            "<\\n><\\t>" +
             "<else>" +
             "<flcol.ParentTable>.set<flcol.column_name>(j.get(i).getAsJsonObject().get(\"<flcol.ParentTable>\").getAsJsonObject().get(\"<flcol.column_name>\")." +
             "<if(flcol.TypeNumber)>" +
