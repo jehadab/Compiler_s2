@@ -2016,6 +2016,7 @@ boolean seminticCheckForDuplicateColumnNameInTable(String columnName , String ta
         return_type t = new return_type();
         if (ctx.IDENTIFIER() != null) {
 
+
             System.out.println(" visite identifier " + ctx.IDENTIFIER().getSymbol().getText().toString());
 
             t.setTt(ctx.IDENTIFIER().getSymbol());

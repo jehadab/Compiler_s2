@@ -78,10 +78,7 @@ import java.util.Set;
 	clubs tableName = new clubs();
 	if (j.get(i).getAsJsonObject().get("city").isJsonObject() == true)
 	{
-	city city = new city();    city.setcountry(get_types(j.get(i).getAsJsonObject().get("city").getAsJsonObject().get("country").deepCopy()));
-	city.setname(j.get(i).getAsJsonObject().get("city").getAsJsonObject().get("name").getAsString());
-	city.setid(j.get(i).getAsJsonObject().get("city").getAsJsonObject().get("id").getAsDouble());
-	 tableName.city = city ;}
+	city city = new city(); tableName.city = city ;}
 	 if(j.get(i).getAsJsonObject().get("name") != null);
 	{
 	tableName.setname(j.get(i).getAsJsonObject().get("name").getAsString());
@@ -93,7 +90,7 @@ import java.util.Set;
 	 result.add(tableName);
 	}
 	return result;
-	 }public List<clubs> readCsvFile() throws IOException{
+	 }public List<clubs> readCsvFile() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{
 	List<clubs> result = new ArrayList<>(); 
 	BufferedReader csvReader = null;
 	String[] data = new String[0];
@@ -107,16 +104,16 @@ import java.util.Set;
 	 for (CSVRecord csvRecord: csvParser)
 	{
 	if(csvRecord.get("city") != null){
-	classname.setcity(city);
+	String h = csvRecord.get("city");if(!h.equals( "city")){classname.setcity(city);}
 	}
 	if(csvRecord.get("name") != null){
-	classname.setname(csvRecord.get("name"));
+	String h = csvRecord.get("name");if(!h.equals( "name")){classname.setname(csvRecord.get("name"));}
 	}
 	if(csvRecord.get("id") != null){
-	classname.setid(Double.parseDouble(csvRecord.get("id")));
+	String h = csvRecord.get("id");if(!h.equals( "id")){classname.setid(Double.parseDouble(csvRecord.get("id")));}
 	}
+	 result.add((clubs) classname.clone());;
 	}
-	 result.add(classname);
 	}
 	return result;}
 	 public void printContentFunction()
@@ -132,36 +129,6 @@ import java.util.Set;
 	System.out.println("-----------------------------------------------------------------------------");
 	}public <T> T get_types(JsonElement object)
 	{
-region region = new region();
-	country country = new country();
-	boolean fill_country_name = false ; 
-if (object.getAsJsonObject().get("name") != null){
-country.setname(object.getAsJsonObject().get("name").getAsString());
-fill_country_name = true ; 
-}
-boolean fill_country_id = false ; 
-if (object.getAsJsonObject().get("id") != null){
-country.setid(object.getAsJsonObject().get("id").getAsDouble());
-fill_country_id = true ; 
-}
-boolean fill_country_region = false ; 
-if (object.getAsJsonObject().get("region") != null){
-country.setregion(get_types(object.getAsJsonObject().get("region").deepCopy()));
-fill_country_region = true ; 
-}
-boolean fill_region_region_name = false ; 
-if (object.getAsJsonObject().get("region_name") != null){
-region.setregion_name(object.getAsJsonObject().get("region_name").getAsString());
-fill_region_region_name = true ; 
-}
-if(fill_country_name)
-return (T) country;
-if(fill_country_id)
-return (T) country;
-if(fill_country_region)
-return (T) country;
-if(fill_region_region_name)
-return (T) region;
 return null;
 }
  }

@@ -1,8 +1,14 @@
-create type region(region_name String);
-create type country(id double, name String, region region);
-create type city(id double, name String, country country);
-create table clubs(id double , name String , city city) type= "json" path= "src/Data/clubs.json";
-create aggregation function MAX("src/AggregationFunctions.jar",CommonAggregations,MAX,Double,[Double]);
-Func(){
-   var c = select MAX(id) from clubs where city.country.region in ("Asia","Africa");
-    print(c);}
+create aggregation function MAX("src/AggregationFunctions.jar",CommonAggregations,MAX,Double,[Double])
+create aggregation function AVG("src/AggregationFunctions.jar",CommonAggregations,AVG,Double,[Double])
+create aggregation function COUNT("src/AggregationFunctions.jar",CommonAggregations,COUNT,Integer,[Double]);
+
+create table songs(initials String, track_id String, artist_name String , title String, loudness double , tempo double , time_signature double  , key double  ,mode double ,duration double , year double ) type = "csv"  path= "src/Data/songs.csv"
+create table clubs (id double , name String, city city) type="json" path="src/Data/clubs.json"
+create table countries(id double  , name String, code String, post_code String, region String) type="json"  path= "src/Data/countries.json";
+
+
+fn()
+{
+  var cl = select COUNT(*), AVG(duration) from songs inner join countries on songs.key = countries.id;
+     print(cl);
+}

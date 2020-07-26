@@ -268,6 +268,7 @@ public class CodeGeneration {
 
     public ArrayList<Column> returnTableFlatColumn(Type typeclass){
         ArrayList<Column> columnList = new ArrayList<>();
+        if(typeclass.getName() != null)
         if(typeclass.getName().contains("_AGG")){
             return columnList;
         }
@@ -839,9 +840,10 @@ public class CodeGeneration {
             return str;
     }
 
+
     public String readFileCsvFunction(){
         String str = "readCsvFile(className,columns,tablePath)::=<<" +
-                "public List\\<<className>\\> readCsvFile() throws IOException" +
+                "public List\\<<className>\\> readCsvFile() "+throwException()+"" +
                 "{<\\n><\\t>" +
                 "<if(tablePath)>" +
                 "List\\<<className>\\> result = new ArrayList\\<>(); <\\n><\\t>" +
@@ -853,13 +855,16 @@ public class CodeGeneration {
                 "{<\\n><\\t>" +
                 " String row; <\\n><\\t>" +
                 "<className> classname = new <className>();<\\n><\\t>" +
-                "CSVParser csvParser = new CSVParser(csvReader, CSVFormat.DEFAULT.withHeader(" +
+                "CSVParser csvParser = new CSVParser(csvReader, CSVFor" +
+                "mat.DEFAULT.withHeader(" +
                 "<columns:{col | <if(col.LastColumn)> \"<col.column_name>\" <else> \"<col.column_name>\", <endif>  }>).withIgnoreHeaderCase().withTrim());<\\n><\\t>" +
                 " for (CSVRecord csvRecord: csvParser)<\\n><\\t>" +
                 "{<\\n><\\t>" +
                 "<columns:{col | " +
                 "if(csvRecord.get(\"<col.column_name>\") != null)" +
                 "{<\\n><\\t>" +
+                "String h = csvRecord.get(\"<col.column_name>\");" +
+                "if(!h.equals( \"<col.column_name>\")){" +
                 "classname.set<col.column_name>(" +
                 "<if(col.TypeNumber)>Double.parseDouble(" +
                 "csvRecord.get(\"<col.column_name>\")));" +
@@ -872,11 +877,12 @@ public class CodeGeneration {
                 "csvRecord.get(\"<col.column_name>\"));" +
                 "<endif>" +
                 "<if(col.TypeObject)><col.column_name>);<endif>" +
+                "\\}" +
                 "<\\n><\\t>" +
                 "\\}<\\n><\\t>" +
                 "}>" +
+                " result.add((<className>) classname.clone());;<\\n><\\t>" +
                 "}<\\n><\\t>" +
-                " result.add(classname);<\\n><\\t>" +
                 "}<\\n><\\t>" +
                 "return result;" +
                 "<else>"+
@@ -1190,13 +1196,13 @@ public class CodeGeneration {
                 " <tablesInQuery:{ col| \\} }>"  +
                 "<\\t><\\t> <aggrAndColums :{ agg |" +
                "<if(agg.isCount)>" +
-               "List\\<<agg.tableName>\\> <agg.aggregationFunction.returnType>s = new ArrayList\\<>() ;<\\n>" +
-                "<\\t><\\t> <agg.tableName>.entityObject.forEach(fafa -> <agg.aggregationFunction.returnType>s.add(fafa));<\\n>" +
+               "List\\<<agg.tableName>\\> <agg.aggregationFunction.AggregationFunctionName>s = new ArrayList\\<>() ;<\\n>" +
+                "<\\t><\\t> <agg.tableName>.entityObject.forEach(fafa -> <agg.aggregationFunction.AggregationFunctionName>s.add(fafa));<\\n>" +
                "<else>" +
-                "<\\t><\\t> List\\<<agg.aggregationFunction.returnType>\\> <agg.aggregationFunction.returnType>s = new ArrayList\\<>() ;<\\n>" +
-                "<\\t><\\t> <agg.tableName>.entityObject.forEach(fofo -> <agg.aggregationFunction.returnType>s.add(fofo.<agg.columnName>));<\\n>" +
+                "<\\t><\\t> List\\<<agg.aggregationFunction.returnType>\\> <agg.aggregationFunction.AggregationFunctionName>s = new ArrayList\\<>() ;<\\n>" +
+                "<\\t><\\t> <agg.tableName>.entityObject.forEach(fofo -> <agg.aggregationFunction.AggregationFunctionName>s.add(fofo.<agg.columnName>));<\\n>" +
                "<endif>" +
-                "<\\t><\\t> _AGG<agg.aggregationFunction.MethodName> = <agg.aggregationFunction.MethodName>(<agg.aggregationFunction.returnType>s);<\\n>" +
+                "<\\t><\\t> _AGG<agg.aggregationFunction.MethodName> = <agg.aggregationFunction.MethodName>(<agg.aggregationFunction.AggregationFunctionName>s);<\\n>" +
                 "<\\t><\\t> System.out.println(_AGG<agg.aggregationFunction.MethodName>); <\\n> }>" +
 //                "<\\n><\\t>Field tableField[] ="+tableName+".getClass().getFields();" +
 //                String  leftTableName;

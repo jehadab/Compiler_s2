@@ -1,5 +1,5 @@
 package Java;
- import Java.SqlGenerated.TableClasses.clubs_AGGMAX; import Java.SqlGenerated.TableClasses.clubs;   
+ import Java.SqlGenerated.TableClasses._AGGCOUNT_AGGAVG; import Java.SqlGenerated.TableClasses.songs; import Java.SqlGenerated.TableClasses.clubs; import Java.SqlGenerated.TableClasses.countries;   
  
 import java.util.List;
 import org.apache.commons.csv.CSVFormat;
@@ -30,11 +30,15 @@ import java.util.HashSet;
 import java.util.Set;
  public class SqlMain { 
 	public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException { 
+ 	 songs tablesongs = new songs(); 
+	 tablesongs.load(); 
  	 clubs tableclubs = new clubs(); 
-	 tableclubs.load();  Func(); }
-  private static void Func()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{
-  clubs_AGGMAX c = new clubs_AGGMAX();
-  c.load();
+	 tableclubs.load(); 
+ 	 countries tablecountries = new countries(); 
+	 tablecountries.load();  fn(); }
+  private static void fn()throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, MalformedURLException ,CloneNotSupportedException, IOException{
+  _AGGCOUNT_AGGAVG cl = new _AGGCOUNT_AGGAVG();
+  cl.load();
         
  	}
  }
